@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPRA - Programação e Robótica</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <h1>EPRA</h1>
+                <span>Programação de Computadores e Robótica com Arduino</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#inicio">Início</a></li>
+                <li><a href="#sobre">Sobre</a></li>
+                <li><a href="#tutoriais">Tutoriais</a></li>
+                <li><a href="#desafios">Desafios</a></li>
+                <li><a href="#biblioteca">Biblioteca</a></li>
+                <li><a href="#cursos">Cursos</a></li>
+                <li><a href="#portfolio">Portfólio</a></li>
+                <li><a href="#impacto">Impacto</a></li> <li><a href="#oportunidades" class="btn-nav">Vagas</a></li>
+            </ul>
+            <div class="menu-toggle" id="mobile-menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <header id="inicio" class="hero">
+        <div class="container hero-content">
+            <div class="hero-text">
+                <span class="badge">Projeto de Extensão Universitária</span>
+                <h1>EPRA</h1>
+                <p>Ensino da Programação de Computadores e Robótica com Arduino Extensão em Programação, Robótica e Arquitetura de Computadores</p>
+                <br>
+                <p>Democratizando o conhecimento em tecnologia através de cursos práticos, tutoriais e projetos com Arduino, robótica e muito mais.</p>
+                <div class="hero-buttons">
+                    <a href="#cursos" class="btn btn-primary">Ver Cursos</a>
+                    <a href="#tutoriais" class="btn btn-outline">Explorar Tutoriais</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="images/turmaepra.jpeg" alt="Estudantes no curso do EPRA" class="hero-img"> 
+            </div>
+        </div>
+        
+        <section class="pillars-section">
+    <div class="container">
+        <div class="pillars-grid">
+            
+            <div class="pillar-card">
+                <div class="pillar-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="16 18 22 12 16 6"></polyline>
+                        <polyline points="8 6 2 12 8 18"></polyline>
+                    </svg>
+                </div>
+                <h3>Programação</h3>
+            </div>
+
+            <div class="pillar-card">
+                <div class="pillar-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                        <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                        <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                        <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                    </svg>
+                </div>
+                <h3>Arduíno & IoT</h3>
+            </div>
+
+            <div class="pillar-card">
+                <div class="pillar-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                        <circle cx="12" cy="5" r="2"></circle>
+                        <path d="M12 7v4"></path>
+                        <line x1="8" y1="16" x2="8" y2="16"></line>
+                        <line x1="16" y1="16" x2="16" y2="16"></line>
+                    </svg>
+                </div>
+                <h3>Robótica</h3>
+            </div>
+
+        </div>
+    </div>
+</section>
+    </header>
+
+    <section id="sobre" class="section-light">
+        <div class="container">
+            <div class="section-title">
+                <h2>Sobre o EPRA</h2>
+                <p>O EPRA (Projeto Arduino) é um projeto de extensão da Universidade Federal do Ceará, campus Russas, que tem como objetivo principal levar a 
+                    programação de computadores e a robótica com Arduino às instituições de ensino médio da região de Russas. Em meio a um contexto de pandemia 
+                    e isolamento social em 2020, a equipe do EPRA criou este site para divulgar cursos e outros projetos que envolvam a área de tecnologia, visando levar o ensino da computação ao maior número de pessoas possível.</p>
+            </div>
+            <div class="mission-box">
+                <h3>Nossa Missão</h3>
+                <p>Capacitar pessoas através do ensino de tecnologias emergentes, proporcionando conhecimentos práticos em programação, robótica e arquitetura de computadores que possam transformar vidas e abrir portas no mercado de trabalho.</p>
+                <br>
+                <p>Desde nossa fundação, já formamos centenas de alunos e impactamos dezenas de escolas e instituições, levando o conhecimento em tecnologia para quem mais precisa.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="tutoriais" class="section-white">
+    <div class="container">
+        <div class="section-title">
+            <h2>Tutoriais & Mão na Massa</h2>
+            <p>Explore nossos guias passo a passo para dominar as ferramentas mais utilizadas na robótica e programação.</p>
+        </div>
+        <div class="grid-3">
+            <div class="card">
+                <img src="images/tutorial-tinkercad.jpg" alt="Interface do TinkerCAD" class="card-img">
+                <div class="card-body">
+                    <span class="tag">Simulação</span>
+                    <h4>Primeiros Passos no TinkerCAD</h4>
+                    <p>Aprenda a simular seus primeiros circuitos com Arduino sem precisar de componentes físicos.</p>
+                    <a href="#" class="link-arrow">Acessar Tutorial ></a>
+                </div>
+            </div>
+
+            <div class="card">
+                <img src="images/tutorial-cpp.jpg" alt="Código C++ na tela" class="card-img">
+                <div class="card-body">
+                    <span class="tag">Programação</span>
+                    <h4>Lógica de Programação em C++</h4>
+                    <p>Entenda a sintaxe e a lógica por trás dos códigos que dão vida aos seus projetos de hardware.</p>
+                    <a href="#" class="link-arrow">Acessar Tutorial ></a>
+                </div>
+            </div>
+
+            <div class="card">
+                <img src="images/tutorial-eletronica.jpg" alt="Componentes eletrônicos" class="card-img">
+                <div class="card-body">
+                    <span class="tag">Básico</span>
+                    <h4>Eletrônica Básica para Robótica</h4>
+                    <p>Conheça os componentes fundamentais: resistores, leds, potenciômetros e muito mais.</p>
+                    <a href="#" class="link-arrow">Acessar Tutorial ></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </section>
+
+    <section id="desafios" class="section-light">
+    <div class="container">
+        <div class="section-title">
+            <h2>Desafios EPRA</h2>
+            <p>Participe, teste seus conhecimentos e ganhe destaque na comunidade.</p>
+        </div>
+
+        <div class="challenge-box-yellow">
+            <span class="badge-gold">Desafio Atual</span>
+            <h3>Desafio de Dezembro: Sistema de Alarme Inteligente</h3>
+            <p>Crie um sistema de alarme completo utilizando Arduino que detecte movimento através de sensores PIR e envie notificações visuais e sonoras.</p>
+            
+            <div class="challenge-meta">
+                <span>📅 Prazo: 31 Dez 2025</span>
+                <span>👥 Participantes: 42</span>
+            </div>
+            
+            <button class="btn btn-primary">Participar do Desafio</button>
+        </div>
+
+    </div>
+    </section>
+
+    <section id="biblioteca" class="section-white">
+        <div class="container">
+            <h2 class="section-header">Biblioteca de Códigos & Materiais</h2>
+            <p class="full-width" style="margin-bottom: 30px; color: #666;">
+                Acesse nosso repositório completo de códigos-fonte, bibliotecas úteis e todo material de apoio dos nossos cursos.
+            </p>
+            
+            <div class="custom-tabs-wrapper filter-library">
+                <div class="tabs-pill-bg">
+                    <button class="tab-pill active" data-filter="codigos">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                        Códigos
+                    </button>
+                    <button class="tab-pill" data-filter="bibliotecas">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                        Bibliotecas
+                    </button>
+                    <button class="tab-pill" data-filter="materiais">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                        Materiais de Curso
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid-2 library-grid">
+                
+                <div class="lib-card" data-category="codigos">
+                    <div class="lib-card-top">
+                        <span class="tag-cat">Básico</span>
+                        <svg class="icon-top" fill="none" stroke="#007bff" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <h4>LED Blink - Básico</h4>
+                    <p>Exemplo básico de como fazer um LED piscar com Arduino.</p>
+                    <div class="lib-card-footer">
+                        <span class="meta-info">⬇ 523 | C++</span>
+                        <button class="btn-lib-download">Download</button>
+                    </div>
+                </div>
+
+                <div class="lib-card" data-category="codigos">
+                    <div class="lib-card-top">
+                        <span class="tag-cat">Sensores</span>
+                        <svg class="icon-top" fill="none" stroke="#007bff" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <h4>Sensor de Temperatura DHT11</h4>
+                    <p>Código para leitura de temperatura e umidade com DHT11.</p>
+                    <div class="lib-card-footer">
+                        <span class="meta-info">⬇ 412 | C++</span>
+                        <button class="btn-lib-download">Download</button>
+                    </div>
+                </div>
+
+                <div class="lib-card" data-category="codigos">
+                    <div class="lib-card-top">
+                        <span class="tag-cat">Motores</span>
+                        <svg class="icon-top" fill="none" stroke="#007bff" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <h4>Servo Motor Control</h4>
+                    <p>Controle de servo motores com diferentes ângulos.</p>
+                    <div class="lib-card-footer">
+                        <span class="meta-info">⬇ 389 | C++</span>
+                        <button class="btn-lib-download">Download</button>
+                    </div>
+                </div>
+                
+                 <div class="lib-card" data-category="codigos">
+                    <div class="lib-card-top">
+                        <span class="tag-cat">Displays</span>
+                        <svg class="icon-top" fill="none" stroke="#007bff" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <h4>Display LCD 16x2</h4>
+                    <p>Exibir texto em display LCD com interface I2C.</p>
+                    <div class="lib-card-footer">
+                        <span class="meta-info">⬇ 456 | C++</span>
+                        <button class="btn-lib-download">Download</button>
+                    </div>
+                </div>
+
+                <div class="lib-card hidden" data-category="bibliotecas">
+                    <div class="lib-card-top">
+                        <span class="tag-cat-outline">v1.2.0</span>
+                        <svg class="icon-top-folder" fill="none" stroke="#a855f7" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                    </div>
+                    <h4>Servo.h</h4>
+                    <p>Biblioteca padrão para controle de servo motores.</p>
+                    <div class="lib-card-footer">
+                        <span class="meta-info">⬇ 892 downloads</span>
+                        <button class="btn-lib-download dark">Baixar</button>
+                    </div>
+                </div>
+
+                <div class="lib-card hidden" data-category="bibliotecas">
+                    <div class="lib-card-top">
+                        <span class="tag-cat-outline">v1.4.4</span>
+                        <svg class="icon-top-folder" fill="none" stroke="#a855f7" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                    </div>
+                    <h4>DHT Sensor Library</h4>
+                    <p>Leitura de sensores DHT11 e DHT22.</p>
+                    <div class="lib-card-footer">
+                        <span class="meta-info">⬇ 756 downloads</span>
+                        <button class="btn-lib-download dark">Baixar</button>
+                    </div>
+                </div>
+                
+                 <div class="lib-card hidden" data-category="bibliotecas">
+                    <div class="lib-card-top">
+                        <span class="tag-cat-outline">v1.1.2</span>
+                        <svg class="icon-top-folder" fill="none" stroke="#a855f7" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                    </div>
+                    <h4>LiquidCrystal I2C</h4>
+                    <p>Controle de displays LCD via I2C.</p>
+                    <div class="lib-card-footer">
+                        <span class="meta-info">⬇ 634 downloads</span>
+                        <button class="btn-lib-download dark">Baixar</button>
+                    </div>
+                </div>
+
+                <div class="lib-card hidden" data-category="bibliotecas">
+                    <div class="lib-card-top">
+                        <span class="tag-cat-outline">v1.9.6</span>
+                        <svg class="icon-top-folder" fill="none" stroke="#a855f7" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                    </div>
+                    <h4>NewPing</h4>
+                    <p>Biblioteca avançada para sensores ultrassônicos.</p>
+                    <div class="lib-card-footer">
+                        <span class="meta-info">⬇ 521 downloads</span>
+                        <button class="btn-lib-download dark">Baixar</button>
+                    </div>
+                </div>
+
+                <div class="lib-card hidden card-material" data-category="materiais">
+                    <div class="lib-card-top">
+                        <svg class="icon-material" fill="none" stroke="#28a745" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <span class="star-icon">⭐</span>
+                    </div>
+                    <h4>Arduino Básico 2025</h4>
+                    <p>Material completo do curso de Arduino para iniciantes.</p>
+                    <div class="material-meta">
+                        <span>12 arquivos</span>
+                        <span>25 MB total</span>
+                    </div>
+                    <button class="btn-lib-download full-dark">📥 Baixar Pacote</button>
+                </div>
+
+                 <div class="lib-card hidden card-material" data-category="materiais">
+                    <div class="lib-card-top">
+                        <svg class="icon-material" fill="none" stroke="#28a745" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <span class="star-icon">⭐</span>
+                    </div>
+                    <h4>Python para Robótica 2024</h4>
+                    <p>Slides, códigos e exercícios do curso de Python.</p>
+                     <div class="material-meta">
+                        <span>18 arquivos</span>
+                        <span>42 MB total</span>
+                    </div>
+                    <button class="btn-lib-download full-dark">📥 Baixar Pacote</button>
+                </div>
+
+                 <div class="lib-card hidden card-material" data-category="materiais">
+                    <div class="lib-card-top">
+                        <svg class="icon-material" fill="none" stroke="#28a745" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <span class="star-icon">⭐</span>
+                    </div>
+                    <h4>Arquitetura de Computadores</h4>
+                    <p>Material teórico e prático sobre arquitetura.</p>
+                     <div class="material-meta">
+                        <span>15 arquivos</span>
+                        <span>38 MB total</span>
+                    </div>
+                    <button class="btn-lib-download full-dark">📥 Baixar Pacote</button>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="cursos" class="section-light">
+        <div class="container">
+            <h2 class="section-header">Cursos EPRA</h2>
+            <p style="text-align: center; margin-bottom: 30px; color: #666;">
+                Cursos práticos e gratuitos de programação, robótica e eletrônica. Confira os próximos cursos e nosso histórico desde 2018.
+            </p>
+
+            <div class="custom-tabs-wrapper filter-courses">
+                <div class="tabs-pill-bg">
+                    <button class="tab-pill active" data-filter="proximos">Próximos Cursos</button>
+                    <button class="tab-pill" data-filter="historico">Arquivo Histórico</button>
+                </div>
+            </div>
+
+            <div class="grid-2 courses-grid">
+                <div class="course-card" data-category="proximos">
+                    <div class="course-header">
+                        <span class="status-green">Inscrições Abertas</span>
+                        <span class="slots">8 vagas disponíveis</span>
+                    </div>
+                    <h3>Arduino para Iniciantes</h3>
+                    <p>Aprenda os fundamentos de Arduino e eletrônica básica através de projetos práticos.</p>
+                    <ul class="course-info">
+                        <li>📅 Início: 15 de Janeiro, 2026</li>
+                        <li>🕒 4 semanas • Segundas e Quartas, 18h-20h</li>
+                        <li>📍 Laboratório 3 - Bloco 1A</li>
+                    </ul>
+                    <div style="margin-top: 20px; display: flex; gap: 10px;">
+                        <button class="btn btn-dark" style="flex: 1;">Inscrever-se</button>
+                        <button class="btn btn-outline">Mais Detalhes</button>
+                    </div>
+                </div>
+
+                <div class="course-card" data-category="proximos">
+                    <div class="course-header">
+                        <span class="status-green">Inscrições Abertas</span>
+                        <span class="slots">12 vagas disponíveis</span>
+                    </div>
+                    <h3>Python para Robótica</h3>
+                    <p>Programação em Python aplicada ao controle de robôs e automação.</p>
+                    <ul class="course-info">
+                        <li>📅 Início: 22 de Janeiro, 2026</li>
+                        <li>🕒 6 semanas • Terças e Quintas, 18h-20h</li>
+                        <li>📍 Lab. de Robótica - Bloco 1A</li>
+                    </ul>
+                    <div style="margin-top: 20px; display: flex; gap: 10px;">
+                        <button class="btn btn-dark" style="flex: 1;">Inscrever-se</button>
+                        <button class="btn btn-outline">Mais Detalhes</button>
+                    </div>
+                </div>
+
+                <div class="course-card" data-category="proximos">
+                    <div class="course-header">
+                        <span class="status-green">Inscrições Abertas</span>
+                        <span class="slots">15 vagas disponíveis</span>
+                    </div>
+                    <h3>IoT com ESP32</h3>
+                    <p>Desenvolva projetos de Internet das Coisas usando ESP32 e plataformas cloud.</p>
+                    <ul class="course-info">
+                        <li>📅 Início: 05 de Fevereiro, 2026</li>
+                        <li>🕒 5 semanas • Sábados, 09h-12h</li>
+                        <li>📍 Online (Ao vivo)</li>
+                    </ul>
+                    <div style="margin-top: 20px; display: flex; gap: 10px;">
+                        <button class="btn btn-dark" style="flex: 1;">Inscrever-se</button>
+                        <button class="btn btn-outline">Mais Detalhes</button>
+                    </div>
+                </div>
+
+                <div class="course-card archive-card hidden" data-category="historico">
+                    <div class="archive-header">
+                        <h2 class="archive-year">2025</h2>
+                        <span class="tag-sm">8 cursos</span>
+                        <span class="tag-sm">245 alunos</span>
+                    </div>
+                    <div class="archive-body">
+                        <h4>Cursos focados em IoT e automação</h4>
+                    </div>
+                    <a href="#" class="archive-link">Ver Detalhes ></a>
+                </div>
+
+                <div class="course-card archive-card hidden" data-category="historico">
+                    <div class="archive-header">
+                        <h2 class="archive-year">2024</h2>
+                        <span class="tag-sm">6 cursos</span>
+                        <span class="tag-sm">198 alunos</span>
+                    </div>
+                    <div class="archive-body">
+                        <h4>Introdução à robótica educacional</h4>
+                    </div>
+                    <a href="#" class="archive-link">Ver Detalhes ></a>
+                </div>
+
+                <div class="course-card archive-card hidden" data-category="historico">
+                    <div class="archive-header">
+                        <h2 class="archive-year">2023</h2>
+                        <span class="tag-sm">5 cursos</span>
+                        <span class="tag-sm">156 alunos</span>
+                    </div>
+                    <div class="archive-body">
+                        <h4>Arduino e programação básica</h4>
+                    </div>
+                    <a href="#" class="archive-link">Ver Detalhes ></a>
+                </div>
+
+                <div class="course-card archive-card hidden" data-category="historico">
+                    <div class="archive-header">
+                        <h2 class="archive-year">2022</h2>
+                        <span class="tag-sm">4 cursos</span>
+                        <span class="tag-sm">132 alunos</span>
+                    </div>
+                    <div class="archive-body">
+                        <h4>Primeiros cursos de extensão</h4>
+                    </div>
+                    <a href="#" class="archive-link">Ver Detalhes ></a>
+                </div>
+
+                 <div class="course-card archive-card hidden" data-category="historico">
+                    <div class="archive-header">
+                        <h2 class="archive-year">2021</h2>
+                        <span class="tag-sm">3 cursos</span>
+                        <span class="tag-sm">89 alunos</span>
+                    </div>
+                    <div class="archive-body">
+                        <h4>Fase piloto do projeto</h4>
+                    </div>
+                    <a href="#" class="archive-link">Ver Detalhes ></a>
+                </div>
+            </div>
+            
+            <div style="margin-top: 40px; background: #e3f2fd; padding: 30px; border-radius: 10px; display: flex; align-items: center; gap: 20px;">
+                <div style="background: var(--primary-blue); color: white; padding: 15px; border-radius: 10px; font-size: 1.5rem;">📅</div>
+                <div style="flex: 1;">
+                    <h4 style="margin-bottom: 5px; color: var(--dark-blue);">Quer ser notificado sobre novos cursos?</h4>
+                    <p style="font-size: 0.9rem; color: #555;">Cadastre-se em nossa lista de interesse e receba avisos sobre abertura de novas turmas.</p>
+                </div>
+                <button class="btn btn-dark">Cadastrar Interesse</button>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="portfolio" class="section-white">
+        <div class="container">
+            <h2 class="section-header">Portfólio de Projetos</h2>
+            <p style="text-align: center; margin-bottom: 40px; color: #666; max-width: 700px; margin-left: auto; margin-right: auto;">
+                Conheça os incríveis projetos desenvolvidos pelos nossos alunos. Cada projeto representa horas de aprendizado, dedicação e criatividade.
+            </p>
+
+            <div class="grid-3">
+                
+                <div class="project-card">
+                    <div class="project-img-wrapper">
+                        <img src="images/projeto-robo.jpg" alt="Robô seguidor de linha" class="project-img">
+                        
+                        <span class="cat-badge">Robótica</span>
+                        <span class="media-badge video">▶ Video</span>
+                    </div>
+                    <div class="project-body">
+                        <h4>Robô Seguidor de Linha Autônomo</h4>
+                        <span class="project-meta">Turma Arduino Avançado 2025</span>
+                        <p class="project-desc">Robô móvel que segue linhas pretas usando sensores infravermelhos e controle PID para navegação precisa.</p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-img-wrapper">
+                        <img src="images/projeto-robo.jpg" alt="Robô seguidor de linha" class="project-img">
+                        
+                        <span class="cat-badge">IoT</span>
+                        <span class="media-badge photo">📷 Foto</span>
+                    </div>
+                    <div class="project-body">
+                        <h4>Estação Meteorológica IoT</h4>
+                        <span class="project-meta">Projeto Final - Python para Robótica</span>
+                        <p class="project-desc">Sistema completo de monitoramento climático com dados enviados para plataforma cloud e dashboard web.</p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-img-wrapper">
+                        <img src="images/projeto-robo.jpg" alt="Robô seguidor de linha" class="project-img">
+
+                        <span class="cat-badge">Automação</span>
+                        <span class="media-badge photo">📷 Foto</span>
+                    </div>
+                    <div class="project-body">
+                        <h4>Sistema de Irrigação Automatizado</h4>
+                        <span class="project-meta">Turma Arduino Intermediário 2024</span>
+                        <p class="project-desc">Controle automático de irrigação baseado em umidade do solo e previsão do tempo via API.</p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-img-wrapper">
+                        <img src="images/projeto-robo.jpg" alt="Robô seguidor de linha" class="project-img">
+
+                        <span class="cat-badge">Robótica</span>
+                        <span class="media-badge video">▶ Video</span>
+                    </div>
+                    <div class="project-body">
+                        <h4>Braço Robótico Controlado</h4>
+                        <span class="project-meta">Workshop de Robótica 2025</span>
+                        <p class="project-desc">Braço robótico de 4 graus de liberdade controlado por joystick analógico e interface serial.</p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-img-wrapper">
+                        <img src="images/projeto-robo.jpg" alt="Robô seguidor de linha" class="project-img">
+
+                        <span class="cat-badge">Eletrônica</span>
+                        <span class="media-badge video">▶ Video</span>
+                    </div>
+                    <div class="project-body">
+                        <h4>Cubo de LEDs 8x8x8</h4>
+                        <span class="project-meta">Desafio EPRA - Setembro 2024</span>
+                        <p class="project-desc">Cubo tridimensional de 512 LEDs com animações programáveis e controle via bluetooth.</p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="project-img-wrapper">
+                        <img src="images/projeto-robo.jpg" alt="Robô seguidor de linha" class="project-img">
+                        
+                        <span class="cat-badge">Automação</span>
+                        <span class="media-badge photo">📷 Foto</span>
+                    </div>
+                    <div class="project-body">
+                        <h4>Sistema de Segurança Residencial</h4>
+                        <span class="project-meta">Turma Arduino Avançado 2024</span>
+                        <p class="project-desc">Sistema completo com múltiplos sensores, alarme sonoro, notificações por SMS e registro em cartão SD.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="impacto" class="section-light">
+    <div class="container">
+        
+        <div class="section-title">
+            <h2>Nossos Resultados & Impacto</h2>
+            <p>Números que refletem nosso compromisso em transformar a educação através da tecnologia e inovação.</p>
+        </div>
+
+        <div class="impact-grid">
+            
+            <div class="impact-card">
+                <div class="impact-icon">🎓</div>
+                <h3>X</h3>
+                <p>Alunos Impactados</p>
+            </div>
+
+            <div class="impact-card">
+                <div class="impact-icon">🏫</div>
+                <h3>Y</h3>
+                <p>Escolas Parceiras</p>
+            </div>
+
+            <div class="impact-card">
+                <div class="impact-icon">📈</div>
+                <h3>X</h3>
+                <p>Projetos Desenvolvidos</p>
+            </div>
+        </div>
+    </div>
+<br>
+        <div class="container success-stories-container">
+            <h3 class="subsection-header">Histórias de Sucesso</h3>
+            <p class="subsection-desc">Veja o que nossos alunos e parceiros têm a dizer.</p>
+            
+            <div class="grid-3 stories-grid">
+                <div class="story-card">
+                    <img src="images/avatar-ana.jpg" alt="Foto de João Lucas" class="story-avatar">
+                    <p class="story-text">"Participar do EPRA em 2024 foi uma experiência inovadora e gratificante. Ensinar Arduino e o funcionamento dos kits Lego para alunos do ensino médio permitiu que muitos despertassem o interesse pela tecnologia. A introdução à programação nesse nível é essencial, pois amplia as chances de os alunos seguirem carreiras na área. Foi incrível ver alguns decidirem tentar cursos na UFC, motivados pelas aulas dinâmicas e interativas. Além de ensinar programação, foi enriquecedor compartilhar conhecimento e acompanhar o desenvolvimento dos alunos ao longo do curso. O projeto proporciona aprendizado técnico tanto para os estudantes quanto para quem ensina."</p>
+                    <div class="story-author">
+                        <strong>João Lucas</strong>
+                        <span>Aluno EPRA</span>
+                    </div>
+                </div>
+
+                <div class="story-card">
+                    <img src="images/avatar-ana.jpg" alt="Foto de Ylana Torres" class="story-avatar">
+                    <p class="story-text">"Fazer parte do EPRA me trouxe experiências únicas que nunca esquecerei, o projeto busca incluir e dar oportunidade no mundo da programação de forma dinâmica onde compartilhar nossos conhecimentos e acompanhar o desenvolvimento dos alunos ao decorrer do curso é algo gratificante e enriquecedor. Durante minha jornada como membro do EPRA, pude testemunhar o impacto positivo que a educação em programação pode ter na vida dos estudantes. Através de aulas interativas e práticas, fomos capazes de despertar o interesse pela programação em diversos jovens. Sou grata por ter tido a chance de contribuir para a formação de novos programadores e por ter aprendido tanto com eles. O projeto é um exemplo inspirador de como a educação pode ser transformadora e empoderadora."</p>
+                    <div class="story-author">
+                        <strong>Ylana Torres</strong>
+                        <span>Instrutora</span>
+                    </div>
+                </div>
+
+                <div class="story-card">
+                    <img src="images/avatar-ana.jpg" alt="Foto de Ana Silva" class="story-avatar">
+                    <p class="story-text">"XXXXXXXXX"</p>
+                    <div class="story-author">
+                        <strong>Prof. XXXXXX</strong>
+                        <span>Escola XXXXXX</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="oportunidades" class="section-white">
+        <div class="container">
+            <h2 class="section-header">Vagas e Oportunidades</h2>
+            <p style="text-align: center; margin-bottom: 50px; color: #666; max-width: 700px; margin-left: auto; margin-right: auto;">
+                Faça parte do time EPRA. Buscamos alunos engajados para transformar o ensino de tecnologia.
+            </p>
+
+            <div class="grid-3">
+                
+                <div class="job-card">
+                    <div class="job-card-inner">
+                        <div class="job-top">
+                            <span class="job-badge scholarship">Bolsa Remunerada</span>
+                            <span class="job-location">📍 Lab 3 - Tarde</span>
+                        </div>
+                        <h3>Monitor de Robótica</h3>
+                        <p class="job-desc">Auxiliar nas aulas práticas de Arduino e organizar os kits de componentes.</p>
+                        
+                        <div class="job-details">
+                            <p><strong>Requisito:</strong> Domínio de C++ básico</p>
+                            <p><strong>Carga:</strong> 12h/semana</p>
+                        </div>
+
+                        <button class="btn btn-outline full-width">Inscrever-se</button>
+                    </div>
+                </div>
+
+                <div class="job-card">
+                    <div class="job-card-inner">
+                        <div class="job-top">
+                            <span class="job-badge volunteer">Voluntariado</span>
+                            <span class="job-location">🏠 Híbrido</span>
+                        </div>
+                        <h3>Criador de Conteúdo</h3>
+                        <p class="job-desc">Escrita de tutoriais para o blog e roteiros de vídeo para o canal.</p>
+                        
+                        <div class="job-details">
+                            <p><strong>Requisito:</strong> Boa escrita técnica</p>
+                            <p><strong>Carga:</strong> Flexível</p>
+                        </div>
+
+                        <button class="btn btn-outline full-width">Inscrever-se</button>
+                    </div>
+                </div>
+
+                <div class="job-card">
+                    <div class="job-card-inner">
+                        <div class="job-top">
+                            <span class="job-badge internship">Estágio Web</span>
+                            <span class="job-location">💻 Remoto</span>
+                        </div>
+                        <h3>Dev Front-end</h3>
+                        <p class="job-desc">Manutenção da plataforma do projeto. Ótimo para portfólio.</p>
+                        
+                        <div class="job-details">
+                            <p><strong>Requisito:</strong> HTML/CSS/JS</p>
+                            <p><strong>Carga:</strong> 20h/semana</p>
+                        </div>
+
+                        <button class="btn btn-outline full-width">Inscrever-se</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="general-apply-box">
+                <div class="content">
+                    <h3>Não encontrou a vaga ideal?</h3>
+                    <p>Sempre buscamos novos talentos. Envie seu currículo para nosso banco.</p>
+                </div>
+                <button class="btn btn-dark pulse-animation">Enviar Currículo</button>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        <div class="container footer-content">
+            
+            <div class="footer-section about">
+                <h2>EPRA</h2>
+                <p>
+                    Democratizando o conhecimento em tecnologia através da Robótica e Programação.
+                    Um projeto de extensão da UFC - Campus Russas.
+                </p>
+    
+            </div>
+
+            <div class="footer-section links">
+                <h4>Navegação</h4>
+                <ul>
+                    <li><a href="#inicio">Início</a></li>
+                    <li><a href="#sobre">Sobre o Projeto</a></li>
+                    <li><a href="#tutoriais">Tutoriais & Aulas</a></li>
+                    <li><a href="#cursos">Cursos Disponíveis</a></li>
+                    <li><a href="#biblioteca">Biblioteca</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section contact">
+                <h4>Contato</h4>
+                <ul>
+                    <li>
+                        <i class="fas fa-envelope"></i> 
+                        <span>epra@ufc.br</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-map-marker-alt"></i> 
+                        <span>Campus da UFC<br>Russas, CE</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-clock"></i> 
+                        <span>Seg - Sex: 08:00 - 17:30</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="footer-section social-media">
+                <h4>Redes Sociais</h4>
+                <p>
+                    Siga-nos para ficar por dentro das novidades e eventos!
+                </p>
+                <div class="social-icons">
+                    <a href="https://www.instagram.com/epraufc/" target="_blank" aria-label="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://linkedin.com/LINK" target="_blank" aria-label="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="https://www.youtube.com/channel/UCBW98Hnabj2KKUtEHVS4pkA" target="_blank" aria-label="YouTube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a href="https://github.com/LINK" target="_blank" aria-label="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 EPRA - Todos os direitos reservados.</p>
+            <p class="designer">Desenvolvido com 💙 pela equipe de extensão</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
