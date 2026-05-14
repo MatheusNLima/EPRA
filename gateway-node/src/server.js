@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const cursoRoutes = require('./routes/cursoRoutes');
+const vagaRoutes = require('./routes/vagaRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,6 +14,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/cursos', cursoRoutes);
+app.use('/api/vagas', vagaRoutes);
 
 app.listen(PORT, () => {
     console.log(`🚀 Gateway Node.js rodando na porta ${PORT}`);

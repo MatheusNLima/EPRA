@@ -42,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Busca os dados da API e injeta no HTML
     async function carregarCursos() {
         try {
             const response = await fetch('http://localhost:3000/api/cursos');
@@ -51,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const grid = document.querySelector('.courses-grid');
             if (!grid) return;
             
-            grid.innerHTML = ''; // Limpa os cards fixos do HTML
+            grid.innerHTML = '';
 
             cursos.forEach(curso => {
                 if (curso.categoria === 'proximos') {
@@ -75,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     `;
                 } else if (curso.categoria === 'historico') {
-                    // Adiciona a classe 'hidden' por padrão para a aba não ativa
                     grid.innerHTML += `
                         <div class="course-card archive-card hidden" data-category="historico">
                             <div class="archive-header">
@@ -92,15 +90,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // Reaplica a lógica de abas após injetar os novos elementos
             setupFilter('.filter-courses .tab-pill', '.courses-grid .course-card');
         } catch (error) {
             console.error('Erro ao buscar cursos na API:', error);
         }
     }
 
+    async function carregarVagas() {
+        try {
+            const response = await fetch('http://localhost:3000/api/vagas');
+            const vagas = await response.json();
+            
+            const grid = document.querySelector('#oportunidades .grid-3');
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+
+            vagas.forEach(vaga => {
+                grid.innerHTML += `
+                    <div class="job-card">
+                        <div class="job-card-inner">
+                            <div class="job-top">
+                                <span class="job-badge ${vaga.classeBadge}">${vaga.tipo}</span>
+                                <span class="job-location">📍 ${vaga.local}</span>
+                            </div>
+                            <h3>${vaga.titulo}</h3>
+                            <p class="job-desc">${vaga.descricao}</p>
+                            
+                            <div class="job-details">
+                                <p><strong>Requisito:</strong> ${vaga.requisito}</p>
+                                <p><strong>Carga:</strong> ${vaga.carga}</p>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #666; margin-bottom: 15px;">
+                                <span>👥 ${vaga.qtd_vagas} vagas</span>
+                                <span>📅 ${vaga.prazo}</span>
+                            </div>
+
+                            <button class="btn btn-outline full-width mt-auto">Candidatar-se</button>
+                        </div>
+                    </div>
+                `;
+            });
+        } catch (error) {
+            console.error('Erro ao buscar vagas:', error);
+        }
+    }
+
     setupFilter('.filter-library .tab-pill', '.library-grid .lib-card');
     
-    // Inicia a requisição à API
     carregarCursos();
+    carregarVagas();
 });
