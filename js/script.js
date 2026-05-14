@@ -88,9 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
             setupFilter('.filter-courses .tab-pill', '.courses-grid .course-card');
-        } catch (error) {
-            console.error('Erro ao buscar cursos na API:', error);
-        }
+        } catch (error) { console.error(error); }
     }
 
     async function carregarVagas() {
@@ -124,9 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 `;
             });
-        } catch (error) {
-            console.error('Erro ao buscar vagas:', error);
-        }
+        } catch (error) { console.error(error); }
     }
 
     async function carregarMateriais() {
@@ -148,19 +144,77 @@ document.addEventListener('DOMContentLoaded', () => {
                         <h3>${mat.titulo}</h3>
                         <p>${mat.descricao}</p>
                         <span class="lib-meta">${mat.infoExtra}</span>
-                        <div style="margin-top: 15px;">
-                            ${botao}
-                        </div>
+                        <div style="margin-top: 15px;">${botao}</div>
                     </div>
                 `;
             });
             setupFilter('.filter-library .tab-pill', '.library-grid .lib-card');
-        } catch (error) {
-            console.error('Erro ao buscar materiais:', error);
-        }
+        } catch (error) { console.error(error); }
+    }
+
+    async function carregarTutoriais() {
+        try {
+            const response = await fetch('http://localhost:3000/api/tutoriais');
+            const tutoriais = await response.json();
+            const grid = document.querySelector('#tutoriais .grid-3');
+            if (!grid) return;
+
+            grid.innerHTML = '';
+            tutoriais.forEach(tut => {
+                grid.innerHTML += `
+                    <div class="tutorial-card">
+                        <div class="tutorial-content" style="padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+                            <span class="tag-sm">${tut.nivel}</span>
+                            <span class="tag-sm">${tut.tipo}</span>
+                            <h3 style="margin-top: 10px;">${tut.titulo}</h3>
+                            <a href="${tut.link}" class="btn btn-outline" style="margin-top: 15px;">Acessar</a>
+                        </div>
+                    </div>
+                `;
+            });
+        } catch (error) { console.error(error); }
+    }
+
+    async function carregarPortfolio() {
+        try {
+            const response = await fetch('http://localhost:3000/api/portfolio');
+            const portfolio = await response.json();
+            const grid = document.querySelector('#portfolio .grid-3');
+            if (!grid) return;
+
+            grid.innerHTML = '';
+            portfolio.forEach(item => {
+                grid.innerHTML += `
+                    <div class="portfolio-card" style="padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+                        <span class="media-badge" style="font-weight: bold; color: #0056b3;">${item.selo}</span>
+                        <h3 style="margin-top: 10px;">${item.titulo}</h3>
+                        <p>Autor: ${item.autor}</p>
+                        <a href="${item.link}" class="btn btn-outline" style="margin-top: 15px;">Ver Projeto</a>
+                    </div>
+                `;
+            });
+        } catch (error) { console.error(error); }
+    }
+
+    async function carregarImpacto() {
+        try {
+            const response = await fetch('http://localhost:3000/api/impacto');
+            const impacto = await response.json();
+            
+            const elEscolas = document.getElementById('num-escolas');
+            const elAlunos = document.getElementById('num-alunos');
+            const elHoras = document.getElementById('num-horas');
+
+            if (elEscolas) elEscolas.innerText = impacto.escolas_atendidas;
+            if (elAlunos) elAlunos.innerText = impacto.alunos_impactados;
+            if (elHoras) elHoras.innerText = impacto.horas_ensino;
+        } catch (error) { console.error(error); }
     }
 
     carregarCursos();
     carregarVagas();
     carregarMateriais();
+    carregarTutoriais();
+    carregarPortfolio();
+    carregarImpacto();
 });
