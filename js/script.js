@@ -46,12 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('http://localhost:3000/api/cursos');
             const cursos = await response.json();
-            
             const grid = document.querySelector('.courses-grid');
             if (!grid) return;
             
             grid.innerHTML = '';
-
             cursos.forEach(curso => {
                 if (curso.categoria === 'proximos') {
                     grid.innerHTML += `
@@ -89,7 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                 }
             });
-
             setupFilter('.filter-courses .tab-pill', '.courses-grid .course-card');
         } catch (error) {
             console.error('Erro ao buscar cursos na API:', error);
@@ -100,12 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('http://localhost:3000/api/vagas');
             const vagas = await response.json();
-            
             const grid = document.querySelector('#oportunidades .grid-3');
             if (!grid) return;
             
             grid.innerHTML = '';
-
             vagas.forEach(vaga => {
                 grid.innerHTML += `
                     <div class="job-card">
@@ -116,17 +111,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <h3>${vaga.titulo}</h3>
                             <p class="job-desc">${vaga.descricao}</p>
-                            
                             <div class="job-details">
                                 <p><strong>Requisito:</strong> ${vaga.requisito}</p>
                                 <p><strong>Carga:</strong> ${vaga.carga}</p>
                             </div>
-                            
                             <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #666; margin-bottom: 15px;">
                                 <span>👥 ${vaga.qtd_vagas} vagas</span>
                                 <span>📅 ${vaga.prazo}</span>
                             </div>
-
                             <button class="btn btn-outline full-width mt-auto">Candidatar-se</button>
                         </div>
                     </div>
@@ -137,8 +129,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    setupFilter('.filter-library .tab-pill', '.library-grid .lib-card');
-    
+    async function carregarMateriais() {
+        try {
+            const response = await fetch('http://localhost:3000/api/materiais');
+            const materiais = await response.json();
+            const grid = document.querySelector('.library-grid');
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+            materiais.forEach(mat => {
+                const botao = mat.tipoBotao === 'download' 
+                    ? `<button class="btn btn-dark">📥 Baixar Pacote</button>` 
+                    : `<button class="btn btn-outline">🔗 Acessar Repositório</button>`;
+
+                grid.innerHTML += `
+                    <div class="lib-card" data-category="${mat.categoria}">
+                        <div class="lib-icon">📁</div>
+                        <h3>${mat.titulo}</h3>
+                        <p>${mat.descricao}</p>
+                        <span class="lib-meta">${mat.infoExtra}</span>
+                        <div style="margin-top: 15px;">
+                            ${botao}
+                        </div>
+                    </div>
+                `;
+            });
+            setupFilter('.filter-library .tab-pill', '.library-grid .lib-card');
+        } catch (error) {
+            console.error('Erro ao buscar materiais:', error);
+        }
+    }
+
     carregarCursos();
     carregarVagas();
+    carregarMateriais();
 });
