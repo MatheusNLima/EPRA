@@ -7,6 +7,9 @@ const materialRoutes = require('./routes/materialRoutes');
 const tutorialRoutes = require('./routes/tutorialRoutes');
 const portfolioRoutes = require('./routes/portfolioRoutes');
 const impactoRoutes = require('./routes/impactoRoutes');
+const depoimentoRoutes = require('./routes/depoimentoRoutes');
+const desafioRoutes = require('./routes/desafioRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,6 +27,9 @@ app.use('/api/materiais', materialRoutes);
 app.use('/api/tutoriais', tutorialRoutes);
 app.use('/api/portfolio', portfolioRoutes);
 app.use('/api/impacto', impactoRoutes);
+app.use('/api/depoimentos', depoimentoRoutes);
+app.use('/api/desafios', desafioRoutes);
+app.use('/api/auth', authRoutes);
 
 app.listen(PORT, () => {
     console.log(`🚀 Gateway Node.js rodando na porta ${PORT}`);

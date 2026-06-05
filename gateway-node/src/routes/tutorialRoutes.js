@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { obterTutoriais } = require('../controllers/tutorialController');
-router.get('/', obterTutoriais);
+const { listarTutoriais } = require('../controllers/tutorialController');
+
+router.get('/', listarTutoriais);
+
 module.exports = router;

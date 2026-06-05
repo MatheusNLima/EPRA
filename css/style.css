@@ -515,3 +515,39 @@ footer {
 @media (max-width: 600px) {
     .values-grid { grid-template-columns: 1fr; }
 }
+.navbar {
+    width: 100%;
+    background: #fff;
+    padding: 15px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.nav-container {
+    max-width: 1200px; /* Alinha com o resto do conteúdo do site */
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between; /* ESSE É O COMANDO QUE SEPARA: Logo na esquerda, links na direita */
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #0056b3;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 15px; /* Espaço entre os links */
+    align-items: center;
+    margin: 0;
+}
+
+.nav-links li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 0.95rem;
+    white-space: nowrap; /* Impede que os nomes dos links fiquem um embaixo do outro */
+}
