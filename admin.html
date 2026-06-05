@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Orientador | EPRA</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body { background-color: #f4f7f6; padding-top: 80px; }
+        .navbar { position: fixed; top: 0; left: 0; width: 100%; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1000; }
+        .dashboard-container { display: flex; max-width: 1200px; margin: 0 auto; padding: 20px; gap: 30px; min-height: calc(100vh - 120px); }
+        .sidebar { width: 250px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); align-self: flex-start; }
+        .sidebar h3 { font-size: 1.1rem; color: #666; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .sidebar button { display: block; width: 100%; text-align: left; padding: 12px 15px; margin-bottom: 8px; border: none; background: transparent; cursor: pointer; border-radius: 6px; font-size: 1rem; color: #333; transition: all 0.2s; }
+        .sidebar button:hover { background: #f0f4f8; }
+        .sidebar button.active { background: #0056b3; color: white; font-weight: bold; }
+        .main-content { flex: 1; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        .header-aba { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .admin-table th, .admin-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        .admin-table th { background-color: #f8f9fa; font-weight: 600; color: #333; }
+        .admin-table tr:hover { background-color: #f9f9f9; }
+        .btn-sm { padding: 6px 12px; font-size: 0.85rem; border-radius: 4px; cursor: pointer; border: none; margin-right: 5px; }
+        .btn-edit { background-color: #f0ad4e; color: white; }
+        .btn-delete { background-color: #d9534f; color: white; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; max-width: 1200px; margin: 0 auto;">
+            <div class="logo" style="font-size: 1.8rem; font-weight: bold; color: #0056b3;">EPRA Admin</div>
+            <ul class="nav-links" style="display: flex; gap: 20px; list-style: none; margin: 0;">
+                <li><a href="index.html" class="btn btn-outline" style="text-decoration: none; padding: 8px 15px; border-radius: 5px; color: #333; border: 1px solid #333;">Ver Site</a></li>
+                <li><a href="#" onclick="logout()" style="color: #d9534f; font-weight: bold; text-decoration: none; display: flex; align-items: center;">Sair</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <h3>Menu Principal</h3>
+            <button class="tab-link active" onclick="abrirAba(event, 'abaCursos')">📚 Cursos</button>
+            <button class="tab-link" onclick="abrirAba(event, 'abaVagas')">💼 Vagas</button>
+            <button class="tab-link" onclick="abrirAba(event, 'abaTutoriais')">🛠️ Tutoriais</button>
+            <button class="tab-link" onclick="abrirAba(event, 'abaBiblioteca')">📁 Biblioteca</button>
+            <button class="tab-link" onclick="abrirAba(event, 'abaPortfolio')">🏆 Portfólio</button>
+        </aside>
+
+        <main class="main-content">
+            <div id="abaCursos" class="tab-content active">
+                <div class="header-aba">
+                    <h2>Gestão de Cursos</h2>
+                    <button class="btn btn-dark" onclick="abrirModal('modalCurso')" style="padding: 10px 20px; background-color: #333; color: white; border: none; border-radius: 5px; cursor: pointer;">+ Novo Curso</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Título do Curso</th>
+                                <th>Data de Início</th>
+                                <th>Vagas</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabelaCursos">
+                            <tr><td colspan="4" style="text-align: center;">A carregar cursos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="abaVagas" class="tab-content"><div class="header-aba"><h2>Gestão de Vagas</h2></div><p>Área em construção...</p></div>
+            <div id="abaTutoriais" class="tab-content"><h2>Tutoriais</h2><p>Área em construção...</p></div>
+            <div id="abaBiblioteca" class="tab-content"><h2>Biblioteca</h2><p>Área em construção...</p></div>
+            <div id="abaPortfolio" class="tab-content"><h2>Portfólio</h2><p>Área em construção...</p></div>
+        </main>
+    </div>
+
+    <div id="modalCurso" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:500px;">
+            <h3 style="margin-bottom: 20px;">Criar Novo Curso</h3>
+            <form id="formCurso">
+                <input type="text" id="tituloCurso" placeholder="Título do Curso" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                <textarea id="descricaoCurso" placeholder="Descrição" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; min-height:100px; box-sizing: border-box;"></textarea>
+                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                    <input type="date" id="dataInicio" required style="flex:1; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                    <input type="number" id="vagas" placeholder="Vagas" required style="flex:1; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                </div>
+                <p id="mensagemFeedback" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalCurso')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
+                    <button type="submit" class="btn btn-dark" style="flex: 1; padding: 10px; background: #333; color: white; border: none; cursor: pointer; border-radius: 5px;">Guardar Curso</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalEditarCurso" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:500px;">
+            <h3 style="margin-bottom: 20px;">Editar Curso</h3>
+            <form id="formEditarCurso">
+                <input type="hidden" id="editIdCurso">
+                <input type="text" id="editTitulo" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                <textarea id="editDescricao" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; min-height:100px; box-sizing: border-box;"></textarea>
+                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                    <input type="date" id="editDataInicio" required style="flex:1; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                    <input type="number" id="editVagas" required style="flex:1; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                </div>
+                <p id="msgEditFeedback" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalEditarCurso')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
+                    <button type="submit" class="btn btn-dark" style="flex: 1; padding: 10px; background: #f0ad4e; color: white; border: none; cursor: pointer; border-radius: 5px;">Atualizar Curso</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalConfirmacao" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:3000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:400px; text-align: center;">
+            <h3>Excluir Curso</h3>
+            <p>Tem certeza que deseja excluir este curso? Esta ação não pode ser desfeita.</p>
+            <input type="hidden" id="idParaExcluir">
+            <div style="display:flex; gap:10px; margin-top: 20px;">
+                <button class="btn btn-outline" onclick="fecharModal('modalConfirmacao')" style="flex: 1; padding: 10px; cursor: pointer; border: 1px solid #333; background: white; border-radius: 5px;">Cancelar</button>
+                <button class="btn btn-dark" onclick="confirmarExclusao()" style="flex: 1; padding: 10px; background: #d9534f; color: white; border: none; cursor: pointer; border-radius: 5px;">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>

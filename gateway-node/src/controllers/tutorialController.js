@@ -1,7 +1,13 @@
-const obterTutoriais = (req, res) => {
-    res.status(200).json([
-        { id: 1, titulo: 'Piscar LED com Arduino', nivel: 'Iniciante', tipo: 'Texto', link: '#' },
-        { id: 2, titulo: 'Lendo Sensores Ultrassônicos', nivel: 'Intermediário', tipo: 'Vídeo', link: '#' }
-    ]);
+const db = require('../config/db');
+
+const listarTutoriais = async (req, res) => {
+    try {
+        const resultado = await db.query('SELECT * FROM tutorial ORDER BY id DESC');
+        res.json(resultado.rows);
+    } catch (erro) {
+        console.error(erro);
+        res.status(500).json({ erro: 'Erro interno no servidor' });
+    }
 };
-module.exports = { obterTutoriais };
+
+module.exports = { listarTutoriais };

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { obterMateriais } = require('../controllers/materialController');
+const { listarMateriais } = require('../controllers/materialController');
 
-router.get('/', obterMateriais);
+router.get('/', listarMateriais);
 
 module.exports = router;

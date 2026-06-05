@@ -1,8 +1,13 @@
-const obterImpacto = (req, res) => {
-    res.status(200).json({
-        escolas_atendidas: 12,
-        alunos_impactados: 450,
-        horas_ensino: '+1000'
-    });
+const db = require('../config/db');
+
+const listarMetricas = async (req, res) => {
+    try {
+        const resultado = await db.query('SELECT * FROM metrica_impacto ORDER BY id ASC');
+        res.json(resultado.rows);
+    } catch (erro) {
+        console.error(erro);
+        res.status(500).json({ erro: 'Erro interno no servidor' });
+    }
 };
-module.exports = { obterImpacto };
+
+module.exports = { listarMetricas };

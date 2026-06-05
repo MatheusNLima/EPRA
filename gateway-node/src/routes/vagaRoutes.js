@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { obterVagas } = require('../controllers/vagaController');
+const { listarVagas } = require('../controllers/vagaController');
 
-router.get('/', obterVagas);
+router.get('/', listarVagas);
 
 module.exports = router;

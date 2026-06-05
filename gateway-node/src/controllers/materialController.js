@@ -1,32 +1,14 @@
-const obterMateriais = (req, res) => {
-    const materiais = [
-        {
-            id: 1,
-            categoria: 'materiais',
-            titulo: 'Pacote de Slides - Introdução',
-            descricao: 'Slides das aulas teóricas de 1 a 5.',
-            infoExtra: '25 MB total',
-            tipoBotao: 'download'
-        },
-        {
-            id: 2,
-            categoria: 'codigos',
-            titulo: 'Repositório Base - Arduino',
-            descricao: 'Códigos utilizados nas aulas práticas no laboratório.',
-            infoExtra: 'GitHub',
-            tipoBotao: 'link'
-        },
-        {
-            id: 3,
-            categoria: 'bibliotecas',
-            titulo: 'Lib ESP32 Custom',
-            descricao: 'Biblioteca modificada para os projetos de IoT da equipe.',
-            infoExtra: 'ZIP - 2 MB',
-            tipoBotao: 'download'
-        }
-    ];
-
-    res.status(200).json(materiais);
+const listarMateriais = (req, res) => {
+    try {
+        const materiais = [
+            { id: 1, titulo: "Apostila de Estrutura de Dados", tipo: "PDF", link: "https://exemplo.com/apostila.pdf" },
+            { id: 2, titulo: "Guia Rápido de SQL", tipo: "Documento", link: "https://exemplo.com/guia-sql.pdf" }
+        ];
+        res.json(materiais);
+    } catch (erro) {
+        console.error(erro);
+        res.status(500).json({ erro: 'Erro interno no servidor' });
+    }
 };
 
-module.exports = { obterMateriais };
+module.exports = { listarMateriais };
