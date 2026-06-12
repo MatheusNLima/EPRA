@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const authMiddleware = require('../middlewares/authMiddleware');
 
 // 1. Importamos o nosso segurança
 const verificarToken = require('../middlewares/authMiddleware');
@@ -15,5 +16,9 @@ router.get('/:id', obterCurso);
 router.post('/', verificarToken, criarCurso);
 router.put('/:id', verificarToken, atualizarCurso);
 router.delete('/:id', verificarToken, excluirCurso);
+router.post('/', authMiddleware, criarCurso);
+router.get('/:id', obterCurso);
+router.put('/:id', authMiddleware, atualizarCurso);
+router.delete('/:id', authMiddleware, excluirCurso);
 
 module.exports = router;
