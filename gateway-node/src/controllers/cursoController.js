@@ -1,4 +1,6 @@
 const db = require('../config/db');
+const fs = require('fs'); // ADICIONADO: Para interagir com os ficheiros do disco
+const path = require('path'); // ADICIONADO: Para resolver os caminhos das pastas
 
 // 1. Criar um novo curso
 const criarCurso = async (req, res) => {
@@ -68,20 +70,35 @@ const atualizarCurso = async (req, res) => {
     }
 };
 
-// 5. Excluir um curso
+// 5. Excluir um curso (AGORA COM LIMPEZA FÍSICA DOS PDFs)
 const excluirCurso = async (req, res) => {
     const { id } = req.params;
     try {
+        // 1. Primeiro, buscamos todas as inscrições deste curso para saber os caminhos dos PDFs
+        const inscricoes = await db.query('SELECT termo_consentimento FROM inscricao WHERE curso_id = $1', [id]);
+        
+        // 2. Apagamos fisicamente cada ficheiro encontrado
+        inscricoes.rows.forEach(inscricao => {
+            if (inscricao.termo_consentimento) {
+                const caminhoFicheiro = path.resolve(__dirname, '../../', inscricao.termo_consentimento);
+                if (fs.existsSync(caminhoFicheiro)) {
+                    fs.unlinkSync(caminhoFicheiro);
+                    console.log(`🗑️ Ficheiro removido na exclusão do curso: ${inscricao.termo_consentimento}`);
+                }
+            }
+        });
+
+        // 3. Agora que os ficheiros físicos foram limpos, apagamos o curso do banco
         const resultado = await db.query('DELETE FROM curso WHERE id = $1 RETURNING *', [id]);
         
         if (resultado.rowCount === 0) {
             return res.status(404).json({ erro: 'Curso não encontrado para exclusão' });
         }
         
-        res.json({ mensagem: 'Curso excluído com sucesso!' });
+        res.json({ mensagem: 'Curso, inscrições e todos os documentos foram excluídos com sucesso!' });
     } catch (err) {
         console.error('❌ ERRO DETALHADO DO BANCO (EXCLUIR CURSO):', err);
-        res.status(500).json({ erro: 'Erro ao excluir o curso.' });
+        res.status(500).json({ erro: 'Erro ao excluir o curso e os ficheiros associados.' });
     }
 };
 

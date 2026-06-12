@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
     function checkAuthStatus() {
         const token = localStorage.getItem('token');
         const userStr = localStorage.getItem('usuario');
@@ -33,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Verificação de Candidatura Pendente Pós-Login
     const pendingId = localStorage.getItem('pendingCandidacyVagaId');
     const pendingTitulo = localStorage.getItem('pendingCandidacyVagaTitulo');
     const token = localStorage.getItem('token');
@@ -45,104 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 200);
     }
 
-    // Modal de Candidatura - Abrir
-    window.abrirModalCandidatura = function(id, titulo) {
-        const userToken = localStorage.getItem('token');
-        if (!userToken) {
-            localStorage.setItem('pendingCandidacyVagaId', id);
-            localStorage.setItem('pendingCandidacyVagaTitulo', titulo);
-            document.getElementById('modalLogin').style.display = 'flex';
-            return;
-        }
-
-        document.getElementById('candidaturaVagaId').value = id;
-        document.getElementById('candidaturaVagaTitulo').value = titulo;
-        
-        // Resetar os campos
-        document.getElementById('candidaturaNome').value = '';
-        document.getElementById('candidaturaEmail').value = '';
-        document.getElementById('candidaturaCurso').value = '';
-        document.getElementById('candidaturaTelefone').value = '';
-        document.getElementById('candidaturaLinkedin').value = '';
-        document.getElementById('candidaturaCurriculo').value = '';
-        
-        const feedback = document.getElementById('feedbackCandidatura');
-        feedback.innerText = '';
-        feedback.style.display = 'none';
-
-        document.getElementById('modalCandidaturaVaga').style.display = 'flex';
-    };
-
-    // Modal de Candidatura - Fechar
-    window.fecharModalCandidatura = function() {
-        document.getElementById('modalCandidaturaVaga').style.display = 'none';
-        document.getElementById('formCandidaturaVaga').reset();
-    };
-
-    // Máscara de Telefone
     const inputTelefone = document.getElementById('candidaturaTelefone');
     if (inputTelefone) {
         inputTelefone.addEventListener('input', (e) => {
             let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
             e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
-        });
-    }
-
-    // Envio do formulário de candidatura
-    const formCandidatura = document.getElementById('formCandidaturaVaga');
-    if (formCandidatura) {
-        formCandidatura.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const userToken = localStorage.getItem('token');
-            const feedback = document.getElementById('feedbackCandidatura');
-            
-            feedback.style.display = 'block';
-            feedback.innerText = 'Enviando candidatura...';
-            feedback.style.color = '#666';
-
-            const idVaga = document.getElementById('candidaturaVagaId').value;
-            
-            const formData = new FormData();
-            formData.append('nome', document.getElementById('candidaturaNome').value);
-            formData.append('email', document.getElementById('candidaturaEmail').value);
-            formData.append('curso', document.getElementById('candidaturaCurso').value);
-            formData.append('telefone', document.getElementById('candidaturaTelefone').value);
-            formData.append('linkedin', document.getElementById('candidaturaLinkedin').value);
-            
-            const fileInput = document.getElementById('candidaturaCurriculo');
-            if (fileInput.files.length > 0) {
-                formData.append('curriculo', fileInput.files[0]);
-            }
-
-            try {
-                const response = await fetch(`http://localhost:3000/api/vagas/${idVaga}/candidaturas`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + userToken
-                    },
-                    body: formData
-                });
-
-                const data = await response.json();
-
-                if (response.status === 201) {
-                    feedback.innerText = 'Candidatura enviada com sucesso!';
-                    feedback.style.color = '#28a745';
-                    setTimeout(() => {
-                        window.fecharModalCandidatura();
-                    }, 1500);
-                } else if (response.status === 400) {
-                    feedback.innerText = data.erro || 'Você já se candidatou a esta vaga.';
-                    feedback.style.color = '#d9534f';
-                } else {
-                    feedback.innerText = data.erro || 'Servidor indisponível no momento.';
-                    feedback.style.color = '#d9534f';
-                }
-            } catch (err) {
-                console.error('❌ ERRO AO ENVIAR CANDIDATURA:', err);
-                feedback.innerText = 'Servidor indisponível no momento.';
-                feedback.style.color = '#d9534f';
-            }
         });
     }
 
@@ -194,9 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('http://localhost:3000/api/cursos');
             const cursos = await response.json();
-            const grid = document.querySelector('.courses-grid');
-            if (!grid) return;
-            
             const containerDinamico = document.getElementById('cursos-container');
             if(containerDinamico) containerDinamico.innerHTML = '';
 
@@ -209,7 +113,6 @@ document.addEventListener('DOMContentLoaded', () => {
             cursos.forEach(curso => {
                 const dataFormatada = curso.datainicio ? new Date(curso.datainicio).toLocaleDateString('pt-BR') : 'A definir';
                 
-                // Lógica de visualização dinâmica se não houver vagas
                 let statusBandeira = `<span class="status-green">Inscrições Abertas</span>`;
                 let vagasInfo = `<span class="slots">${curso.vagas} vagas disponíveis</span>`;
                 let botaoAcao = `<button class="btn btn-dark" style="flex: 1;" onclick="abrirFormularioInscricao(${curso.id})">Inscrever-se</button>`;
@@ -307,16 +210,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const response = await fetch('http://localhost:3000/api/tutoriais');
-            if (!response.ok) {
-                throw new Error('Erro na resposta do servidor');
-            }
+            if (!response.ok) throw new Error('Erro na resposta');
             const tutoriais = await response.json();
 
             if (tutoriais.length === 0) {
                 grid.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: #f8f9fa; border-radius: 8px;">
                         <h3 style="margin-bottom: 10px; color: #333;">Nenhum tutorial encontrado</h3>
-                        <p style="color: #666;">Não existem guias práticos publicados no momento. Volte a tentar mais tarde ou contacte um orientador.</p>
                     </div>
                 `;
                 return;
@@ -324,13 +224,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             grid.innerHTML = '';
             tutoriais.forEach(tut => {
-                // Obter primeira imagem ou usar fallback
                 let imgSrc = 'images/default-tutorial.jpg';
                 if (tut.imagens_paths && tut.imagens_paths.length > 0) {
                     imgSrc = `http://localhost:3000${tut.imagens_paths[0]}`;
                 }
 
-                // Formatar tags
                 const tagsList = tut.tags ? tut.tags.split(',') : [];
                 const tagsHtml = tagsList
                     .map(tag => `<span class="tag" style="margin-right: 8px;">${tag.trim()}</span>`)
@@ -340,9 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="card">
                         <img src="${imgSrc}" alt="${tut.titulo}" class="card-img">
                         <div class="card-body">
-                            <div style="margin-bottom: 10px;">
-                                ${tagsHtml}
-                            </div>
+                            <div style="margin-bottom: 10px;">${tagsHtml}</div>
                             <h4>${tut.titulo}</h4>
                             <p>${tut.descricao || (tut.conteudo.length > 100 ? tut.conteudo.substring(0, 100) + '...' : tut.conteudo)}</p>
                             <a href="tutorial.html?id=${tut.id}" class="link-arrow">Acessar Tutorial <span aria-hidden="true">&gt;</span></a>
@@ -351,12 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             });
         } catch (error) {
-            console.error('Erro ao carregar tutoriais:', error);
-            grid.innerHTML = `
-                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: #f8f9fa; border-radius: 8px; border: 1px solid #d9534f;">
-                    <p style="color: #d9534f; font-weight: bold;">Erro ao carregar os dados. Verifique a sua ligação à internet ou tente novamente mais tarde.</p>
-                </div>
-            `;
+            console.error('Erro:', error);
         }
     }
 
@@ -391,53 +282,94 @@ document.addEventListener('DOMContentLoaded', () => {
             const elHoras = document.getElementById('num-horas');
 
             metricas.forEach(metrica => {
-                if (metrica.descricao === 'Total de Inscritos' && elAlunos) {
-                    elAlunos.innerText = metrica.valor;
-                }
-                if (metrica.descricao === 'Certificados Emitidos' && elHoras) {
-                    elHoras.innerText = metrica.valor;
-                }
+                if (metrica.descricao === 'Total de Inscritos' && elAlunos) elAlunos.innerText = metrica.valor;
+                if (metrica.descricao === 'Certificados Emitidos' && elHoras) elHoras.innerText = metrica.valor;
             });
-
-            if (elEscolas && elEscolas.innerText === 'Y') {
-                elEscolas.innerText = '12';
-            }
+            if (elEscolas && elEscolas.innerText === 'Y') elEscolas.innerText = '12';
         } catch (error) { console.error(error); }
     }
 
-    // Como o carregarCursos vai ser chamado novamente após inscrição, tornei-o global no escopo da página
     window.atualizarVisualizacaoCursos = carregarCursos;
-
     carregarCursos();
     carregarVagas();
     carregarMateriais();
     carregarTutoriaisHome();
     carregarPortfolio();
     carregarImpacto();
-});
 
-// --- FUNÇÕES DE INSCRIÇÃO PÚBLICA ---
+}); // <-- FIM DO DOMContentLoaded
+
+
+// ============================================================================
+// --- FUNÇÕES GLOBAIS DE INSCRIÇÃO & CANDIDATURA (Fora do DOMContentLoaded) ---
+// ============================================================================
 
 window.abrirFormularioInscricao = function(idCurso) {
     document.getElementById('inscricaoCursoId').value = idCurso;
     document.getElementById('modalInscricaoPublica').style.display = 'flex';
+    
+    // Limpa a caixa de feedback sempre que a janela abrir
+    const feedback = document.getElementById('msgFeedbackInscricao');
+    if(feedback) {
+        feedback.style.display = 'none';
+        feedback.innerText = '';
+    }
 };
 
 window.fecharModalInscricao = function() {
     document.getElementById('modalInscricaoPublica').style.display = 'none';
-    document.getElementById('formInscricaoPublica').reset();
+    const form = document.getElementById('formInscricaoPublica');
+    if(form) form.reset();
 };
 
-document.getElementById('formInscricaoPublica').addEventListener('submit', async (e) => {
-    e.preventDefault();
+window.abrirModalCandidatura = function(id, titulo) {
+    const userToken = localStorage.getItem('token');
+    if (!userToken) {
+        localStorage.setItem('pendingCandidacyVagaId', id);
+        localStorage.setItem('pendingCandidacyVagaTitulo', titulo);
+        document.getElementById('modalLogin').style.display = 'flex';
+        return;
+    }
+
+    document.getElementById('candidaturaVagaId').value = id;
+    document.getElementById('candidaturaVagaTitulo').value = titulo;
     
-    const btnSubmit = e.target.querySelector('button[type="submit"]');
+    document.getElementById('candidaturaNome').value = '';
+    document.getElementById('candidaturaEmail').value = '';
+    document.getElementById('candidaturaCurso').value = '';
+    document.getElementById('candidaturaTelefone').value = '';
+    document.getElementById('candidaturaLinkedin').value = '';
+    document.getElementById('candidaturaCurriculo').value = '';
+    
+    const feedback = document.getElementById('feedbackCandidatura');
+    if(feedback) {
+        feedback.innerText = '';
+        feedback.style.display = 'none';
+    }
+
+    document.getElementById('modalCandidaturaVaga').style.display = 'flex';
+};
+
+window.fecharModalCandidatura = function() {
+    document.getElementById('modalCandidaturaVaga').style.display = 'none';
+    const form = document.getElementById('formCandidaturaVaga');
+    if(form) form.reset();
+};
+
+
+// 🛡️ A MÁGICA: A FUNÇÃO CHAMADA DIRETAMENTE PELO HTML
+window.submeterInscricao = async function() {
+    const form = document.getElementById('formInscricaoPublica');
+    const btnSubmit = form.querySelector('button[type="submit"]');
     const textoOriginal = btnSubmit.innerText;
+    
     btnSubmit.innerText = 'A enviar...';
     btnSubmit.disabled = true;
 
+    const feedback = document.getElementById('msgFeedbackInscricao');
+    if (feedback) feedback.style.display = 'none';
+
     const formData = new FormData();
-    
     formData.append('curso_id', document.getElementById('inscricaoCursoId').value);
     formData.append('nome', document.getElementById('inscNome').value);
     formData.append('documento', document.getElementById('inscDocumento').value);
@@ -453,7 +385,7 @@ document.getElementById('formInscricaoPublica').addEventListener('submit', async
     formData.append('instituicao_ensino', document.getElementById('inscInstituicao').value);
     
     const inputArquivo = document.getElementById('inscTermo');
-    if (inputArquivo.files.length > 0) {
+    if (inputArquivo && inputArquivo.files.length > 0) {
         formData.append('termo_consentimento', inputArquivo.files[0]);
     }
 
@@ -464,20 +396,116 @@ document.getElementById('formInscricaoPublica').addEventListener('submit', async
         });
 
         if (response.ok) {
-            alert('Inscrição realizada com sucesso! Fique atento ao seu e-mail.');
-            fecharModalInscricao();
-            // Atualiza os cursos na tela imediatamente para o aluno ver a vaga a descer!
-            if (window.atualizarVisualizacaoCursos) window.atualizarVisualizacaoCursos(); 
+            // DEU CERTO: Mostramos o aviso a verde
+            if (feedback) {
+                feedback.style.display = 'block';
+                feedback.style.backgroundColor = '#d4edda';
+                feedback.style.color = '#155724';
+                feedback.style.border = '1px solid #c3e6cb';
+                feedback.innerText = 'Inscrição realizada com sucesso!';
+            }
+            // Esperamos 2 segundos para o utilizador ler, e só depois fechamos a janela
+            setTimeout(() => {
+                window.fecharModalInscricao(); 
+                if (window.atualizarVisualizacaoCursos) window.atualizarVisualizacaoCursos();
+                btnSubmit.innerText = textoOriginal;
+                btnSubmit.disabled = false;
+            }, 2000);
+
         } else {
-            // Lemos a mensagem de erro do backend (ex: "Desculpe, as vagas para esta turma esgotaram!")
+            // DEU ERRO (Duplicado, Falta de Vagas): Mostramos o aviso a vermelho e deixamos o formulário ABERTO!
             const errorData = await response.json();
-            alert(errorData.erro || 'Ocorreu um erro ao processar a inscrição. Tente novamente.');
+            if (feedback) {
+                feedback.style.display = 'block';
+                feedback.style.backgroundColor = '#f8d7da';
+                feedback.style.color = '#721c24';
+                feedback.style.border = '1px solid #f5c6cb';
+                feedback.innerHTML = `⚠️ <b>Atenção:</b> ${errorData.erro}`;
+            }
+            btnSubmit.innerText = textoOriginal;
+            btnSubmit.disabled = false;
         }
+
     } catch (error) {
+        // SERVIDOR FORA DO AR
         console.error(error);
-        alert('Erro de ligação ao servidor.');
-    } finally {
+        if (feedback) {
+            feedback.style.display = 'block';
+            feedback.style.backgroundColor = '#f8d7da';
+            feedback.style.color = '#721c24';
+            feedback.style.border = '1px solid #f5c6cb';
+            feedback.innerText = 'Erro de ligação ao servidor. Tente novamente.';
+        }
         btnSubmit.innerText = textoOriginal;
         btnSubmit.disabled = false;
     }
-});
+};
+
+window.submeterCandidaturaVaga = async function() {
+    const userToken = localStorage.getItem('token');
+    const form = document.getElementById('formCandidaturaVaga');
+    const btnSubmit = form.querySelector('button[type="submit"]');
+    const textoOriginal = btnSubmit.innerText;
+    
+    btnSubmit.innerText = 'A enviar...';
+    btnSubmit.disabled = true;
+
+    const feedback = document.getElementById('feedbackCandidatura');
+    if (feedback) {
+        feedback.style.display = 'block';
+        feedback.innerText = 'Enviando candidatura...';
+        feedback.style.color = '#666';
+    }
+
+    const idVaga = document.getElementById('candidaturaVagaId').value;
+    const formData = new FormData();
+    formData.append('nome', document.getElementById('candidaturaNome').value);
+    formData.append('email', document.getElementById('candidaturaEmail').value);
+    formData.append('curso', document.getElementById('candidaturaCurso').value);
+    formData.append('telefone', document.getElementById('candidaturaTelefone').value);
+    formData.append('linkedin', document.getElementById('candidaturaLinkedin').value);
+    
+    const fileInput = document.getElementById('candidaturaCurriculo');
+    if (fileInput && fileInput.files.length > 0) {
+        formData.append('curriculo', fileInput.files[0]);
+    }
+
+    try {
+        const response = await fetch(`http://localhost:3000/api/vagas/${idVaga}/candidaturas`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + userToken
+            },
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.status === 201) {
+            if (feedback) {
+                feedback.innerText = 'Candidatura enviada com sucesso!';
+                feedback.style.color = '#28a745';
+            }
+            setTimeout(() => { 
+                window.fecharModalCandidatura(); 
+                btnSubmit.innerText = textoOriginal;
+                btnSubmit.disabled = false;
+            }, 1500);
+        } else {
+            // Erro 400 (Duplicado)
+            if (feedback) {
+                feedback.innerText = data.erro || 'Você já se candidatou a esta vaga.';
+                feedback.style.color = '#d9534f';
+            }
+            btnSubmit.innerText = textoOriginal;
+            btnSubmit.disabled = false;
+        }
+    } catch (err) {
+        if (feedback) {
+            feedback.innerText = 'Servidor indisponível no momento.';
+            feedback.style.color = '#d9534f';
+        }
+        btnSubmit.innerText = textoOriginal;
+        btnSubmit.disabled = false;
+    }
+};

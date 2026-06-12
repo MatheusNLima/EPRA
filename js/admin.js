@@ -15,6 +15,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // 🛡️ ESCUDO DE UX: Defesa contra fecho prematuro do HTML
+    // Varremos todos os botões de submissão do painel e removemos ordens diretas de fecho.
+    // Assim, apenas o JavaScript decide quando o modal pode ser fechado (apenas no sucesso!).
+    document.querySelectorAll('form button[type="submit"]').forEach(btn => {
+        btn.removeAttribute('onclick');
+        btn.removeAttribute('data-dismiss');
+        btn.removeAttribute('data-bs-dismiss');
+    });
+
     carregarCursosAdmin();
     carregarVagasAdmin();
     carregarTutoriaisAdmin();
@@ -94,8 +103,21 @@ window.verificarStatusResponse = function(response) {
 
 async function carregarCursosAdmin() {
     const tbody = document.getElementById('corpoTabelaCursos');
+    if (!tbody) return;
+    
+    const token = localStorage.getItem('token');
+
     try {
-        const response = await fetch('http://localhost:3000/api/cursos');
+        const response = await fetch('http://localhost:3000/api/cursos', {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Erro na resposta do servidor ao listar cursos.</td></tr>';
+            return;
+        }
+
         const cursos = await response.json();
         tbody.innerHTML = ''; 
         
@@ -345,10 +367,13 @@ document.getElementById('formInscricaoManual').addEventListener('submit', async 
         if (response.ok) {
             alert('Aluno inscrito manualmente com sucesso!');
             document.getElementById('formInscricaoManual').reset();
+            // A JANELA SÓ SE ESCONDE AQUI, SE TUDO CORRER BEM:
             document.getElementById('formInscricaoManual').style.display = 'none';
             atualizarTabelaInscritos(cursoId);
         } else {
-            alert('Falha ao registrar inscrição.');
+            const erroData = await response.json();
+            alert(`⚠️ Atenção: ${erroData.erro}`);
+            // Se der erro, não fazemos nada! O formulário fica intocável e aberto.
         }
     } catch (error) {
         alert('Servidor fora do ar.');
@@ -405,10 +430,13 @@ document.getElementById('formEditarInscrito').addEventListener('submit', async (
 
         if (response.ok) {
             alert('Dados do aluno atualizados com sucesso!');
+            // A JANELA SÓ SE FECHA AQUI:
             fecharModal('modalEditarInscrito');
             atualizarTabelaInscritos(cursoId);
         } else {
-            alert('Erro ao atualizar os dados do aluno.');
+            const erroData = await response.json();
+            alert(`⚠️ Atenção: ${erroData.erro}`);
+            // Se der erro, não fazemos nada! O formulário fica intocável e aberto.
         }
     } catch (error) {
         alert('Servidor indisponível.');
@@ -417,10 +445,8 @@ document.getElementById('formEditarInscrito').addEventListener('submit', async (
 
 // --- GESTÃO DE VAGAS ---
 
-// Listar Vagas
 async function carregarVagasAdmin() {
     const tbody = document.getElementById('corpoTabelaVagas');
-    // Verificamos se o elemento existe na tela antes de continuar
     if(!tbody) return; 
     
     try {
@@ -451,7 +477,6 @@ async function carregarVagasAdmin() {
     }
 }
 
-// Submeter Nova Vaga
 const formVaga = document.getElementById('formVaga');
 if(formVaga) {
     formVaga.addEventListener('submit', async (e) => {
@@ -461,7 +486,6 @@ if(formVaga) {
         const datalimite = document.getElementById('dataLimiteVaga').value;
         const msgFeedback = document.getElementById('mensagemFeedbackVaga');
 
-        // Validação de data no passado
         const hoje = new Date();
         hoje.setHours(0, 0, 0, 0);
         const dataSelecionada = new Date(datalimite + 'T00:00:00');
@@ -503,7 +527,6 @@ if(formVaga) {
     });
 }
 
-// Abrir modal de edição com os dados da vaga
 window.editarVaga = async function(id) {
     try {
         const response = await fetch(`http://localhost:3000/api/vagas/${id}`);
@@ -534,7 +557,6 @@ window.editarVaga = async function(id) {
     }
 };
 
-// Submeter Edição da Vaga
 const formEditarVaga = document.getElementById('formEditarVaga');
 if(formEditarVaga) {
     formEditarVaga.addEventListener('submit', async (e) => {
@@ -545,7 +567,6 @@ if(formEditarVaga) {
         const datalimite = document.getElementById('editDataLimiteVaga').value;
         const msgFeedback = document.getElementById('msgEditFeedbackVaga');
 
-        // Validação de data no passado
         const hoje = new Date();
         hoje.setHours(0, 0, 0, 0);
         const dataSelecionada = new Date(datalimite + 'T00:00:00');
@@ -586,13 +607,11 @@ if(formEditarVaga) {
     });
 }
 
-// Excluir Vaga
 window.excluirVaga = function(id) {
     document.getElementById('idParaExcluirVaga').value = id;
     abrirModal('modalConfirmacaoVaga');
 };
 
-// Confirmar exclusão no servidor
 window.confirmarExclusaoVaga = async function() {
     const id = document.getElementById('idParaExcluirVaga').value;
     const token = localStorage.getItem('token');
@@ -619,7 +638,6 @@ window.confirmarExclusaoVaga = async function() {
 
 // --- GESTÃO DE TUTORIAIS ---
 
-// Listar Tutoriais
 async function carregarTutoriaisAdmin() {
     const tbody = document.getElementById('corpoTabelaTutoriais');
     if(!tbody) return;
@@ -659,7 +677,6 @@ async function carregarTutoriaisAdmin() {
     }
 }
 
-// Validar imagens no modal de criação
 const inputImagens = document.getElementById('imagensTutorial');
 if (inputImagens) {
     inputImagens.addEventListener('change', function() {
@@ -687,7 +704,6 @@ if (inputImagens) {
     });
 }
 
-// Submeter Novo Tutorial
 const formTutorial = document.getElementById('formTutorial');
 if (formTutorial) {
     formTutorial.addEventListener('submit', async function(e) {
@@ -735,7 +751,6 @@ if (formTutorial) {
     });
 }
 
-// Abrir modal de edição com os dados do tutorial
 window.editarTutorial = function(id) {
     const tutorial = tutoriaisCarregados.find(t => t.id === id);
     if (!tutorial) {
@@ -768,7 +783,6 @@ window.editarTutorial = function(id) {
     abrirModal('modalEditarTutorial');
 };
 
-// Renderizar imagens que já foram salvas anteriormente
 window.renderImagensExistentes = function() {
     const container = document.getElementById('containerImagensExistentes');
     if (!container) return;
@@ -784,14 +798,12 @@ window.renderImagensExistentes = function() {
     });
 };
 
-// Remover uma das imagens mantidas
 window.removerImagemMantida = function(path) {
     imagensMantidas = imagensMantidas.filter(img => img !== path);
     window.renderImagensExistentes();
     window.validarQuantidadeImagensEditar();
 };
 
-// Validar quantidade total de imagens na edição (mantidas + novas)
 window.validarQuantidadeImagensEditar = function() {
     const inputEdit = document.getElementById('editImagensNovo');
     const feedback = document.getElementById('msgEditFeedbackTutorial');
@@ -815,7 +827,6 @@ window.validarQuantidadeImagensEditar = function() {
     return true;
 };
 
-// Evento change do input de novas imagens na edição
 const inputEditNovo = document.getElementById('editImagensNovo');
 if (inputEditNovo) {
     inputEditNovo.addEventListener('change', function() {
@@ -838,7 +849,6 @@ if (inputEditNovo) {
     });
 }
 
-// Submeter Edição do Tutorial
 const formEditarTutorial = document.getElementById('formEditarTutorial');
 if (formEditarTutorial) {
     formEditarTutorial.addEventListener('submit', async function(e) {
@@ -889,13 +899,11 @@ if (formEditarTutorial) {
     });
 }
 
-// Excluir Tutorial
 window.excluirTutorial = function(id) {
     document.getElementById('idParaExcluirTutorial').value = id;
     abrirModal('modalConfirmacaoTutorial');
 };
 
-// Confirmar exclusão do tutorial
 window.confirmarExclusaoTutorial = async function() {
     const id = document.getElementById('idParaExcluirTutorial').value;
     const token = localStorage.getItem('token');
