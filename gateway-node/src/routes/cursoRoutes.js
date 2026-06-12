@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
+const authMiddleware = require('../middlewares/authMiddleware');
 
 // Verifica se todos estes estão aqui dentro das chaves {}
 const { criarCurso, listarCursos, obterCurso, atualizarCurso, excluirCurso } = require('../controllers/cursoController');
 
 router.get('/', listarCursos);
-router.post('/', criarCurso);
+router.post('/', authMiddleware, criarCurso);
 router.get('/:id', obterCurso);
-router.put('/:id', atualizarCurso);
-router.delete('/:id', excluirCurso);
+router.put('/:id', authMiddleware, atualizarCurso);
+router.delete('/:id', authMiddleware, excluirCurso);
 
 module.exports = router;

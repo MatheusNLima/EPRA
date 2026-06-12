@@ -1,5 +1,8 @@
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const express = require('express');
 const cors = require('cors');
+
 
 const cursoRoutes = require('./routes/cursoRoutes');
 const vagaRoutes = require('./routes/vagaRoutes');
@@ -16,6 +19,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'online', projeto: 'EPRA' });
