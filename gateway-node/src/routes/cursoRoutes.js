@@ -1,13 +1,19 @@
 const express = require('express');
 const router = express.Router();
 
+// 1. Importamos o nosso segurança
+const verificarToken = require('../middlewares/authMiddleware');
+
 // Verifica se todos estes estão aqui dentro das chaves {}
 const { criarCurso, listarCursos, obterCurso, atualizarCurso, excluirCurso } = require('../controllers/cursoController');
 
+// 2. Rotas PÚBLICAS (Visitantes do site precisam ver os cursos)
 router.get('/', listarCursos);
-router.post('/', criarCurso);
 router.get('/:id', obterCurso);
-router.put('/:id', atualizarCurso);
-router.delete('/:id', excluirCurso);
+
+// 3. Rotas PRIVADAS (Apenas o Coordenador logado pode mexer)
+router.post('/', verificarToken, criarCurso);
+router.put('/:id', verificarToken, atualizarCurso);
+router.delete('/:id', verificarToken, excluirCurso);
 
 module.exports = router;
