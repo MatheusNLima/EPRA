@@ -261,11 +261,11 @@ document.addEventListener('DOMContentLoaded', () => {
             grid.innerHTML = '';
             portfolio.forEach(item => {
                 grid.innerHTML += `
-                    <div class="portfolio-card" style="padding: 20px; border: 1px solid #eee; border-radius: 8px;">
-                        <span class="media-badge" style="font-weight: bold; color: #0056b3;">Projeto</span>
-                        <h3 style="margin-top: 10px;">${item.titulo}</h3>
-                        <p style="margin-top: 5px; color: #666; font-size: 0.9rem;">Autor: ${item.autor}</p>
-                        <a href="${item.link_github}" target="_blank" class="btn btn-outline" style="margin-top: 15px;">Acessar Repositório</a>
+                    <div class="project-card project-body" style="display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 32px 24px;">
+                        <span class="badge badge-green" style="font-weight: 600;">Projeto</span>
+                        <h4 style="margin: 4px 0 0; font-size: 1.25rem; font-weight: 600; color: var(--text-dark);">${item.titulo}</h4>
+                        <p style="margin: 0; color: var(--text-light); font-size: 0.9rem;">Autor: ${item.autor}</p>
+                        <a href="${item.link_github}" target="_blank" class="btn btn-outline" style="margin-top: 8px;">Acessar Repositório</a>
                     </div>
                 `;
             });

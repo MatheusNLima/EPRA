@@ -4,80 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Administrativo | EPRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <style>
-        body { background-color: #f4f7f6; padding-top: 80px; }
-        .navbar { position: fixed; top: 0; left: 0; width: 100%; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1000; }
+        body { background-color: var(--bg-light); padding-top: 80px; }
         .dashboard-container { display: flex; max-width: 1200px; margin: 0 auto; padding: 20px; gap: 30px; min-height: calc(100vh - 120px); }
-        .sidebar { width: 250px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); align-self: flex-start; }
-        .sidebar h3 { font-size: 1.1rem; color: #666; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
-        .sidebar button { display: block; width: 100%; text-align: left; padding: 12px 15px; margin-bottom: 8px; border: none; background: transparent; cursor: pointer; border-radius: 6px; font-size: 1rem; color: #333; transition: all 0.2s; }
-        .sidebar button:hover { background: #f0f4f8; }
-        .sidebar button.active { background: #0056b3; color: white; font-weight: bold; }
-        .main-content { flex: 1; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .tab-content { display: none; }
+        .sidebar { width: 250px; background: white; padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); align-self: flex-start; }
+        .sidebar h3 { font-size: 1.1rem; color: var(--text-dark); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--outline); font-weight: 600; }
+        .sidebar-menu { display: flex; flex-direction: column; gap: 8px; }
+        .tab-link { display: block; width: 100%; text-align: left; padding: 12px 16px; border: none; background: transparent; cursor: pointer; border-radius: var(--radius-md); font-size: 1rem; color: var(--text-light); transition: var(--transition-fast); font-family: 'Poppins', sans-serif; font-weight: 500; }
+        .tab-link:hover { background: var(--bg-light); color: var(--primary); }
+        .tab-link.active { background: var(--primary); color: white; font-weight: 600; }
+        
+        .main-content { flex: 1; }
+        .tab-content { display: none; background: white; padding: 32px; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
-        .header-aba { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .header-aba { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 16px; border-bottom: 1px solid var(--outline); }
+        .header-aba h2 { font-weight: 600; color: var(--text-dark); margin: 0; }
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .admin-table th, .admin-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
-        .admin-table th { background-color: #f8f9fa; font-weight: 600; color: #333; }
-        .admin-table tr:hover { background-color: #f9f9f9; }
-        .btn-sm { padding: 6px 12px; font-size: 0.85rem; border-radius: 4px; cursor: pointer; border: none; margin-right: 5px; }
-        .btn-edit { background-color: #f0ad4e; color: white; }
-        .btn-delete { background-color: #d9534f; color: white; }
-        .btn-info { background-color: #0056b3; color: white; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        .preview-container {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            border-radius: 4px;
-            overflow: hidden;
-            border: 1px solid #ddd;
-        }
-        .preview-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .preview-delete-btn {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            background: rgba(217, 83, 79, 0.9);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 12px;
-            line-height: 20px;
-            text-align: center;
-            cursor: pointer;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .tag-badge {
-            background: #e9ecef;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            margin-right: 4px;
-            color: #495057;
-            display: inline-block;
-        }
+        .admin-table th, .admin-table td { padding: 16px; text-align: left; border-bottom: 1px solid var(--outline); }
+        .admin-table th { font-weight: 600; color: var(--text-light); font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; }
+        .admin-table tr:hover { background-color: var(--bg-light); }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Modais */
+        .admin-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+        .admin-modal-card { background: white; padding: 40px; border-radius: var(--radius-xl); width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 30px 60px rgba(0,0,0,0.15); box-sizing: border-box; }
+        .admin-modal-card.large { max-width: 800px; }
+        .admin-modal-card h3 { margin-bottom: 24px; color: var(--text-dark); font-weight: 600; }
+        .admin-input, .admin-textarea { width: 100%; padding: 12px 16px; margin-bottom: 16px; border: 1.5px solid var(--outline); border-radius: var(--radius-sm); box-sizing: border-box; font-family: 'Poppins', sans-serif; transition: var(--transition-fast); font-size: 0.95rem; }
+        .admin-input:focus, .admin-textarea:focus { outline: none; border-color: var(--primary); }
+        .admin-textarea { min-height: 100px; resize: vertical; }
+        .form-group-flex { display: flex; gap: 16px; margin-bottom: 16px; }
+        .form-group-flex .admin-input { margin-bottom: 0; }
+        
+        /* Utilities */
+        .preview-container { position: relative; width: 80px; height: 80px; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--outline); }
+        .preview-container img { width: 100%; height: 100%; object-fit: cover; }
+        .preview-delete-btn { position: absolute; top: 4px; right: 4px; background: #ef4444; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .tag-badge { background: var(--bg-light); padding: 4px 8px; border-radius: var(--radius-sm); font-size: 0.8rem; margin-right: 4px; color: var(--text-dark); display: inline-block; font-weight: 500; }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
         <div class="container" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; max-width: 1200px; margin: 0 auto;">
-            <div class="logo" style="font-size: 1.8rem; font-weight: bold; color: #0056b3;">EPRA Admin</div>
+            <div class="nav-logo logo gradient-text" style="font-size: 1.8rem; font-weight: bold;"><a href="index.html" style="color: inherit; text-decoration: none;">EPRA</a></div>
             <ul class="nav-links" style="display: flex; gap: 20px; list-style: none; margin: 0;">
-                <li><a href="index.html" class="btn btn-outline" style="text-decoration: none; padding: 8px 15px; border-radius: 5px; color: #333; border: 1px solid #333;">Ver Site</a></li>
-                <li><a href="#" onclick="logout()" style="color: #d9534f; font-weight: bold; text-decoration: none; display: flex; align-items: center;">Sair</a></li>
+                <li><a href="index.html" class="btn btn-outline btn-sm" style="text-decoration: none;">Ver Site</a></li>
+                <li id="logoutLink"><a href="#" onclick="logout()" class="btn btn-outline btn-sm" style="color: #ef4444; border-color: #ef4444; text-decoration: none;">Sair</a></li>
             </ul>
         </div>
     </nav>
@@ -85,18 +62,20 @@
     <div class="dashboard-container">
         <aside class="sidebar">
             <h3>Menu Principal</h3>
-            <button class="tab-link active" onclick="abrirAba(event, 'abaCursos')">📚 Cursos</button>
-            <button class="tab-link" onclick="abrirAba(event, 'abaVagas')">💼 Vagas</button>
-            <button class="tab-link" onclick="abrirAba(event, 'abaTutoriais')">🛠️ Tutoriais</button>
-            <button class="tab-link" onclick="abrirAba(event, 'abaBiblioteca')">📁 Biblioteca</button>
-            <button class="tab-link" onclick="abrirAba(event, 'abaPortfolio')">🏆 Portfólio</button>
+            <div class="sidebar-menu">
+                <button class="tab-link active" onclick="abrirAba(event, 'abaCursos')"><i class="fa-solid fa-book"></i> Cursos</button>
+                <button class="tab-link" onclick="abrirAba(event, 'abaVagas')"><i class="fa-solid fa-briefcase"></i> Vagas</button>
+                <button class="tab-link" onclick="abrirAba(event, 'abaTutoriais')"><i class="fa-solid fa-tools"></i> Tutoriais</button>
+                <button class="tab-link" onclick="abrirAba(event, 'abaBiblioteca')"><i class="fa-solid fa-folder"></i> Biblioteca</button>
+                <button class="tab-link" onclick="abrirAba(event, 'abaPortfolio')"><i class="fa-solid fa-trophy"></i> Portfólio</button>
+            </div>
         </aside>
 
         <main class="main-content">
             <div id="abaCursos" class="tab-content active">
                 <div class="header-aba">
                     <h2>Gestão de Cursos</h2>
-                    <button class="btn btn-dark" onclick="abrirModal('modalCurso')" style="padding: 10px 20px; background-color: #333; color: white; border: none; border-radius: 5px; cursor: pointer;">+ Novo Curso</button>
+                    <button class="btn btn-primary btn-sm" onclick="abrirModal('modalCurso')" >+ Novo Curso</button>
                 </div>
                 <div style="overflow-x: auto;">
                     <table class="admin-table">
@@ -118,7 +97,7 @@
             <div id="abaVagas" class="tab-content">
                 <div class="header-aba">
                     <h2>Gestão de Vagas</h2>
-                    <button class="btn btn-dark" onclick="abrirModal('modalVaga')" style="padding: 10px 20px; background-color: #333; color: white; border: none; border-radius: 5px; cursor: pointer;">+ Nova Vaga</button>
+                    <button class="btn btn-primary btn-sm" onclick="abrirModal('modalVaga')" >+ Nova Vaga</button>
                 </div>
                 <div style="overflow-x: auto;">
                     <table class="admin-table">
@@ -138,7 +117,7 @@
             <div id="abaTutoriais" class="tab-content">
                 <div class="header-aba">
                     <h2>Gestão de Tutoriais</h2>
-                    <button class="btn btn-dark" onclick="abrirModal('modalTutorial')" style="padding: 10px 20px; background-color: #333; color: white; border: none; border-radius: 5px; cursor: pointer;">+ Novo Tutorial</button>
+                    <button class="btn btn-primary btn-sm" onclick="abrirModal('modalTutorial')" >+ Novo Tutorial</button>
                 </div>
                 <div style="overflow-x: auto;">
                     <table class="admin-table">
@@ -160,47 +139,47 @@
         </main>
     </div>
 
-    <div id="modalCurso" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
-        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:500px;">
+    <div id="modalCurso" class="admin-modal-overlay">
+        <div class="admin-modal-card">
             <h3 style="margin-bottom: 20px;">Criar Novo Curso</h3>
             <form id="formCurso">
-                <input type="text" id="tituloCurso" placeholder="Título do Curso" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
-                <textarea id="descricaoCurso" placeholder="Descrição" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; min-height:100px; box-sizing: border-box;"></textarea>
-                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
-                    <input type="date" id="dataInicio" required style="flex:1; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
-                    <input type="number" id="vagas" placeholder="Vagas" required style="flex:1; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                <input type="text" id="tituloCurso" placeholder="Título do Curso" required class="admin-input">
+                <textarea id="descricaoCurso" placeholder="Descrição" required class="admin-textarea"></textarea>
+                <div class="form-group-flex">
+                    <input type="date" id="dataInicio" required class="admin-input">
+                    <input type="number" id="vagas" placeholder="Vagas" required class="admin-input">
                 </div>
                 <p id="mensagemFeedback" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
-                <div style="display:flex; gap:10px;">
-                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalCurso')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
-                    <button type="submit" class="btn btn-dark" style="flex: 1; padding: 10px; background: #333; color: white; border: none; cursor: pointer; border-radius: 5px;">Guardar Curso</button>
+                <div class="form-group-flex">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalCurso')" style="flex: 1;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Guardar Curso</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="modalEditarCurso" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
-        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:500px;">
+    <div id="modalEditarCurso" class="admin-modal-overlay">
+        <div class="admin-modal-card">
             <h3 style="margin-bottom: 20px;">Editar Curso</h3>
             <form id="formEditarCurso">
                 <input type="hidden" id="editIdCurso">
-                <input type="text" id="editTitulo" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
-                <textarea id="editDescricao" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; min-height:100px; box-sizing: border-box;"></textarea>
-                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
-                    <input type="date" id="editDataInicio" required style="flex:1; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
-                    <input type="number" id="editVagas" required style="flex:1; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                <input type="text" id="editTitulo" required class="admin-input">
+                <textarea id="editDescricao" required class="admin-textarea"></textarea>
+                <div class="form-group-flex">
+                    <input type="date" id="editDataInicio" required class="admin-input">
+                    <input type="number" id="editVagas" required class="admin-input">
                 </div>
                 <p id="msgEditFeedback" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
-                <div style="display:flex; gap:10px;">
-                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalEditarCurso')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
-                    <button type="submit" class="btn btn-dark" style="flex: 1; padding: 10px; background: #f0ad4e; color: white; border: none; cursor: pointer; border-radius: 5px;">Atualizar Curso</button>
+                <div class="form-group-flex">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalEditarCurso')" style="flex: 1;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Atualizar Curso</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="modalInscritos" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2500; justify-content:center; align-items:center;">
-        <div style="background:white; padding:30px; border-radius:8px; width:95%; max-width:800px; max-height: 85vh; overflow-y: auto;">
+    <div id="modalInscritos" class="admin-modal-overlay">
+        <div class="admin-modal-card large">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h3 id="tituloModalInscritos">Alunos Inscritos</h3>
                 <button class="btn-sm btn-info" onclick="exibirFormularioInscricaoManual()">+ Inscrição Manual (Especial)</button>
@@ -238,141 +217,141 @@
         </div>
     </div>
 
-    <div id="modalEditarInscrito" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2600; justify-content:center; align-items:center;">
-        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:500px;">
+    <div id="modalEditarInscrito" class="admin-modal-overlay">
+        <div class="admin-modal-card">
             <h3 style="margin-bottom: 20px;">Editar Dados do Aluno</h3>
             <form id="formEditarInscrito">
                 <input type="hidden" id="editInscritoId">
                 <input type="hidden" id="editInscritoCursoId">
                 
-                <input type="text" id="editInscritoNome" placeholder="Nome Completo" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
-                <input type="text" id="editInscritoDocumento" placeholder="Documento" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
-                <input type="email" id="editInscritoEmail" placeholder="E-mail" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                <input type="text" id="editInscritoNome" placeholder="Nome Completo" required class="admin-input">
+                <input type="text" id="editInscritoDocumento" placeholder="Documento" required class="admin-input">
+                <input type="email" id="editInscritoEmail" placeholder="E-mail" required class="admin-input">
                 
-                <div style="display:flex; gap:10px;">
-                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalEditarInscrito')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
-                    <button type="submit" class="btn btn-dark" style="flex: 1; padding: 10px; background: #f0ad4e; color: white; border: none; cursor: pointer; border-radius: 5px;">Salvar Alterações</button>
+                <div class="form-group-flex">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalEditarInscrito')" style="flex: 1;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Salvar Alterações</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="modalConfirmacao" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:3000; justify-content:center; align-items:center;">
-        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:400px; text-align: center;">
+    <div id="modalConfirmacao" class="admin-modal-overlay">
+        <div class="admin-modal-card">
             <h3>Excluir Curso</h3>
             <p>Tem certeza que deseja excluir este curso? Esta ação não pode ser desfeita.</p>
             <input type="hidden" id="idParaExcluir">
-            <div style="display:flex; gap:10px; margin-top: 20px;">
-                <button class="btn btn-outline" onclick="fecharModal('modalConfirmacao')" style="flex: 1; padding: 10px; cursor: pointer; border: 1px solid #333; background: white; border-radius: 5px;">Cancelar</button>
-                <button class="btn btn-dark" onclick="confirmarExclusao()" style="flex: 1; padding: 10px; background: #d9534f; color: white; border: none; cursor: pointer; border-radius: 5px;">Excluir</button>
+            <div class="form-group-flex" style="margin-top: 20px;">
+                <button class="btn btn-outline" onclick="fecharModal('modalConfirmacao')" style="flex: 1;">Cancelar</button>
+                <button class="btn btn-dark" onclick="confirmarExclusao()" style="flex: 1;">Excluir</button>
             </div>
         </div>
     </div>
 
     <!-- Modais de Gestão de Vagas -->
-    <div id="modalVaga" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
-        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:500px;">
+    <div id="modalVaga" class="admin-modal-overlay">
+        <div class="admin-modal-card">
             <h3 style="margin-bottom: 20px;">Criar Nova Vaga</h3>
             <form id="formVaga">
-                <input type="text" id="tituloVaga" placeholder="Título da Vaga" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
-                <textarea id="descricaoVaga" placeholder="Descrição" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; min-height:100px; box-sizing: border-box;"></textarea>
+                <input type="text" id="tituloVaga" placeholder="Título da Vaga" required class="admin-input">
+                <textarea id="descricaoVaga" placeholder="Descrição" required class="admin-textarea"></textarea>
                 <div style="margin-bottom: 15px;">
                     <label for="dataLimiteVaga" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Data Limite para Candidatura</label>
-                    <input type="date" id="dataLimiteVaga" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                    <input type="date" id="dataLimiteVaga" required class="admin-input">
                 </div>
                 <p id="mensagemFeedbackVaga" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
-                <div style="display:flex; gap:10px;">
-                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalVaga')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
-                    <button type="submit" class="btn btn-dark" style="flex: 1; padding: 10px; background: #333; color: white; border: none; cursor: pointer; border-radius: 5px;">Guardar Vaga</button>
+                <div class="form-group-flex">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalVaga')" style="flex: 1;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Guardar Vaga</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="modalEditarVaga" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
-        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:500px;">
+    <div id="modalEditarVaga" class="admin-modal-overlay">
+        <div class="admin-modal-card">
             <h3 style="margin-bottom: 20px;">Editar Vaga</h3>
             <form id="formEditarVaga">
                 <input type="hidden" id="editIdVaga">
-                <input type="text" id="editTituloVaga" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
-                <textarea id="editDescricaoVaga" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; min-height:100px; box-sizing: border-box;"></textarea>
+                <input type="text" id="editTituloVaga" required class="admin-input">
+                <textarea id="editDescricaoVaga" required class="admin-textarea"></textarea>
                 <div style="margin-bottom: 15px;">
                     <label for="editDataLimiteVaga" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Data Limite para Candidatura</label>
-                    <input type="date" id="editDataLimiteVaga" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                    <input type="date" id="editDataLimiteVaga" required class="admin-input">
                 </div>
                 <p id="msgEditFeedbackVaga" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
-                <div style="display:flex; gap:10px;">
-                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalEditarVaga')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
-                    <button type="submit" class="btn btn-dark" style="flex: 1; padding: 10px; background: #f0ad4e; color: white; border: none; cursor: pointer; border-radius: 5px;">Atualizar Vaga</button>
+                <div class="form-group-flex">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalEditarVaga')" style="flex: 1;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Atualizar Vaga</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="modalConfirmacaoVaga" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:3000; justify-content:center; align-items:center;">
-        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:400px; text-align: center;">
+    <div id="modalConfirmacaoVaga" class="admin-modal-overlay">
+        <div class="admin-modal-card">
             <h3>Excluir Vaga</h3>
             <p>Tem certeza que deseja excluir esta vaga? Esta ação não pode ser desfeita.</p>
             <input type="hidden" id="idParaExcluirVaga">
-            <div style="display:flex; gap:10px; margin-top: 20px;">
-                <button class="btn btn-outline" onclick="fecharModal('modalConfirmacaoVaga')" style="flex: 1; padding: 10px; cursor: pointer; border: 1px solid #333; background: white; border-radius: 5px;">Cancelar</button>
-                <button class="btn btn-dark" onclick="confirmarExclusaoVaga()" style="flex: 1; padding: 10px; background: #d9534f; color: white; border: none; cursor: pointer; border-radius: 5px;">Excluir</button>
+            <div class="form-group-flex" style="margin-top: 20px;">
+                <button class="btn btn-outline" onclick="fecharModal('modalConfirmacaoVaga')" style="flex: 1;">Cancelar</button>
+                <button class="btn btn-dark" onclick="confirmarExclusaoVaga()" style="flex: 1;">Excluir</button>
             </div>
         </div>
     </div>
 
     <!-- Modais de Gestão de Tutoriais -->
-    <div id="modalTutorial" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
-        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:600px; max-height:90vh; overflow-y:auto; box-sizing: border-box;">
+    <div id="modalTutorial" class="admin-modal-overlay">
+        <div class="admin-modal-card large">
             <h3 style="margin-bottom: 20px;">Criar Novo Tutorial</h3>
             <form id="formTutorial" enctype="multipart/form-data">
-                <input type="text" id="tituloTutorial" name="titulo" placeholder="Título do Tutorial *" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                <input type="text" id="tituloTutorial" name="titulo" placeholder="Título do Tutorial *" required class="admin-input">
                 
-                <textarea id="descricaoTutorial" name="descricao" placeholder="Descrição Curta (Opcional)" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; min-height:60px; box-sizing: border-box; resize: vertical;"></textarea>
+                <textarea id="descricaoTutorial" name="descricao" placeholder="Descrição Curta (Opcional)" class="admin-textarea"></textarea>
                 
-                <textarea id="conteudoTutorial" name="conteudo" placeholder="Conteúdo Completo (Markdown/Texto) *" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; min-height:120px; box-sizing: border-box; resize: vertical;"></textarea>
+                <textarea id="conteudoTutorial" name="conteudo" placeholder="Conteúdo Completo (Markdown/Texto) *" required class="admin-textarea"></textarea>
                 
-                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
-                    <input type="text" id="linkgithubTutorial" name="linkgithub" placeholder="Link do GitHub (Opcional)" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
-                    <input type="text" id="linkVideoTutorial" name="link_video" placeholder="Link do Vídeo (Opcional)" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                <div class="form-group-flex">
+                    <input type="text" id="linkgithubTutorial" name="linkgithub" placeholder="Link do GitHub (Opcional)" class="admin-input">
+                    <input type="text" id="linkVideoTutorial" name="link_video" placeholder="Link do Vídeo (Opcional)" class="admin-input">
                 </div>
                 
-                <input type="text" id="tagsTutorial" name="tags" placeholder="Tags (separadas por vírgula, ex: arduino, led, ufc)" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                <input type="text" id="tagsTutorial" name="tags" placeholder="Tags (separadas por vírgula, ex: arduino, led, ufc)" class="admin-input">
                 
                 <div style="margin-bottom: 15px;">
                     <label for="imagensTutorial" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Selecionar Imagens (Máx. 5)</label>
-                    <input type="file" id="imagensTutorial" name="imagens" accept="image/*" multiple style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                    <input type="file" id="imagensTutorial" name="imagens" accept="image/*" multiple class="admin-input">
                     <div id="previewImagensTutorial" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
                 </div>
 
                 <p id="mensagemFeedbackTutorial" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
                 
-                <div style="display:flex; gap:10px;">
-                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalTutorial')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
-                    <button type="submit" id="btnSalvarTutorial" class="btn btn-dark" style="flex: 1; padding: 10px; background: #333; color: white; border: none; cursor: pointer; border-radius: 5px;">Guardar Tutorial</button>
+                <div class="form-group-flex">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalTutorial')" style="flex: 1;">Cancelar</button>
+                    <button type="submit" id="btnSalvarTutorial" class="btn btn-primary" style="flex: 1;">Guardar Tutorial</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="modalEditarTutorial" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
-        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:600px; max-height:90vh; overflow-y:auto; box-sizing: border-box;">
+    <div id="modalEditarTutorial" class="admin-modal-overlay">
+        <div class="admin-modal-card large">
             <h3 style="margin-bottom: 20px;">Editar Tutorial</h3>
             <form id="formEditarTutorial" enctype="multipart/form-data">
                 <input type="hidden" id="editIdTutorial">
                 
-                <input type="text" id="editTituloTutorial" name="titulo" placeholder="Título do Tutorial *" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                <input type="text" id="editTituloTutorial" name="titulo" placeholder="Título do Tutorial *" required class="admin-input">
                 
-                <textarea id="editDescricaoTutorial" name="descricao" placeholder="Descrição Curta (Opcional)" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; min-height:60px; box-sizing: border-box; resize: vertical;"></textarea>
+                <textarea id="editDescricaoTutorial" name="descricao" placeholder="Descrição Curta (Opcional)" class="admin-textarea"></textarea>
                 
-                <textarea id="editConteudoTutorial" name="conteudo" placeholder="Conteúdo Completo (Markdown/Texto) *" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; min-height:120px; box-sizing: border-box; resize: vertical;"></textarea>
+                <textarea id="editConteudoTutorial" name="conteudo" placeholder="Conteúdo Completo (Markdown/Texto) *" required class="admin-textarea"></textarea>
                 
-                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
-                    <input type="text" id="editLinkgithubTutorial" name="linkgithub" placeholder="Link do GitHub (Opcional)" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
-                    <input type="text" id="editLinkVideoTutorial" name="link_video" placeholder="Link do Vídeo (Opcional)" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                <div class="form-group-flex">
+                    <input type="text" id="editLinkgithubTutorial" name="linkgithub" placeholder="Link do GitHub (Opcional)" class="admin-input">
+                    <input type="text" id="editLinkVideoTutorial" name="link_video" placeholder="Link do Vídeo (Opcional)" class="admin-input">
                 </div>
                 
-                <input type="text" id="editTagsTutorial" name="tags" placeholder="Tags (separadas por vírgula, ex: arduino, led, ufc)" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                <input type="text" id="editTagsTutorial" name="tags" placeholder="Tags (separadas por vírgula, ex: arduino, led, ufc)" class="admin-input">
                 
                 <!-- Imagens Existentes -->
                 <div style="margin-bottom: 15px;">
@@ -383,28 +362,28 @@
                 <!-- Novas Imagens -->
                 <div style="margin-bottom: 15px;">
                     <label for="editImagensNovo" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Adicionar Novas Imagens</label>
-                    <input type="file" id="editImagensNovo" name="imagens" accept="image/*" multiple style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                    <input type="file" id="editImagensNovo" name="imagens" accept="image/*" multiple class="admin-input">
                     <div id="previewNovasImagensTutorial" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
                 </div>
 
                 <p id="msgEditFeedbackTutorial" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
                 
-                <div style="display:flex; gap:10px;">
-                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalEditarTutorial')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
-                    <button type="submit" id="btnAtualizarTutorial" class="btn btn-dark" style="flex: 1; padding: 10px; background: #f0ad4e; color: white; border: none; cursor: pointer; border-radius: 5px;">Atualizar Tutorial</button>
+                <div class="form-group-flex">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalEditarTutorial')" style="flex: 1;">Cancelar</button>
+                    <button type="submit" id="btnAtualizarTutorial" class="btn btn-primary" style="flex: 1;">Atualizar Tutorial</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="modalConfirmacaoTutorial" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:3000; justify-content:center; align-items:center;">
-        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:400px; text-align: center;">
+    <div id="modalConfirmacaoTutorial" class="admin-modal-overlay">
+        <div class="admin-modal-card">
             <h3>Excluir Tutorial</h3>
             <p>Tem certeza que deseja excluir este tutorial? Esta ação não pode ser desfeita e todas as imagens associadas serão removidas do disco.</p>
             <input type="hidden" id="idParaExcluirTutorial">
-            <div style="display:flex; gap:10px; margin-top: 20px;">
-                <button class="btn btn-outline" onclick="fecharModal('modalConfirmacaoTutorial')" style="flex: 1; padding: 10px; cursor: pointer; border: 1px solid #333; background: white; border-radius: 5px;">Cancelar</button>
-                <button class="btn btn-dark" onclick="confirmarExclusaoTutorial()" style="flex: 1; padding: 10px; background: #d9534f; color: white; border: none; cursor: pointer; border-radius: 5px;">Excluir</button>
+            <div class="form-group-flex" style="margin-top: 20px;">
+                <button class="btn btn-outline" onclick="fecharModal('modalConfirmacaoTutorial')" style="flex: 1;">Cancelar</button>
+                <button class="btn btn-dark" onclick="confirmarExclusaoTutorial()" style="flex: 1;">Excluir</button>
             </div>
         </div>
     </div>

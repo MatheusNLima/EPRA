@@ -5,14 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EPRA - Programação e Robótica</title>
     <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
     <nav class="navbar">
         <div class="nav-container">
-            <div class="logo">EPRA</div>
+            <div class="nav-logo logo gradient-text">EPRA</div>
+
+            <button id="mobile-menu" class="menu-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
 
             <ul class="nav-links">
                 <li><a href="#inicio">Início</a></li>
@@ -23,129 +30,136 @@
                 <li><a href="#cursos">Cursos</a></li>
                 <li><a href="#portfolio">Portfólio</a></li>
                 <li><a href="#impacto">Impacto</a></li>
+                <li><a href="login.html" id="loginLink" class="btn btn-nav btn-sm">Login</a></li>
+                <li><a href="admin.html" id="adminLink" class="btn btn-nav btn-sm" style="display:none;">Admin</a></li>
             </ul>
         </div>
     </nav>
 
     <header id="inicio" class="hero">
         <div class="container hero-content">
-            <div class="hero-text">
-                <span class="badge">Projeto de Extensão Universitária</span>
-                <h1>EPRA</h1>
-                <p>Ensino da Programação de Computadores e Robótica com Arduino Extensão em Programação, Robótica e Arquitetura de Computadores</p>
-                <br>
-                <p>Democratizando o conhecimento em tecnologia através de cursos práticos, tutoriais e projetos com Arduino, robótica e muito mais.</p>
-                <div class="hero-buttons">
+            <div class="hero-text" data-aos="fade-right" data-aos-duration="800">
+                <span class="badge hero-badge">Portal Educacional</span>
+                <h1 class="hero-title">Formando a nova geração em <span class="gradient-text">Tecnologia</span></h1>
+                <p class="hero-subtitle">O portal EPRA conecta estudantes a cursos de robótica, tutoriais práticos e oportunidades únicas.</p>
+                <div class="hero-actions">
                     <a href="#cursos" class="btn btn-primary">Ver Cursos</a>
-                    <a href="#tutoriais" class="btn btn-outline">Explorar Tutoriais</a>
+                    <a href="#sobre" class="btn btn-outline">Nossa Missão</a>
                 </div>
             </div>
-            <div class="hero-image">
-                <img src="images/turmaepra.jpeg" alt="Estudantes no curso do EPRA" class="hero-img"> 
+            <div class="hero-image" data-aos="fade-left" data-aos-duration="800" data-aos-delay="200">
+                <img src="images/robo-transparente.png" alt="Robô EPRA" class="hero-img">
             </div>
         </div>
         
         <section class="pillars-section">
-    <div class="container">
-        <div class="pillars-grid">
-            
-            <div class="pillar-card">
-                <div class="pillar-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="16 18 22 12 16 6"></polyline>
-                        <polyline points="8 6 2 12 8 18"></polyline>
-                    </svg>
-                </div>
-                <h3>Programação</h3>
-            </div>
+            <div class="container">
+                <div class="grid-3">
+                    
+                    <div class="pillar-card" data-aos="fade-up" data-aos-delay="100">
+                        <div class="pillar-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="16 18 22 12 16 6"></polyline>
+                                <polyline points="8 6 2 12 8 18"></polyline>
+                            </svg>
+                        </div>
+                        <h3>Programação</h3>
+                    </div>
 
-            <div class="pillar-card">
-                <div class="pillar-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
-                        <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
-                        <line x1="6" y1="6" x2="6.01" y2="6"></line>
-                        <line x1="6" y1="18" x2="6.01" y2="18"></line>
-                    </svg>
-                </div>
-                <h3>Arduíno & IoT</h3>
-            </div>
+                    <div class="pillar-card" data-aos="fade-up" data-aos-delay="200">
+                        <div class="pillar-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                                <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                                <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                                <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                            </svg>
+                        </div>
+                        <h3>Arduíno & IoT</h3>
+                    </div>
 
-            <div class="pillar-card">
-                <div class="pillar-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="10" rx="2"></rect>
-                        <circle cx="12" cy="5" r="2"></circle>
-                        <path d="M12 7v4"></path>
-                        <line x1="8" y1="16" x2="8" y2="16"></line>
-                        <line x1="16" y1="16" x2="16" y2="16"></line>
-                    </svg>
-                </div>
-                <h3>Robótica</h3>
-            </div>
+                    <div class="pillar-card" data-aos="fade-up" data-aos-delay="300">
+                        <div class="pillar-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                                <circle cx="12" cy="5" r="2"></circle>
+                                <path d="M12 7v4"></path>
+                                <line x1="8" y1="16" x2="8" y2="16"></line>
+                                <line x1="16" y1="16" x2="16" y2="16"></line>
+                            </svg>
+                        </div>
+                        <h3>Robótica</h3>
+                    </div>
 
-        </div>
-    </div>
-</section>
+                </div>
+            </div>
+        </section>
     </header>
 
-    <section id="sobre" class="section-light">
+    <section id="sobre" class="section-light section-padding">
+        <div class="container">
+            <div class="sobre-grid">
+                <div class="sobre-illustration" data-aos="fade-right">
+                    <img src="images/educacao-e-robotica.svg" alt="Educação e Robótica" style="width:100%; max-width:420px; border-radius:var(--radius-xl); display:block; margin:auto;">
+                </div>
+                <div data-aos="fade-left">
+                    <div class="section-title" style="text-align: left; margin-bottom: 24px;">
+                        <h2>Sobre o EPRA</h2>
+                        <p>O EPRA (Projeto Arduino) é um projeto de extensão da Universidade Federal do Ceará, campus Russas, que tem como objetivo principal levar a 
+                            programação de computadores e a robótica com Arduino às instituições de ensino médio da região de Russas. Em meio a um contexto de pandemia 
+                            e isolamento social em 2020, a equipe do EPRA criou este site para divulgar cursos e outros projetos que envolvam a área de tecnologia, visando levar o ensino da computação ao maior número de pessoas possível.</p>
+                    </div>
+                    <div class="mission-box">
+                        <h3>Nossa Missão</h3>
+                        <p>Capacitar pessoas através do ensino de tecnologias emergentes, proporcionando conhecimentos práticos em programação, robótica e arquitetura de computadores que possam transformar vidas e abrir portas no mercado de trabalho.</p>
+                        <br>
+                        <p>Desde nossa fundação, já formamos centenas de alunos e impactamos dezenas de escolas e instituições, levando o conhecimento em tecnologia para quem mais precisa.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tutoriais" class="section-white section-padding" data-aos="fade-up">
         <div class="container">
             <div class="section-title">
-                <h2>Sobre o EPRA</h2>
-                <p>O EPRA (Projeto Arduino) é um projeto de extensão da Universidade Federal do Ceará, campus Russas, que tem como objetivo principal levar a 
-                    programação de computadores e a robótica com Arduino às instituições de ensino médio da região de Russas. Em meio a um contexto de pandemia 
-                    e isolamento social em 2020, a equipe do EPRA criou este site para divulgar cursos e outros projetos que envolvam a área de tecnologia, visando levar o ensino da computação ao maior número de pessoas possível.</p>
+                <h2>Tutoriais & Mão na Massa</h2>
+                <p>Explore nossos guias passo a passo para dominar as ferramentas mais utilizadas na robótica e programação.</p>
             </div>
-            <div class="mission-box">
-                <h3>Nossa Missão</h3>
-                <p>Capacitar pessoas através do ensino de tecnologias emergentes, proporcionando conhecimentos práticos em programação, robótica e arquitetura de computadores que possam transformar vidas e abrir portas no mercado de trabalho.</p>
-                <br>
-                <p>Desde nossa fundação, já formamos centenas de alunos e impactamos dezenas de escolas e instituições, levando o conhecimento em tecnologia para quem mais precisa.</p>
+            <div id="containerTutoriais" class="grid-3">
             </div>
         </div>
     </section>
 
-    <section id="tutoriais" class="section-white">
-    <div class="container">
-        <div class="section-title">
-            <h2>Tutoriais & Mão na Massa</h2>
-            <p>Explore nossos guias passo a passo para dominar as ferramentas mais utilizadas na robótica e programação.</p>
-        </div>
-        <div id="containerTutoriais" class="grid-3">
-            </div>
-    </div>
-    </section>
-
-    <section id="desafios" class="section-light">
-    <div class="container">
-        <div class="section-title">
-            <h2>Desafios EPRA</h2>
-            <p>Participe, teste seus conhecimentos e ganhe destaque na comunidade.</p>
-        </div>
-
-        <div class="challenge-box-yellow">
-            <span class="badge-gold">Desafio Atual</span>
-            <h3>Desafio de Dezembro: Sistema de Alarme Inteligente</h3>
-            <p>Crie um sistema de alarme completo utilizando Arduino que detecte movimento através de sensores PIR e envie notificações visuais e sonoras.</p>
-            
-            <div class="challenge-meta">
-                <span>📅 Prazo: 31 Dez 2025</span>
-                <span>👥 Participantes: 42</span>
-            </div>
-            
-            <button class="btn btn-primary">Participar do Desafio</button>
-        </div>
-
-    </div>
-    </section>
-
-    <section id="biblioteca" class="section-white">
+    <section id="desafios" class="section-light section-padding" data-aos="fade-up">
         <div class="container">
-            <h2 class="section-header">Biblioteca de Códigos & Materiais</h2>
-            <p class="full-width" style="margin-bottom: 30px; color: #666;">
-                Acesse nosso repositório completo de códigos-fonte, bibliotecas úteis e todo material de apoio dos nossos cursos.
-            </p>
+            <div class="section-title">
+                <h2>Desafios EPRA</h2>
+                <p>Participe, teste seus conhecimentos e ganhe destaque na comunidade.</p>
+            </div>
+
+            <div class="desafio-destaque">
+                <span class="desafio-badge-pill">Desafio Atual</span>
+                <h2>Desafio de Dezembro: Sistema de Alarme Inteligente</h2>
+                <p>Crie um sistema de alarme completo utilizando Arduino que detecte movimento através de sensores PIR e envie notificações visuais e sonoras.</p>
+                
+                <div class="desafio-meta">
+                    <span class="desafio-chip">📅 Prazo: 31 Dez 2025</span>
+                    <span class="desafio-chip">👥 Participantes: 42</span>
+                </div>
+                
+                <button class="btn btn-desafio">Participar do Desafio</button>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="biblioteca" class="section-white section-padding" data-aos="fade-up">
+        <div class="container">
+            <div class="section-title">
+                <h2>Biblioteca de Códigos & Materiais</h2>
+                <p>Acesse nosso repositório completo de códigos-fonte, bibliotecas úteis e todo material de apoio dos nossos cursos.</p>
+            </div>
             
             <div class="custom-tabs-wrapper filter-library">
                 <div class="tabs-pill-bg">
@@ -164,19 +178,19 @@
                     <p>Exemplo básico de como fazer um LED piscar com Arduino.</p>
                     <div class="lib-card-footer">
                         <span class="meta-info">⬇ 523 | C++</span>
-                        <button class="btn-lib-download">Download</button>
+                        <button class="btn btn-primary btn-sm">Download</button>
                     </div>
                 </div>
-                </div>
+            </div>
         </div>
     </section>
 
-    <section id="cursos" class="section-light">
+    <section id="cursos" class="section-light section-padding" data-aos="fade-up">
         <div class="container">
-            <h2 class="section-header">Cursos EPRA</h2>
-            <p style="text-align: center; margin-bottom: 30px; color: #666;">
-                Cursos práticos e gratuitos de programação, robótica e eletrônica. Confira os próximos cursos e nosso histórico desde 2018.
-            </p>
+            <div class="section-title">
+                <h2>Cursos EPRA</h2>
+                <p>Cursos práticos e gratuitos de programação, robótica e eletrônica. Confira os próximos cursos e nosso histórico desde 2018.</p>
+            </div>
 
             <div class="custom-tabs-wrapper filter-courses">
                 <div class="tabs-pill-bg">
@@ -264,12 +278,12 @@
         </div>
     </section>
 
-    <section id="portfolio" class="section-white">
+    <section id="portfolio" class="section-white section-padding" data-aos="fade-up">
         <div class="container">
-            <h2 class="section-header">Portfólio de Projetos</h2>
-            <p style="text-align: center; margin-bottom: 40px; color: #666; max-width: 700px; margin-left: auto; margin-right: auto;">
-                Conheça os incríveis projetos desenvolvidos pelos nossos alunos. Cada projeto representa horas de aprendizado, dedicação e criatividade.
-            </p>
+            <div class="section-title">
+                <h2>Portfólio de Projetos</h2>
+                <p>Conheça os incríveis projetos desenvolvidos pelos nossos alunos. Cada projeto representa horas de aprendizado, dedicação e criatividade.</p>
+            </div>
 
             <div class="grid-3">
                 <div class="project-card">
@@ -288,31 +302,90 @@
         </div>
     </section>
 
-    <section id="impacto" class="section-light">
+    <section id="impacto" class="section-light section-padding">
+        <div class="container">
+            <div class="section-title" data-aos="fade-up">
+                <h2>Nosso Impacto</h2>
+                <p>Números que mostram nosso compromisso com o futuro</p>
+            </div>
+            <div class="impact-grid">
+                <div class="impact-card" data-aos="zoom-in" data-aos-delay="100">
+                    <span class="impact-icon">🏫</span>
+                    <h3 id="num-escolas">20+</h3>
+                    <p>Escolas Atendidas</p>
+                </div>
+                <div class="impact-card" data-aos="zoom-in" data-aos-delay="200">
+                    <span class="impact-icon">👥</span>
+                    <h3 id="num-alunos">500+</h3>
+                    <p>Alunos Alcançados</p>
+                </div>
+                <div class="impact-card" data-aos="zoom-in" data-aos-delay="300">
+                    <span class="impact-icon">⏱️</span>
+                    <h3 id="num-horas">2000+</h3>
+                    <p>Horas de Ensino</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="oportunidades" class="section-white section-padding" data-aos="fade-up">
         <div class="container">
             <div class="section-title">
-                <h2>Nossos Resultados & Impacto</h2>
-                <p>Números que refletem nosso compromisso em transformar a educação através da tecnologia e inovação.</p>
+                <h2>Vagas e Oportunidades</h2>
+                <p>Participe dos nossos processos seletivos para bolsas e voluntariado.</p>
             </div>
+            <div class="grid-2 filter-vagas">
             </div>
+        </div>
     </section>
 
-    <section id="oportunidades" class="section-white">
+    <section class="cta-section">
+        <div class="container" data-aos="zoom-in">
+            <h2>Pronto para aprender conosco?</h2>
+            <p>Junte-se a centenas de estudantes explorando o mundo da tecnologia.</p>
+            <a href="#cursos" class="btn btn-primary">Inscreva-se Agora</a>
+        </div>
+    </section>
+
+    <footer class="footer">
         <div class="container">
-            <h2 class="section-header">Vagas e Oportunidades</h2>
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="#" class="nav-logo">EPRA</a>
+                    <p>Democratizando o conhecimento em tecnologia através da Robótica e Programação. Um projeto de extensão da UFC - Campus Russas.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Links Úteis</h4>
+                    <ul>
+                        <li><a href="#inicio">Início</a></li>
+                        <li><a href="#sobre">Sobre Nós</a></li>
+                        <li><a href="#cursos">Cursos Abertos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Comunidade</h4>
+                    <ul>
+                        <li><a href="#tutoriais">Tutoriais</a></li>
+                        <li><a href="#portfolio">Portfólio de Alunos</a></li>
+                        <li><a href="#desafios">Desafios</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contato</h4>
+                    <ul>
+                        <li><a href="mailto:contato@epra.ufc.br">contato@epra.ufc.br</a></li>
+                    </ul>
+                    <div class="social-links" style="margin-top: 16px;">
+                        <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
             </div>
-    </section>
-
-    <footer>
-        <div class="container footer-content">
-            <div class="footer-section about">
-                <h2>EPRA</h2>
-                <p>Democratizando o conhecimento em tecnologia através da Robótica e Programação. Um projeto de extensão da UFC - Campus Russas.</p>
+            <div class="footer-bottom">
+                <p>&copy; 2026 EPRA - Todos os direitos reservados.</p>
+                <p class="designer">Desenvolvido com 💙 pela equipe de extensão</p>
             </div>
-            </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 EPRA - Todos os direitos reservados.</p>
-            <p class="designer">Desenvolvido com 💙 pela equipe de extensão</p>
         </div>
     </footer>
 
@@ -428,6 +501,10 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+      AOS.init({ duration: 700, once: true, offset: 80 });
+    </script>
     <script src="js/script.js"></script>
 </body>
 </html>
