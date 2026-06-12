@@ -15,10 +15,22 @@ const criarCurso = async (req, res) => {
     }
 };
 
-// 2. Listar todos os cursos
+// 2. Listar todos os cursos (AGORA COM CÁLCULO DINÂMICO DE VAGAS)
 const listarCursos = async (req, res) => {
     try {
-        const resultado = await db.query('SELECT * FROM curso ORDER BY datainicio ASC');
+        // A MÁGICA: Subtrai a quantidade de inscritos do total de vagas original do curso
+        const query = `
+            SELECT c.id, c.titulo, c.descricao, c.datainicio, c.vagas AS vagas_totais,
+                   (c.vagas - COALESCE(i.qtd, 0)) AS vagas
+            FROM curso c
+            LEFT JOIN (
+                SELECT curso_id, COUNT(*) AS qtd 
+                FROM inscricao 
+                GROUP BY curso_id
+            ) i ON c.id = i.curso_id
+            ORDER BY c.datainicio ASC
+        `;
+        const resultado = await db.query(query);
         res.json(resultado.rows);
     } catch (err) {
         console.error('❌ ERRO DETALHADO DO BANCO (LISTAR CURSOS):', err);
@@ -26,7 +38,7 @@ const listarCursos = async (req, res) => {
     }
 };
 
-// 3. Obter um curso específico pelo ID (para preencher o modal de edição)
+// 3. Obter um curso específico pelo ID
 const obterCurso = async (req, res) => {
     const { id } = req.params;
     try {
@@ -73,4 +85,5 @@ const excluirCurso = async (req, res) => {
     }
 };
 
+// Repare que o excluirCurso está correto aqui para não quebrar a sua rota!
 module.exports = { criarCurso, listarCursos, obterCurso, atualizarCurso, excluirCurso };
