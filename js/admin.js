@@ -3,12 +3,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const userStr = localStorage.getItem('usuario');
 
     if (!token || !userStr) {
-        window.location.href = 'index.html'; 
+        window.location.href = 'login.html'; 
         return;
     }
     const user = JSON.parse(userStr);
-    if (user.tipo !== 'ORIENTADOR') {
-        window.location.href = 'index.html'; 
+    if (user.tipo !== 'COORDENADOR' && user.tipo !== 'ORIENTADOR' && user.tipo !== 'ADMIN') {
+        window.location.href = 'login.html'; 
         return;
     }
 
@@ -40,13 +40,13 @@ window.fecharModal = function(idModal) {
 };
 
 window.logout = function() {
-    localStorage.clear();
-    window.location.href = 'index.html';
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
+    window.location.href = 'login.html';
 };
 
-// --- FUNÇÕES DE COMUNICAÇÃO COM O BACKEND ---
+// --- GESTÃO DE CURSOS ---
 
-// Listar Cursos
 async function carregarCursosAdmin() {
     const tbody = document.getElementById('corpoTabelaCursos');
     try {
@@ -67,6 +67,7 @@ async function carregarCursosAdmin() {
                     <td>${dataFormatada}</td>
                     <td>${curso.vagas}</td>
                     <td>
+                        <button class="btn-sm btn-info" onclick="gerenciarInscritos(${curso.id}, '${curso.titulo}')">👥 Inscritos</button>
                         <button class="btn-sm btn-edit" onclick="editarCurso(${curso.id})">Editar</button>
                         <button class="btn-sm btn-delete" onclick="excluirCurso(${curso.id})">Excluir</button>
                     </td>
@@ -78,7 +79,6 @@ async function carregarCursosAdmin() {
     }
 }
 
-// Submeter Novo Curso
 document.getElementById('formCurso').addEventListener('submit', async (e) => {
     e.preventDefault();
     const curso = {
@@ -116,9 +116,9 @@ document.getElementById('formCurso').addEventListener('submit', async (e) => {
     }
 });
 
-// Abrir modal de edição com os dados
 window.editarCurso = async function(id) {
     try {
+        // Corrigido para /api/cursos/ (plural)
         const response = await fetch(`http://localhost:3000/api/cursos/${id}`);
         if (!response.ok) throw new Error('Curso não encontrado');
         const curso = await response.json();
@@ -142,7 +142,6 @@ window.editarCurso = async function(id) {
     }
 };
 
-// Submeter Edição do Curso
 document.getElementById('formEditarCurso').addEventListener('submit', async (e) => {
     e.preventDefault();
     const id = document.getElementById('editIdCurso').value;
@@ -157,6 +156,7 @@ document.getElementById('formEditarCurso').addEventListener('submit', async (e) 
     const msgFeedback = document.getElementById('msgEditFeedback');
 
     try {
+        // Corrigido para /api/cursos/ (plural)
         const response = await fetch(`http://localhost:3000/api/cursos/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -181,26 +181,25 @@ document.getElementById('formEditarCurso').addEventListener('submit', async (e) 
     }
 });
 
-// Excluir Curso
 window.excluirCurso = function(id) {
     document.getElementById('idParaExcluir').value = id;
     abrirModal('modalConfirmacao');
 };
 
-// Esta nova função é que executa o delete no servidor
 window.confirmarExclusao = async function() {
     const id = document.getElementById('idParaExcluir').value;
     const token = localStorage.getItem('token');
     
     try {
-        const response = await fetch(`http://localhost:3000/api/curso/${id}`, {
+        // Corrigido para /api/cursos/ (plural)
+        const response = await fetch(`http://localhost:3000/api/cursos/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (response.ok) {
             fecharModal('modalConfirmacao');
-            carregarCursosAdmin(); // Atualiza a tabela
+            carregarCursosAdmin(); 
         } else {
             alert("Erro ao excluir o curso.");
         }
@@ -209,3 +208,160 @@ window.confirmarExclusao = async function() {
         alert("Servidor indisponível.");
     }
 };
+
+// --- GESTÃO DE ALUNOS E INSCRIÇÕES ---
+
+window.gerenciarInscritos = async function(cursoId, tituloCurso) {
+    document.getElementById('tituloModalInscritos').innerText = `Inscritos: ${tituloCurso}`;
+    document.getElementById('manualCursoId').value = cursoId;
+    document.getElementById('formInscricaoManual').style.display = 'none';
+    
+    await atualizarTabelaInscritos(cursoId);
+    abrirModal('modalInscritos');
+};
+
+async function atualizarTabelaInscritos(cursoId) {
+    const tbody = document.getElementById('corpoTabelaInscritos');
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Buscando alunos...</td></tr>';
+    
+    const token = localStorage.getItem('token');
+
+    try {
+        const response = await fetch(`http://localhost:3000/api/inscricoes/curso/${cursoId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) throw new Error('Acesso negado pelo servidor');
+
+        const inscritos = await response.json();
+        tbody.innerHTML = '';
+
+        if (inscritos.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Nenhum aluno inscrito neste curso.</td></tr>';
+            return;
+        }
+
+        inscritos.forEach(aluno => {
+            const nomeSeguro = aluno.nome ? aluno.nome.replace(/'/g, "\\'") : '';
+            
+            let btnTermo = '<span style="color:#999; font-size:0.85rem;">Sem anexo</span>';
+            if (aluno.termo_consentimento) {
+                const caminhoCorrigido = aluno.termo_consentimento.replace(/\\/g, '/');
+                btnTermo = `<a href="http://localhost:3000/${caminhoCorrigido}" target="_blank" class="btn-sm btn-info" style="text-decoration:none; display:inline-block; text-align:center;">Ver PDF</a>`;
+            }
+
+            tbody.innerHTML += `
+                <tr>
+                    <td>${aluno.nome}</td>
+                    <td>${aluno.documento}</td>
+                    <td>${aluno.email}</td>
+                    <td>${btnTermo}</td> <td>
+                        <button class="btn-sm btn-edit" onclick="abrirEdicaoInscrito(${aluno.id}, '${nomeSeguro}', '${aluno.documento}', '${aluno.email}', ${cursoId})">Editar</button>
+                        <button class="btn-sm btn-delete" onclick="removerInscrito(${aluno.id}, ${cursoId})">Remover</button>
+                    </td>
+                </tr>
+            `;
+        });
+    } catch (error) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Erro ao carregar dados.</td></tr>';
+    }
+}
+
+window.exibirFormularioInscricaoManual = function() {
+    document.getElementById('formInscricaoManual').style.display = 'block';
+};
+
+document.getElementById('formInscricaoManual').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const cursoId = document.getElementById('manualCursoId').value;
+    const token = localStorage.getItem('token');
+
+    const dados = {
+        curso_id: cursoId,
+        nome: document.getElementById('manualNome').value,
+        documento: document.getElementById('manualDocumento').value,
+        email: document.getElementById('manualEmail').value
+    };
+
+    try {
+        const response = await fetch('http://localhost:3000/api/inscricoes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(dados)
+        });
+
+        if (response.ok) {
+            alert('Aluno inscrito manualmente com sucesso!');
+            document.getElementById('formInscricaoManual').reset();
+            document.getElementById('formInscricaoManual').style.display = 'none';
+            atualizarTabelaInscritos(cursoId);
+        } else {
+            alert('Falha ao registrar inscrição.');
+        }
+    } catch (error) {
+        alert('Servidor fora do ar.');
+    }
+});
+
+window.removerInscrito = async function(inscricaoId, cursoId) {
+    if (confirm("Deseja mesmo cancelar a inscrição deste aluno?")) {
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch(`http://localhost:3000/api/inscricoes/${inscricaoId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                atualizarTabelaInscritos(cursoId);
+            } else {
+                alert('Erro ao cancelar.');
+            }
+        } catch (error) {
+            alert('Erro de conexão.');
+        }
+    }
+};
+
+window.abrirEdicaoInscrito = function(id, nome, documento, email, cursoId) {
+    document.getElementById('editInscritoId').value = id;
+    document.getElementById('editInscritoCursoId').value = cursoId;
+    document.getElementById('editInscritoNome').value = nome;
+    document.getElementById('editInscritoDocumento').value = documento;
+    document.getElementById('editInscritoEmail').value = email;
+    
+    abrirModal('modalEditarInscrito');
+};
+
+document.getElementById('formEditarInscrito').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('editInscritoId').value;
+    const cursoId = document.getElementById('editInscritoCursoId').value;
+    const token = localStorage.getItem('token');
+    
+    const dados = {
+        nome: document.getElementById('editInscritoNome').value,
+        documento: document.getElementById('editInscritoDocumento').value,
+        email: document.getElementById('editInscritoEmail').value
+    };
+
+    try {
+        const response = await fetch(`http://localhost:3000/api/inscricoes/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(dados)
+        });
+
+        if (response.ok) {
+            alert('Dados do aluno atualizados com sucesso!');
+            fecharModal('modalEditarInscrito');
+            atualizarTabelaInscritos(cursoId);
+        } else {
+            alert('Erro ao atualizar os dados do aluno.');
+        }
+    } catch (error) {
+        alert('Servidor indisponível.');
+    }
+});

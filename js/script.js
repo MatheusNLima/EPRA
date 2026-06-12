@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    checkAuthStatus();
 
     const mobileMenu = document.getElementById('mobile-menu');
     const navLinks = document.querySelector('.nav-links');
@@ -15,41 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-    function checkAuthStatus() {
-    const token = localStorage.getItem('token');
-    const userStr = localStorage.getItem('usuario');
-    const loginLink = document.getElementById('loginLink');
-    const adminLink = document.getElementById('adminLink');
-    const logoutLink = document.getElementById('logoutLink');
-
-    if (token && userStr) {
-        const user = JSON.parse(userStr);
-        if (loginLink) loginLink.style.display = 'none';
-        if (logoutLink) logoutLink.style.display = 'block';
-        if (adminLink) adminLink.style.display = (user.tipo === 'ORIENTADOR') ? 'block' : 'none';
-    } else {
-        if (loginLink) loginLink.style.display = 'block';
-        if (adminLink) adminLink.style.display = 'none';
-        if (logoutLink) logoutLink.style.display = 'none';
-    }
-    }
-
-    window.logout = function() {
-        localStorage.clear();
-        window.location.href = 'index.html';
-    };
-
-    window.verificarAcao = function(callback) {
-        if (localStorage.getItem('token')) {
-            callback();
-        } else {
-            document.getElementById('modalLogin').style.display = 'flex';
-        }
-    };
-
-    window.fecharModal = function() {
-        document.getElementById('modalLogin').style.display = 'none';
-    };
 
     function setupFilter(buttonClass, itemClass) {
         const buttons = document.querySelectorAll(buttonClass);
@@ -85,15 +49,34 @@ document.addEventListener('DOMContentLoaded', () => {
             const grid = document.querySelector('.courses-grid');
             if (!grid) return;
             
-            grid.innerHTML = '';
+            const containerDinamico = document.getElementById('cursos-container');
+            if(containerDinamico) containerDinamico.innerHTML = '';
+
+            if (cursos.length === 0 && containerDinamico) {
+                containerDinamico.innerHTML = '<p style="text-align: center; width: 100%; grid-column: 1 / -1; padding: 20px;">Nenhum curso com inscrições abertas no momento.</p>';
+                return;
+            }
+
+            let htmlCursos = '';
             cursos.forEach(curso => {
                 const dataFormatada = curso.datainicio ? new Date(curso.datainicio).toLocaleDateString('pt-BR') : 'A definir';
                 
-                grid.innerHTML += `
+                // Lógica de visualização dinâmica se não houver vagas
+                let statusBandeira = `<span class="status-green">Inscrições Abertas</span>`;
+                let vagasInfo = `<span class="slots">${curso.vagas} vagas disponíveis</span>`;
+                let botaoAcao = `<button class="btn btn-dark" style="flex: 1;" onclick="abrirFormularioInscricao(${curso.id})">Inscrever-se</button>`;
+
+                if (curso.vagas <= 0) {
+                    statusBandeira = `<span class="status-green" style="background-color: #d9534f;">Turma Cheia</span>`;
+                    vagasInfo = `<span class="slots" style="color: #d9534f; font-weight: bold;">Esgotado</span>`;
+                    botaoAcao = `<button class="btn btn-dark" style="flex: 1; background: #666; cursor: not-allowed;" disabled>Sem Vagas</button>`;
+                }
+
+                htmlCursos += `
                     <div class="course-card" data-category="proximos">
                         <div class="course-header">
-                            <span class="status-green">Inscrições Abertas</span>
-                            <span class="slots">${curso.vagas} vagas disponíveis</span>
+                            ${statusBandeira}
+                            ${vagasInfo}
                         </div>
                         <h3>${curso.titulo}</h3>
                         <p>${curso.descricao}</p>
@@ -101,12 +84,17 @@ document.addEventListener('DOMContentLoaded', () => {
                             <li>📅 Início: ${dataFormatada}</li>
                         </ul>
                         <div style="margin-top: 20px; display: flex; gap: 10px;">
-                            <button class="btn btn-dark" style="flex: 1;">Inscrever-se</button>
+                            ${botaoAcao}
                             <button class="btn btn-outline">Mais Detalhes</button>
                         </div>
                     </div>
                 `;
             });
+
+            if(containerDinamico) {
+                containerDinamico.innerHTML = htmlCursos;
+            }
+
             setupFilter('.filter-courses .tab-pill', '.courses-grid .course-card');
         } catch (error) { console.error(error); }
     }
@@ -233,10 +221,79 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { console.error(error); }
     }
 
+    // Como o carregarCursos vai ser chamado novamente após inscrição, tornei-o global no escopo da página
+    window.atualizarVisualizacaoCursos = carregarCursos;
+
     carregarCursos();
     carregarVagas();
     carregarMateriais();
     carregarTutoriais();
     carregarPortfolio();
     carregarImpacto();
+});
+
+// --- FUNÇÕES DE INSCRIÇÃO PÚBLICA ---
+
+window.abrirFormularioInscricao = function(idCurso) {
+    document.getElementById('inscricaoCursoId').value = idCurso;
+    document.getElementById('modalInscricaoPublica').style.display = 'flex';
+};
+
+window.fecharModalInscricao = function() {
+    document.getElementById('modalInscricaoPublica').style.display = 'none';
+    document.getElementById('formInscricaoPublica').reset();
+};
+
+document.getElementById('formInscricaoPublica').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const btnSubmit = e.target.querySelector('button[type="submit"]');
+    const textoOriginal = btnSubmit.innerText;
+    btnSubmit.innerText = 'A enviar...';
+    btnSubmit.disabled = true;
+
+    const formData = new FormData();
+    
+    formData.append('curso_id', document.getElementById('inscricaoCursoId').value);
+    formData.append('nome', document.getElementById('inscNome').value);
+    formData.append('documento', document.getElementById('inscDocumento').value);
+    formData.append('email', document.getElementById('inscEmail').value);
+    formData.append('telefone', document.getElementById('inscTelefone').value);
+    
+    const progSelecionado = document.querySelector('input[name="conhecimentoProg"]:checked');
+    if (progSelecionado) formData.append('conhecimento_programacao', progSelecionado.value);
+    
+    const robSelecionado = document.querySelector('input[name="conhecimentoRob"]:checked');
+    if (robSelecionado) formData.append('conhecimento_robotica', robSelecionado.value);
+    
+    formData.append('instituicao_ensino', document.getElementById('inscInstituicao').value);
+    
+    const inputArquivo = document.getElementById('inscTermo');
+    if (inputArquivo.files.length > 0) {
+        formData.append('termo_consentimento', inputArquivo.files[0]);
+    }
+
+    try {
+        const response = await fetch('http://localhost:3000/api/inscricoes/publica', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            alert('Inscrição realizada com sucesso! Fique atento ao seu e-mail.');
+            fecharModalInscricao();
+            // Atualiza os cursos na tela imediatamente para o aluno ver a vaga a descer!
+            if (window.atualizarVisualizacaoCursos) window.atualizarVisualizacaoCursos(); 
+        } else {
+            // Lemos a mensagem de erro do backend (ex: "Desculpe, as vagas para esta turma esgotaram!")
+            const errorData = await response.json();
+            alert(errorData.erro || 'Ocorreu um erro ao processar a inscrição. Tente novamente.');
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Erro de ligação ao servidor.');
+    } finally {
+        btnSubmit.innerText = textoOriginal;
+        btnSubmit.disabled = false;
+    }
 });
