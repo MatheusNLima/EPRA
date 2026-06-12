@@ -551,3 +551,105 @@ footer {
     font-size: 0.95rem;
     white-space: nowrap; /* Impede que os nomes dos links fiquem um embaixo do outro */
 }
+
+/* ==========================================================================
+   PÁGINA DE DETALHES DO TUTORIAL (Fase 8)
+   ========================================================================== */
+
+.tutorial-details-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    align-items: start;
+    margin-bottom: 40px;
+}
+
+.tutorial-main-column h1 {
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.tutorial-media-block {
+    background: #f8f9fa;
+    border: 1px solid #eee;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    margin-bottom: 20px;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+}
+
+.tutorial-media-block img {
+    width: 100%;
+    max-height: 450px;
+    object-fit: cover;
+    display: block;
+}
+
+.tutorial-sidebar-card {
+    background: #f8f9fa;
+    border: 1px solid #eee;
+    border-radius: var(--border-radius);
+    padding: 25px;
+    position: sticky;
+    top: 90px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    transition: box-shadow 0.3s ease;
+}
+
+.tutorial-sidebar-card:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+.tutorial-text-content {
+    line-height: 1.8;
+    font-size: 1.05rem;
+    color: #444;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.tutorial-text-content h2, .tutorial-text-content h3, .tutorial-text-content h4 {
+    color: #333;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.tutorial-text-content p {
+    margin-bottom: 15px;
+}
+
+.tutorial-text-content pre {
+    background: #f1f3f5;
+    padding: 15px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-family: monospace;
+    font-size: 0.9rem;
+    margin: 15px 0;
+    border-left: 4px solid var(--primary-blue);
+}
+
+.tutorial-text-content code {
+    background: #f1f3f5;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    color: #d63384;
+}
+
+.tutorial-text-content ul {
+    margin-bottom: 15px;
+    padding-left: 20px;
+}
+
+@media (max-width: 768px) {
+    .tutorial-details-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .tutorial-sidebar-card {
+        position: static;
+    }
+}
