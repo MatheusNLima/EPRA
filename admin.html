@@ -27,6 +27,47 @@
         .btn-delete { background-color: #d9534f; color: white; }
         .btn-info { background-color: #0056b3; color: white; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .preview-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+        .preview-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .preview-delete-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(217, 83, 79, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            line-height: 20px;
+            text-align: center;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tag-badge {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-right: 4px;
+            color: #495057;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
@@ -74,8 +115,46 @@
                 </div>
             </div>
             
-            <div id="abaVagas" class="tab-content"><div class="header-aba"><h2>Gestão de Vagas</h2></div><p>Área em construção...</p></div>
-            <div id="abaTutoriais" class="tab-content"><h2>Tutoriais</h2><p>Área em construção...</p></div>
+            <div id="abaVagas" class="tab-content">
+                <div class="header-aba">
+                    <h2>Gestão de Vagas</h2>
+                    <button class="btn btn-dark" onclick="abrirModal('modalVaga')" style="padding: 10px 20px; background-color: #333; color: white; border: none; border-radius: 5px; cursor: pointer;">+ Nova Vaga</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Título da Vaga</th>
+                                <th>Data Limite</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabelaVagas">
+                            <tr><td colspan="3" style="text-align: center;">A carregar vagas...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="abaTutoriais" class="tab-content">
+                <div class="header-aba">
+                    <h2>Gestão de Tutoriais</h2>
+                    <button class="btn btn-dark" onclick="abrirModal('modalTutorial')" style="padding: 10px 20px; background-color: #333; color: white; border: none; border-radius: 5px; cursor: pointer;">+ Novo Tutorial</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Título do Tutorial</th>
+                                <th>Tags</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabelaTutoriais">
+                            <tr><td colspan="3" style="text-align: center;">A carregar tutoriais...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             <div id="abaBiblioteca" class="tab-content"><h2>Biblioteca</h2><p>Área em construção...</p></div>
             <div id="abaPortfolio" class="tab-content"><h2>Portfólio</h2><p>Área em construção...</p></div>
         </main>
@@ -186,6 +265,146 @@
             <div style="display:flex; gap:10px; margin-top: 20px;">
                 <button class="btn btn-outline" onclick="fecharModal('modalConfirmacao')" style="flex: 1; padding: 10px; cursor: pointer; border: 1px solid #333; background: white; border-radius: 5px;">Cancelar</button>
                 <button class="btn btn-dark" onclick="confirmarExclusao()" style="flex: 1; padding: 10px; background: #d9534f; color: white; border: none; cursor: pointer; border-radius: 5px;">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modais de Gestão de Vagas -->
+    <div id="modalVaga" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:500px;">
+            <h3 style="margin-bottom: 20px;">Criar Nova Vaga</h3>
+            <form id="formVaga">
+                <input type="text" id="tituloVaga" placeholder="Título da Vaga" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                <textarea id="descricaoVaga" placeholder="Descrição" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; min-height:100px; box-sizing: border-box;"></textarea>
+                <div style="margin-bottom: 15px;">
+                    <label for="dataLimiteVaga" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Data Limite para Candidatura</label>
+                    <input type="date" id="dataLimiteVaga" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                </div>
+                <p id="mensagemFeedbackVaga" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalVaga')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
+                    <button type="submit" class="btn btn-dark" style="flex: 1; padding: 10px; background: #333; color: white; border: none; cursor: pointer; border-radius: 5px;">Guardar Vaga</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalEditarVaga" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:500px;">
+            <h3 style="margin-bottom: 20px;">Editar Vaga</h3>
+            <form id="formEditarVaga">
+                <input type="hidden" id="editIdVaga">
+                <input type="text" id="editTituloVaga" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                <textarea id="editDescricaoVaga" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; min-height:100px; box-sizing: border-box;"></textarea>
+                <div style="margin-bottom: 15px;">
+                    <label for="editDataLimiteVaga" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Data Limite para Candidatura</label>
+                    <input type="date" id="editDataLimiteVaga" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                </div>
+                <p id="msgEditFeedbackVaga" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalEditarVaga')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
+                    <button type="submit" class="btn btn-dark" style="flex: 1; padding: 10px; background: #f0ad4e; color: white; border: none; cursor: pointer; border-radius: 5px;">Atualizar Vaga</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalConfirmacaoVaga" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:3000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:400px; text-align: center;">
+            <h3>Excluir Vaga</h3>
+            <p>Tem certeza que deseja excluir esta vaga? Esta ação não pode ser desfeita.</p>
+            <input type="hidden" id="idParaExcluirVaga">
+            <div style="display:flex; gap:10px; margin-top: 20px;">
+                <button class="btn btn-outline" onclick="fecharModal('modalConfirmacaoVaga')" style="flex: 1; padding: 10px; cursor: pointer; border: 1px solid #333; background: white; border-radius: 5px;">Cancelar</button>
+                <button class="btn btn-dark" onclick="confirmarExclusaoVaga()" style="flex: 1; padding: 10px; background: #d9534f; color: white; border: none; cursor: pointer; border-radius: 5px;">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modais de Gestão de Tutoriais -->
+    <div id="modalTutorial" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:600px; max-height:90vh; overflow-y:auto; box-sizing: border-box;">
+            <h3 style="margin-bottom: 20px;">Criar Novo Tutorial</h3>
+            <form id="formTutorial" enctype="multipart/form-data">
+                <input type="text" id="tituloTutorial" name="titulo" placeholder="Título do Tutorial *" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                
+                <textarea id="descricaoTutorial" name="descricao" placeholder="Descrição Curta (Opcional)" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; min-height:60px; box-sizing: border-box; resize: vertical;"></textarea>
+                
+                <textarea id="conteudoTutorial" name="conteudo" placeholder="Conteúdo Completo (Markdown/Texto) *" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; min-height:120px; box-sizing: border-box; resize: vertical;"></textarea>
+                
+                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                    <input type="text" id="linkgithubTutorial" name="linkgithub" placeholder="Link do GitHub (Opcional)" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                    <input type="text" id="linkVideoTutorial" name="link_video" placeholder="Link do Vídeo (Opcional)" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                </div>
+                
+                <input type="text" id="tagsTutorial" name="tags" placeholder="Tags (separadas por vírgula, ex: arduino, led, ufc)" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="imagensTutorial" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Selecionar Imagens (Máx. 5)</label>
+                    <input type="file" id="imagensTutorial" name="imagens" accept="image/*" multiple style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                    <div id="previewImagensTutorial" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
+                </div>
+
+                <p id="mensagemFeedbackTutorial" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
+                
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalTutorial')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
+                    <button type="submit" id="btnSalvarTutorial" class="btn btn-dark" style="flex: 1; padding: 10px; background: #333; color: white; border: none; cursor: pointer; border-radius: 5px;">Guardar Tutorial</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalEditarTutorial" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:600px; max-height:90vh; overflow-y:auto; box-sizing: border-box;">
+            <h3 style="margin-bottom: 20px;">Editar Tutorial</h3>
+            <form id="formEditarTutorial" enctype="multipart/form-data">
+                <input type="hidden" id="editIdTutorial">
+                
+                <input type="text" id="editTituloTutorial" name="titulo" placeholder="Título do Tutorial *" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                
+                <textarea id="editDescricaoTutorial" name="descricao" placeholder="Descrição Curta (Opcional)" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; min-height:60px; box-sizing: border-box; resize: vertical;"></textarea>
+                
+                <textarea id="editConteudoTutorial" name="conteudo" placeholder="Conteúdo Completo (Markdown/Texto) *" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; min-height:120px; box-sizing: border-box; resize: vertical;"></textarea>
+                
+                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                    <input type="text" id="editLinkgithubTutorial" name="linkgithub" placeholder="Link do GitHub (Opcional)" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                    <input type="text" id="editLinkVideoTutorial" name="link_video" placeholder="Link do Vídeo (Opcional)" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                </div>
+                
+                <input type="text" id="editTagsTutorial" name="tags" placeholder="Tags (separadas por vírgula, ex: arduino, led, ufc)" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                
+                <!-- Imagens Existentes -->
+                <div style="margin-bottom: 15px;">
+                    <label style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Imagens Existentes</label>
+                    <div id="containerImagensExistentes" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 5px;"></div>
+                </div>
+
+                <!-- Novas Imagens -->
+                <div style="margin-bottom: 15px;">
+                    <label for="editImagensNovo" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Adicionar Novas Imagens</label>
+                    <input type="file" id="editImagensNovo" name="imagens" accept="image/*" multiple style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                    <div id="previewNovasImagensTutorial" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
+                </div>
+
+                <p id="msgEditFeedbackTutorial" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
+                
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalEditarTutorial')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
+                    <button type="submit" id="btnAtualizarTutorial" class="btn btn-dark" style="flex: 1; padding: 10px; background: #f0ad4e; color: white; border: none; cursor: pointer; border-radius: 5px;">Atualizar Tutorial</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalConfirmacaoTutorial" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:3000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:400px; text-align: center;">
+            <h3>Excluir Tutorial</h3>
+            <p>Tem certeza que deseja excluir este tutorial? Esta ação não pode ser desfeita e todas as imagens associadas serão removidas do disco.</p>
+            <input type="hidden" id="idParaExcluirTutorial">
+            <div style="display:flex; gap:10px; margin-top: 20px;">
+                <button class="btn btn-outline" onclick="fecharModal('modalConfirmacaoTutorial')" style="flex: 1; padding: 10px; cursor: pointer; border: 1px solid #333; background: white; border-radius: 5px;">Cancelar</button>
+                <button class="btn btn-dark" onclick="confirmarExclusaoTutorial()" style="flex: 1; padding: 10px; background: #d9534f; color: white; border: none; cursor: pointer; border-radius: 5px;">Excluir</button>
             </div>
         </div>
     </div>

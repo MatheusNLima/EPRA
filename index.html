@@ -112,36 +112,8 @@
             <h2>Tutoriais & Mão na Massa</h2>
             <p>Explore nossos guias passo a passo para dominar as ferramentas mais utilizadas na robótica e programação.</p>
         </div>
-        <div class="grid-3">
-            <div class="card">
-                <img src="images/tutorial-tinkercad.jpg" alt="Interface do TinkerCAD" class="card-img">
-                <div class="card-body">
-                    <span class="tag">Simulação</span>
-                    <h4>Primeiros Passos no TinkerCAD</h4>
-                    <p>Aprenda a simular seus primeiros circuitos com Arduino sem precisar de componentes físicos.</p>
-                    <a href="#" class="link-arrow">Acessar Tutorial ></a>
-                </div>
-            </div>
-
-            <div class="card">
-                <img src="images/tutorial-cpp.jpg" alt="Código C++ na tela" class="card-img">
-                <div class="card-body">
-                    <span class="tag">Programação</span>
-                    <h4>Lógica de Programação em C++</h4>
-                    <p>Entenda a sintaxe e a lógica por trás dos códigos que dão vida aos seus projetos de hardware.</p>
-                    <a href="#" class="link-arrow">Acessar Tutorial ></a>
-                </div>
-            </div>
-
-            <div class="card">
-                <img src="images/tutorial-eletronica.jpg" alt="Componentes eletrônicos" class="card-img">
-                <div class="card-body">
-                    <span class="tag">Básico</span>
-                    <h4>Eletrônica Básica para Robótica</h4>
-                    <p>Conheça os componentes fundamentais: resistores, leds, potenciômetros e muito mais.</p>
-                    <a href="#" class="link-arrow">Acessar Tutorial ></a>
-                </div>
-            </div>
+        <div id="containerTutoriais" class="grid-3">
+            <!-- Os cards dos tutoriais serão carregados dinamicamente via JS -->
         </div>
     </div>
     </section>
@@ -398,6 +370,68 @@
                 <div style="display: flex; gap: 10px;">
                     <button type="button" class="btn btn-outline" onclick="fecharModalInscricao()" style="flex: 1; padding: 12px; border-radius: 5px; cursor: pointer;">Cancelar</button>
                     <button type="submit" class="btn btn-dark" style="flex: 2; padding: 12px; background: #0056b3; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem;">Enviar Inscrição</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Candidatura a Vaga -->
+    <div id="modalCandidaturaVaga" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:500px;">
+            <h3 style="margin-bottom: 20px;">Candidatar-se à Vaga</h3>
+            <form id="formCandidaturaVaga" enctype="multipart/form-data">
+                <!-- ID da Vaga (Oculto) -->
+                <input type="hidden" id="candidaturaVagaId">
+
+                <!-- Título da Vaga (Somente Leitura) -->
+                <div style="margin-bottom: 15px;">
+                    <label style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Vaga Selecionada</label>
+                    <input type="text" id="candidaturaVagaTitulo" readonly style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; background-color:#e9ecef; box-sizing: border-box; font-weight: bold;">
+                </div>
+
+                <!-- Nome Completo (Obrigatório, Sem Pré-preenchimento) -->
+                <div style="margin-bottom: 15px;">
+                    <label for="candidaturaNome" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Nome Completo *</label>
+                    <input type="text" id="candidaturaNome" placeholder="Digite seu nome completo" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                </div>
+
+                <!-- E-mail (Obrigatório, Sem Pré-preenchimento) -->
+                <div style="margin-bottom: 15px;">
+                    <label for="candidaturaEmail" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">E-mail *</label>
+                    <input type="email" id="candidaturaEmail" placeholder="Digite seu e-mail" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                </div>
+
+                <!-- Curso (Obrigatório) -->
+                <div style="margin-bottom: 15px;">
+                    <label for="candidaturaCurso" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Curso da Faculdade *</label>
+                    <input type="text" id="candidaturaCurso" placeholder="Ex: Engenharia de Computação" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                </div>
+
+                <!-- Telefone (Obrigatório) -->
+                <div style="margin-bottom: 15px;">
+                    <label for="candidaturaTelefone" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Telefone/Celular *</label>
+                    <input type="tel" id="candidaturaTelefone" placeholder="(88) 99999-9999" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                </div>
+
+                <!-- LinkedIn (Opcional) -->
+                <div style="margin-bottom: 15px;">
+                    <label for="candidaturaLinkedin" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Link do LinkedIn (Opcional)</label>
+                    <input type="url" id="candidaturaLinkedin" placeholder="https://linkedin.com/in/seu-perfil" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                </div>
+
+                <!-- Currículo PDF (Obrigatório) -->
+                <div style="margin-bottom: 15px;">
+                    <label for="candidaturaCurriculo" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Currículo (Somente PDF) *</label>
+                    <input type="file" id="candidaturaCurriculo" accept=".pdf" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                </div>
+
+                <!-- Feedback de Envio -->
+                <p id="feedbackCandidatura" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
+
+                <!-- Ações -->
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="btn btn-outline" onclick="fecharModalCandidatura()" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
+                    <button type="submit" class="btn btn-dark" style="flex: 1; padding: 10px; background: #333; color: white; border: none; cursor: pointer; border-radius: 5px;">Confirmar Candidatura</button>
                 </div>
             </form>
         </div>

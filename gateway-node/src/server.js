@@ -1,6 +1,7 @@
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const express = require('express');
 const cors = require('cors');
-const path = require('path'); // <-- ADICIONADO: Necessário para gerir caminhos de ficheiros
 
 const cursoRoutes = require('./routes/cursoRoutes');
 const vagaRoutes = require('./routes/vagaRoutes');
@@ -19,7 +20,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// 👇 ADICIONADO: Torna a pasta 'uploads' pública para o painel conseguir abrir os PDFs
+// Torna a pasta 'uploads' pública para o painel conseguir abrir os PDFs
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.get('/api/health', (req, res) => {
