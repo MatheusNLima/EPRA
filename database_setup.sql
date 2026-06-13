@@ -62,7 +62,13 @@ CREATE TABLE portfolio (
     id SERIAL PRIMARY KEY,
     titulo VARCHAR(150) NOT NULL,
     autor VARCHAR(100) NOT NULL,
-    link_github VARCHAR(255)
+    link_github VARCHAR(255),
+    descricao TEXT,
+    conteudo TEXT,
+    imagens_paths TEXT,
+    link_video VARCHAR(255),
+    tags VARCHAR(255),
+    turma VARCHAR(100)
 );
 
 -- 7. Tabela de Depoimentos
@@ -144,9 +150,9 @@ INSERT INTO desafio (titulo, descricao, datalimite) VALUES
 ('Calculadora em Node.js', 'Desenvolva uma calculadora simples por linha de comando em Node.js.', '2026-07-05');
 
 -- Portfolio Inicial
-INSERT INTO portfolio (titulo, autor, link_github) VALUES
-('Braço Robótico Controlado por Bluetooth', 'Equipe EPRA 2025', 'https://github.com/epra/braco-robotico'),
-('Estufa Automatizada com IoT', 'João Silva', 'https://github.com/epra/estufa-iot');
+INSERT INTO portfolio (titulo, autor, link_github, descricao, conteudo, imagens_paths, link_video, tags, turma) VALUES
+('Braço Robótico Controlado por Bluetooth', 'Equipe EPRA 2025', 'https://github.com/epra/braco-robotico', 'Desenvolvimento de um braço robótico impresso em 3D e controlado via aplicativo Android por Bluetooth.', 'Este projeto consistiu no design 3D de um braço com 4 graus de liberdade utilizando servomotores SG90. O circuito foi alimentado por uma fonte externa de 5V e controlado por uma placa Arduino Uno integrada ao módulo Bluetooth HC-06. A programação foi desenvolvida em C++ e a interface móvel no MIT App Inventor.', '[]', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'Robótica, Bluetooth, Arduino', 'Equipe EPRA 2025'),
+('Estufa Automatizada com IoT', 'João Silva', 'https://github.com/epra/estufa-iot', 'Sistema de monitoramento e controle de temperatura e umidade do solo para cultivo interno.', 'Uma estufa inteligente utilizando sensores de umidade do solo e temperatura/umidade DHT11. Os dados coletados são enviados a cada 10 segundos para a nuvem via módulo ESP8266 NodeMCU. Se o solo estiver seco, uma minibomba de água de 5V é ativada automaticamente pelo relé. O painel de visualização de dados foi construído com a plataforma Adafruit IO.', '[]', '', 'Internet das Coisas, ESP8266, Sensores', 'UFC Russas 2025.2');
 
 -- Depoimentos
 INSERT INTO depoimento (autor, texto, aprovado) VALUES
