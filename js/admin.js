@@ -1,5 +1,7 @@
 let tutoriaisCarregados = [];
 let imagensMantidas = [];
+let portfolioCarregados = [];
+let imagensMantidasPortfolio = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
@@ -10,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     const user = JSON.parse(userStr);
-    if (user.tipo !== 'COORDENADOR' && user.tipo !== 'ORIENTADOR' && user.tipo !== 'ADMIN') {
+    if (user.tipo !== 'COORDENADOR' && user.tipo !== 'ORIENTADOR' && user.tipo !== 'ADMIN' && user.tipo !== 'ALUNO_INTERNO') {
         window.location.href = 'login.html'; 
         return;
     }
@@ -27,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     carregarCursosAdmin();
     carregarVagasAdmin();
     carregarTutoriaisAdmin();
+    carregarPortfolioAdmin();
 
     const hojeStr = new Date().toISOString().split('T')[0];
     const inputData = document.getElementById('dataLimiteVaga');
@@ -67,6 +70,9 @@ window.fecharModal = function(idModal) {
     const msgTutorial = document.getElementById(idModal === 'modalTutorial' ? 'mensagemFeedbackTutorial' : 'msgEditFeedbackTutorial');
     if (msgTutorial) msgTutorial.style.display = 'none';
 
+    const msgPortfolio = document.getElementById(idModal === 'modalPortfolio' ? 'mensagemFeedbackPortfolio' : 'msgEditFeedbackPortfolio');
+    if (msgPortfolio) msgPortfolio.style.display = 'none';
+
     if (idModal === 'modalTutorial' || idModal === 'modalEditarTutorial') {
         const previewCriar = document.getElementById('previewImagensTutorial');
         if (previewCriar) previewCriar.innerHTML = '';
@@ -79,6 +85,21 @@ window.fecharModal = function(idModal) {
         const btnSalvar = document.getElementById('btnSalvarTutorial');
         if (btnSalvar) btnSalvar.disabled = false;
         const btnAtualizar = document.getElementById('btnAtualizarTutorial');
+        if (btnAtualizar) btnAtualizar.disabled = false;
+    }
+
+    if (idModal === 'modalPortfolio' || idModal === 'modalEditarPortfolio') {
+        const previewCriar = document.getElementById('previewImagensPortfolio');
+        if (previewCriar) previewCriar.innerHTML = '';
+        const previewNovoEditar = document.getElementById('previewNovasImagensPortfolio');
+        if (previewNovoEditar) previewNovoEditar.innerHTML = '';
+        const containerExistente = document.getElementById('containerImagensExistentesPortfolio');
+        if (containerExistente) containerExistente.innerHTML = '';
+        imagensMantidasPortfolio = [];
+        
+        const btnSalvar = document.getElementById('btnSalvarPortfolio');
+        if (btnSalvar) btnSalvar.disabled = false;
+        const btnAtualizar = document.getElementById('btnAtualizarPortfolio');
         if (btnAtualizar) btnAtualizar.disabled = false;
     }
 };
@@ -927,3 +948,311 @@ window.confirmarExclusaoTutorial = async function() {
         alert('Servidor indisponível.');
     }
 };
+
+// --- GESTÃO DE PORTFÓLIO ---
+
+async function carregarPortfolioAdmin() {
+    const tbody = document.getElementById('corpoTabelaPortfolio');
+    if (!tbody) return;
+
+    try {
+        const response = await fetch('http://localhost:3000/api/portfolio');
+        if (!response.ok) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Erro ao ligar ao servidor.</td></tr>';
+            return;
+        }
+        const portfolio = await response.json();
+        portfolioCarregados = portfolio;
+        tbody.innerHTML = ''; 
+        
+        if (portfolio.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Nenhum projeto cadastrado ainda.</td></tr>';
+            return;
+        }
+
+        portfolio.forEach(projeto => {
+            const miniaturaUrl = (projeto.imagens_paths && projeto.imagens_paths.length > 0)
+                ? `http://localhost:3000${projeto.imagens_paths[0]}`
+                : 'images/default-portfolio.jpg';
+
+            const tagsBadges = projeto.tags 
+                ? projeto.tags.split(',').map(t => `<span class="tag-badge">${t.trim()}</span>`).join('') 
+                : '<em style="color:#aaa;">sem tags</em>';
+
+            tbody.innerHTML += `
+                <tr>
+                    <td>
+                        <div class="preview-container">
+                            <img src="${miniaturaUrl}">
+                        </div>
+                    </td>
+                    <td style="font-weight: 500;">${projeto.titulo}</td>
+                    <td>${tagsBadges}</td>
+                    <td>${projeto.autor}</td>
+                    <td>${projeto.turma}</td>
+                    <td>
+                        <button class="btn-sm btn-edit" onclick="editarPortfolio(${projeto.id})">Editar</button>
+                        <button class="btn-sm btn-delete" onclick="excluirPortfolio(${projeto.id})">Excluir</button>
+                    </td>
+                </tr>
+            `;
+        });
+    } catch (error) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Erro ao ligar ao servidor.</td></tr>';
+    }
+}
+
+const inputImagensPortfolio = document.getElementById('imagensPortfolio');
+if (inputImagensPortfolio) {
+    inputImagensPortfolio.addEventListener('change', function() {
+        const preview = document.getElementById('previewImagensPortfolio');
+        const feedback = document.getElementById('mensagemFeedbackPortfolio');
+        const btnSalvar = document.getElementById('btnSalvarPortfolio');
+        
+        preview.innerHTML = '';
+        feedback.style.display = 'none';
+        btnSalvar.disabled = false;
+        
+        if (this.files.length > 5) {
+            feedback.innerText = 'O máximo de imagens permitido é 5.';
+            feedback.style.color = '#d9534f';
+            feedback.style.display = 'block';
+            btnSalvar.disabled = true;
+            this.value = '';
+            return;
+        }
+        
+        Array.from(this.files).forEach(file => {
+            const url = URL.createObjectURL(file);
+            preview.innerHTML += `<div class="preview-container"><img src="${url}"></div>`;
+        });
+    });
+}
+
+const formPortfolio = document.getElementById('formPortfolio');
+if (formPortfolio) {
+    formPortfolio.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const feedback = document.getElementById('mensagemFeedbackPortfolio');
+        const btnSalvar = document.getElementById('btnSalvarPortfolio');
+        
+        btnSalvar.disabled = true;
+        
+        const formData = new FormData(this);
+        const token = localStorage.getItem('token');
+        
+        try {
+            const response = await fetch('http://localhost:3000/api/portfolio', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            });
+            
+            if (!window.verificarStatusResponse(response)) return;
+
+            if (response.ok) {
+                feedback.innerText = 'Projeto criado com sucesso!';
+                feedback.style.color = '#28a745';
+                feedback.style.display = 'block';
+                this.reset();
+                const preview = document.getElementById('previewImagensPortfolio');
+                if (preview) preview.innerHTML = '';
+                carregarPortfolioAdmin();
+                setTimeout(() => { fecharModal('modalPortfolio'); }, 1500);
+            } else {
+                const data = await response.json();
+                feedback.innerText = data.erro || 'Erro ao criar o projeto.';
+                feedback.style.color = '#d9534f';
+                feedback.style.display = 'block';
+                btnSalvar.disabled = false;
+            }
+        } catch (err) {
+            feedback.innerText = 'Servidor indisponível.';
+            feedback.style.color = '#d9534f';
+            feedback.style.display = 'block';
+            btnSalvar.disabled = false;
+        }
+    });
+}
+
+window.editarPortfolio = function(id) {
+    const projeto = portfolioCarregados.find(p => p.id === id);
+    if (!projeto) {
+        alert('Projeto não encontrado.');
+        return;
+    }
+    
+    document.getElementById('editIdPortfolio').value = projeto.id;
+    document.getElementById('editTituloPortfolio').value = projeto.titulo;
+    document.getElementById('editAutorPortfolio').value = projeto.autor;
+    document.getElementById('editTurmaPortfolio').value = projeto.turma;
+    document.getElementById('editTagsPortfolio').value = projeto.tags || '';
+    document.getElementById('editDescricaoPortfolio').value = projeto.descricao;
+    document.getElementById('editConteudoPortfolio').value = projeto.conteudo;
+    document.getElementById('editLinkgithubPortfolio').value = projeto.link_github || '';
+    document.getElementById('editLinkVideoPortfolio').value = projeto.link_video || '';
+    
+    imagensMantidasPortfolio = [...(projeto.imagens_paths || [])];
+    window.renderImagensExistentesPortfolio();
+    
+    const inputEditNovo = document.getElementById('editImagensNovoPortfolio');
+    if (inputEditNovo) inputEditNovo.value = '';
+    const previewNovoEditar = document.getElementById('previewNovasImagensPortfolio');
+    if (previewNovoEditar) previewNovoEditar.innerHTML = '';
+    
+    const feedback = document.getElementById('msgEditFeedbackPortfolio');
+    if (feedback) feedback.style.display = 'none';
+    
+    const btnAtualizar = document.getElementById('btnAtualizarPortfolio');
+    if (btnAtualizar) btnAtualizar.disabled = false;
+    
+    abrirModal('modalEditarPortfolio');
+};
+
+window.renderImagensExistentesPortfolio = function() {
+    const container = document.getElementById('containerImagensExistentesPortfolio');
+    if (!container) return;
+    container.innerHTML = '';
+    
+    imagensMantidasPortfolio.forEach(imgPath => {
+        container.innerHTML += `
+            <div class="preview-container">
+                <img src="http://localhost:3000${imgPath}">
+                <button type="button" class="preview-delete-btn" onclick="removerImagemMantidaPortfolio('${imgPath}')">&times;</button>
+            </div>
+        `;
+    });
+};
+
+window.removerImagemMantidaPortfolio = function(path) {
+    imagensMantidasPortfolio = imagensMantidasPortfolio.filter(img => img !== path);
+    window.renderImagensExistentesPortfolio();
+    window.validarQuantidadeImagensEditarPortfolio();
+};
+
+window.validarQuantidadeImagensEditarPortfolio = function() {
+    const inputEdit = document.getElementById('editImagensNovoPortfolio');
+    const feedback = document.getElementById('msgEditFeedbackPortfolio');
+    const btnAtualizar = document.getElementById('btnAtualizarPortfolio');
+    
+    const novasQty = inputEdit && inputEdit.files ? inputEdit.files.length : 0;
+    const totalQty = imagensMantidasPortfolio.length + novasQty;
+    
+    if (feedback) feedback.style.display = 'none';
+    if (btnAtualizar) btnAtualizar.disabled = false;
+    
+    if (totalQty > 5) {
+        if (feedback) {
+            feedback.innerText = 'O total de imagens (mantidas + novas) não pode exceder 5.';
+            feedback.style.color = '#d9534f';
+            feedback.style.display = 'block';
+        }
+        if (btnAtualizar) btnAtualizar.disabled = true;
+        return false;
+    }
+    return true;
+};
+
+const inputEditNovoPortfolio = document.getElementById('editImagensNovoPortfolio');
+if (inputEditNovoPortfolio) {
+    inputEditNovoPortfolio.addEventListener('change', function() {
+        const preview = document.getElementById('previewNovasImagensPortfolio');
+        if (preview) preview.innerHTML = '';
+        
+        const isValid = window.validarQuantidadeImagensEditarPortfolio();
+        
+        if (isValid && this.files) {
+            Array.from(this.files).forEach(file => {
+                const url = URL.createObjectURL(file);
+                if (preview) {
+                    preview.innerHTML += `<div class="preview-container"><img src="${url}"></div>`;
+                }
+            });
+        } else if (!isValid) {
+            this.value = '';
+            if (preview) preview.innerHTML = '';
+        }
+    });
+}
+
+const formEditarPortfolio = document.getElementById('formEditarPortfolio');
+if (formEditarPortfolio) {
+    formEditarPortfolio.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const id = document.getElementById('editIdPortfolio').value;
+        const feedback = document.getElementById('msgEditFeedbackPortfolio');
+        const btnAtualizar = document.getElementById('btnAtualizarPortfolio');
+        
+        if (!window.validarQuantidadeImagensEditarPortfolio()) {
+            return;
+        }
+        
+        btnAtualizar.disabled = true;
+        
+        const formData = new FormData(this);
+        formData.set('imagens_mantidas', JSON.stringify(imagensMantidasPortfolio));
+        const token = localStorage.getItem('token');
+        
+        try {
+            const response = await fetch(`http://localhost:3000/api/portfolio/${id}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            });
+            
+            if (!window.verificarStatusResponse(response)) return;
+
+            if (response.ok) {
+                feedback.innerText = 'Projeto atualizado com sucesso!';
+                feedback.style.color = '#28a745';
+                feedback.style.display = 'block';
+                carregarPortfolioAdmin();
+                setTimeout(() => { fecharModal('modalEditarPortfolio'); }, 1500);
+            } else {
+                const data = await response.json();
+                feedback.innerText = data.erro || 'Erro ao atualizar o projeto.';
+                feedback.style.color = '#d9534f';
+                feedback.style.display = 'block';
+                btnAtualizar.disabled = false;
+            }
+        } catch (err) {
+            feedback.innerText = 'Servidor indisponível.';
+            feedback.style.color = '#d9534f';
+            feedback.style.display = 'block';
+            btnAtualizar.disabled = false;
+        }
+    });
+}
+
+window.excluirPortfolio = function(id) {
+    document.getElementById('idParaExcluirPortfolio').value = id;
+    abrirModal('modalConfirmacaoPortfolio');
+};
+
+window.confirmarExclusaoPortfolio = async function() {
+    const id = document.getElementById('idParaExcluirPortfolio').value;
+    const token = localStorage.getItem('token');
+    
+    try {
+        const response = await fetch(`http://localhost:3000/api/portfolio/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!window.verificarStatusResponse(response)) return;
+
+        if (response.ok) {
+            fecharModal('modalConfirmacaoPortfolio');
+            carregarPortfolioAdmin();
+        } else {
+            alert('Erro ao excluir o projeto.');
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Servidor indisponível.');
+    }
+};
+
+window.carregarPortfolioAdmin = carregarPortfolioAdmin;

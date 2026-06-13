@@ -135,7 +135,29 @@
                 </div>
             </div>
             <div id="abaBiblioteca" class="tab-content"><h2>Biblioteca</h2><p>Área em construção...</p></div>
-            <div id="abaPortfolio" class="tab-content"><h2>Portfólio</h2><p>Área em construção...</p></div>
+            <div id="abaPortfolio" class="tab-content">
+                <div class="header-aba">
+                    <h2>Gestão de Portfólio</h2>
+                    <button class="btn btn-primary btn-sm" onclick="abrirModal('modalPortfolio')" >+ Novo Projeto</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Miniatura</th>
+                                <th>Título do Projeto</th>
+                                <th>Categoria</th>
+                                <th>Autor</th>
+                                <th>Turma</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabelaPortfolio">
+                            <tr><td colspan="6" style="text-align: center;">A carregar projetos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -384,6 +406,86 @@
             <div class="form-group-flex" style="margin-top: 20px;">
                 <button class="btn btn-outline" onclick="fecharModal('modalConfirmacaoTutorial')" style="flex: 1;">Cancelar</button>
                 <button class="btn btn-dark" onclick="confirmarExclusaoTutorial()" style="flex: 1;">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modais de Gestão de Portfólio -->
+    <div id="modalPortfolio" class="admin-modal-overlay">
+        <div class="admin-modal-card large">
+            <h3 style="margin-bottom: 20px;">Criar Novo Projeto</h3>
+            <form id="formPortfolio" enctype="multipart/form-data">
+                <input type="text" id="tituloPortfolio" name="titulo" placeholder="Título do Projeto *" required class="admin-input">
+                <div class="form-group-flex">
+                    <input type="text" id="autorPortfolio" name="autor" placeholder="Autor *" required class="admin-input">
+                    <input type="text" id="turmaPortfolio" name="turma" placeholder="Turma *" required class="admin-input">
+                </div>
+                <input type="text" id="tagsPortfolio" name="tags" placeholder="Tags (separadas por vírgula, ex: robótica, arduino, ufc)" class="admin-input">
+                <textarea id="descricaoPortfolio" name="descricao" placeholder="Descrição Curta *" required class="admin-textarea"></textarea>
+                <textarea id="conteudoPortfolio" name="conteudo" placeholder="Conteúdo Completo (Markdown/Texto) *" required class="admin-textarea"></textarea>
+                <div class="form-group-flex">
+                    <input type="text" id="linkgithubPortfolio" name="link_github" placeholder="Link do GitHub (Opcional)" class="admin-input">
+                    <input type="text" id="linkVideoPortfolio" name="link_video" placeholder="Link do Vídeo (Opcional)" class="admin-input">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label for="imagensPortfolio" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Selecionar Imagens (Máx. 5)</label>
+                    <input type="file" id="imagensPortfolio" name="imagens" accept="image/*" multiple class="admin-input">
+                    <div id="previewImagensPortfolio" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
+                </div>
+                <p id="mensagemFeedbackPortfolio" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
+                <div class="form-group-flex">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalPortfolio')" style="flex: 1;">Cancelar</button>
+                    <button type="submit" id="btnSalvarPortfolio" class="btn btn-primary" style="flex: 1;">Guardar Projeto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalEditarPortfolio" class="admin-modal-overlay">
+        <div class="admin-modal-card large">
+            <h3 style="margin-bottom: 20px;">Editar Projeto</h3>
+            <form id="formEditarPortfolio" enctype="multipart/form-data">
+                <input type="hidden" id="editIdPortfolio">
+                <input type="text" id="editTituloPortfolio" name="titulo" placeholder="Título do Projeto *" required class="admin-input">
+                <div class="form-group-flex">
+                    <input type="text" id="editAutorPortfolio" name="autor" placeholder="Autor *" required class="admin-input">
+                    <input type="text" id="editTurmaPortfolio" name="turma" placeholder="Turma *" required class="admin-input">
+                </div>
+                <input type="text" id="editTagsPortfolio" name="tags" placeholder="Tags (separadas por vírgula, ex: robótica, arduino, ufc)" class="admin-input">
+                <textarea id="editDescricaoPortfolio" name="descricao" placeholder="Descrição Curta *" required class="admin-textarea"></textarea>
+                <textarea id="editConteudoPortfolio" name="conteudo" placeholder="Conteúdo Completo (Markdown/Texto) *" required class="admin-textarea"></textarea>
+                <div class="form-group-flex">
+                    <input type="text" id="editLinkgithubPortfolio" name="link_github" placeholder="Link do GitHub (Opcional)" class="admin-input">
+                    <input type="text" id="editLinkVideoPortfolio" name="link_video" placeholder="Link do Vídeo (Opcional)" class="admin-input">
+                </div>
+                <!-- Imagens Existentes -->
+                <div style="margin-bottom: 15px;">
+                    <label style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Imagens Existentes</label>
+                    <div id="containerImagensExistentesPortfolio" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 5px;"></div>
+                </div>
+                <!-- Novas Imagens -->
+                <div style="margin-bottom: 15px;">
+                    <label for="editImagensNovoPortfolio" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Adicionar Novas Imagens</label>
+                    <input type="file" id="editImagensNovoPortfolio" name="imagens" accept="image/*" multiple class="admin-input">
+                    <div id="previewNovasImagensPortfolio" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
+                </div>
+                <p id="msgEditFeedbackPortfolio" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
+                <div class="form-group-flex">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalEditarPortfolio')" style="flex: 1;">Cancelar</button>
+                    <button type="submit" id="btnAtualizarPortfolio" class="btn btn-primary" style="flex: 1;">Atualizar Projeto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalConfirmacaoPortfolio" class="admin-modal-overlay">
+        <div class="admin-modal-card">
+            <h3>Excluir Projeto</h3>
+            <p>Tem certeza que deseja excluir este projeto? Esta ação não pode ser desfeita e todas as imagens associadas serão removidas do disco.</p>
+            <input type="hidden" id="idParaExcluirPortfolio">
+            <div class="form-group-flex" style="margin-top: 20px;">
+                <button class="btn btn-outline" onclick="fecharModal('modalConfirmacaoPortfolio')" style="flex: 1;">Cancelar</button>
+                <button class="btn btn-dark" onclick="confirmarExclusaoPortfolio()" style="flex: 1;">Excluir</button>
             </div>
         </div>
     </div>
