@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const user = JSON.parse(userStr);
             if (loginLink) loginLink.style.display = 'none';
             if (logoutLink) logoutLink.style.display = 'block';
-            if (adminLink) adminLink.style.display = (user.tipo === 'ORIENTADOR') ? 'block' : 'none';
+            if (adminLink) adminLink.style.display = (user.tipo === 'ORIENTADOR' || user.tipo === 'ALUNO_INTERNO' || user.tipo === 'COORDENADOR' || user.tipo === 'ADMIN') ? 'block' : 'none';
         } else {
             if (loginLink) loginLink.style.display = 'block';
             if (adminLink) adminLink.style.display = 'none';
@@ -254,22 +254,52 @@ document.addEventListener('DOMContentLoaded', () => {
     async function carregarPortfolio() {
         try {
             const response = await fetch('http://localhost:3000/api/portfolio');
+            if (!response.ok) throw new Error('Erro ao carregar o portfólio');
             const portfolio = await response.json();
             const grid = document.querySelector('#portfolio .grid-3');
             if (!grid) return;
 
             grid.innerHTML = '';
+            if (portfolio.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: #f8f9fa; border-radius: 8px;">
+                        <h3 style="margin-bottom: 10px; color: #333;">Nenhum projeto encontrado</h3>
+                    </div>
+                `;
+                return;
+            }
+
             portfolio.forEach(item => {
+                const imgSrc = (item.imagens_paths && item.imagens_paths.length > 0)
+                    ? `http://localhost:3000${item.imagens_paths[0]}`
+                    : 'images/default-portfolio.jpg';
+
+                const firstTag = item.tags ? item.tags.split(',')[0].trim() : 'Projeto';
+                const catBadgeHtml = `<span class="cat-badge">${firstTag}</span>`;
+
+                const videoBadgeHtml = item.link_video
+                    ? `<span class="media-badge video">▶ Video</span>`
+                    : '';
+
                 grid.innerHTML += `
-                    <div class="project-card project-body" style="display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 32px 24px;">
-                        <span class="badge badge-green" style="font-weight: 600;">Projeto</span>
-                        <h4 style="margin: 4px 0 0; font-size: 1.25rem; font-weight: 600; color: var(--text-dark);">${item.titulo}</h4>
-                        <p style="margin: 0; color: var(--text-light); font-size: 0.9rem;">Autor: ${item.autor}</p>
-                        <a href="${item.link_github}" target="_blank" class="btn btn-outline" style="margin-top: 8px;">Acessar Repositório</a>
+                    <div class="project-card">
+                        <div class="project-img-wrapper">
+                            <img src="${imgSrc}" alt="${item.titulo}" class="project-img">
+                            ${catBadgeHtml}
+                            ${videoBadgeHtml}
+                        </div>
+                        <div class="project-body">
+                            <h4>${item.titulo}</h4>
+                            <span class="project-meta">Autor: ${item.autor} | ${item.turma}</span>
+                            <p class="project-desc">${item.descricao || ''}</p>
+                            <a href="projeto.html?id=${item.id}" class="link-arrow">Acessar Projeto <span aria-hidden="true">&gt;</span></a>
+                        </div>
                     </div>
                 `;
             });
-        } catch (error) { console.error(error); }
+        } catch (error) { 
+            console.error('❌ ERRO (CARREGAR PORTFÓLIO HOME):', error); 
+        }
     }
 
     async function carregarImpacto() {
