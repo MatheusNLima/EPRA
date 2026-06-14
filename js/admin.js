@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     carregarVagasAdmin();
     carregarTutoriaisAdmin();
     carregarPortfolioAdmin();
+    carregarDesafiosAdmin();
 
     const hojeStr = new Date().toISOString().split('T')[0];
     const inputData = document.getElementById('dataLimiteVaga');
@@ -67,6 +68,9 @@ window.fecharModal = function(idModal) {
     const msgVaga = document.getElementById(idModal === 'modalVaga' ? 'mensagemFeedbackVaga' : 'msgEditFeedbackVaga');
     if (msgVaga) msgVaga.style.display = 'none';
     
+    const msgDesafio = document.getElementById(idModal === 'modalDesafio' ? 'mensagemFeedbackDesafio' : 'msgEditFeedbackDesafio');
+    if (msgDesafio) msgDesafio.style.display = 'none';
+
     const msgTutorial = document.getElementById(idModal === 'modalTutorial' ? 'mensagemFeedbackTutorial' : 'msgEditFeedbackTutorial');
     if (msgTutorial) msgTutorial.style.display = 'none';
 
@@ -1256,3 +1260,258 @@ window.confirmarExclusaoPortfolio = async function() {
 };
 
 window.carregarPortfolioAdmin = carregarPortfolioAdmin;
+
+// --- GESTÃO DE DESAFIOS ---
+
+async function carregarDesafiosAdmin() {
+    const tbody = document.getElementById('corpoTabelaDesafios');
+    if (!tbody) return; 
+    
+    try {
+        const response = await fetch('http://localhost:3000/api/desafios');
+        const desafios = await response.json();
+        tbody.innerHTML = ''; 
+        
+        if (desafios.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">Nenhum desafio cadastrado ainda.</td></tr>';
+            return;
+        }
+
+        desafios.forEach(desafio => {
+            const dataFormatada = desafio.datalimite ? new Date(desafio.datalimite).toLocaleDateString('pt-BR') : 'A definir';
+            tbody.innerHTML += `
+                <tr>
+                    <td style="font-weight: 500;">${desafio.titulo}</td>
+                    <td>${dataFormatada}</td>
+                    <td>
+                        <button class="btn-sm btn-info" onclick="verSolucoes(${desafio.id})">Ver Soluções</button>
+                        <button class="btn-sm btn-edit" onclick="editarDesafio(${desafio.id})">Editar</button>
+                        <button class="btn-sm btn-delete" onclick="excluirDesafio(${desafio.id})">Excluir</button>
+                    </td>
+                </tr>
+            `;
+        });
+    } catch (error) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: red;">Erro ao carregar dados.</td></tr>';
+    }
+}
+
+const formDesafio = document.getElementById('formDesafio');
+if (formDesafio) {
+    formDesafio.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const titulo = document.getElementById('tituloDesafio').value;
+        const descricao = document.getElementById('descricaoDesafio').value;
+        const datalimite = document.getElementById('dataLimiteDesafio').value;
+        const msgFeedback = document.getElementById('mensagemFeedbackDesafio');
+
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch('http://localhost:3000/api/desafios', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ titulo, descricao, datalimite })
+            });
+
+            if (!window.verificarStatusResponse(response)) return;
+
+            if (response.ok) {
+                msgFeedback.innerText = 'Desafio criado com sucesso!';
+                msgFeedback.style.color = '#28a745';
+                msgFeedback.style.display = 'block';
+                document.getElementById('formDesafio').reset();
+                carregarDesafiosAdmin();
+                setTimeout(() => { fecharModal('modalDesafio'); }, 1500);
+            } else {
+                const err = await response.json();
+                msgFeedback.innerText = err.erro || 'Erro ao criar o desafio.';
+                msgFeedback.style.color = '#d9534f';
+                msgFeedback.style.display = 'block';
+            }
+        } catch (err) {
+            msgFeedback.innerText = 'Servidor indisponível.';
+            msgFeedback.style.color = '#d9534f';
+            msgFeedback.style.display = 'block';
+        }
+    });
+}
+
+window.editarDesafio = async function(id) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/desafios/${id}`);
+        if (!response.ok) throw new Error('Desafio não encontrado');
+        const desafio = await response.json();
+
+        document.getElementById('editIdDesafio').value = desafio.id;
+        document.getElementById('editTituloDesafio').value = desafio.titulo;
+        document.getElementById('editDescricaoDesafio').value = desafio.descricao;
+        
+        if (desafio.datalimite) {
+            let dataString = '';
+            if (typeof desafio.datalimite === 'string') {
+                dataString = desafio.datalimite.substring(0, 10);
+            } else {
+                const dateObj = new Date(desafio.datalimite);
+                const ano = dateObj.getFullYear();
+                const mes = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const dia = String(dateObj.getDate()).padStart(2, '0');
+                dataString = `${ano}-${mes}-${dia}`;
+            }
+            document.getElementById('editDataLimiteDesafio').value = dataString;
+        }
+
+        abrirModal('modalEditarDesafio');
+    } catch (error) {
+        alert('Erro ao procurar os dados do desafio.');
+    }
+};
+
+const formEditarDesafio = document.getElementById('formEditarDesafio');
+if (formEditarDesafio) {
+    formEditarDesafio.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('editIdDesafio').value;
+        const titulo = document.getElementById('editTituloDesafio').value;
+        const descricao = document.getElementById('editDescricaoDesafio').value;
+        const datalimite = document.getElementById('editDataLimiteDesafio').value;
+        const msgFeedback = document.getElementById('msgEditFeedbackDesafio');
+
+        const token = localStorage.getItem('token');
+        try {
+            const response = await fetch(`http://localhost:3000/api/desafios/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ titulo, descricao, datalimite })
+            });
+
+            if (!window.verificarStatusResponse(response)) return;
+
+            if (response.ok) {
+                msgFeedback.innerText = 'Desafio atualizado com sucesso!';
+                msgFeedback.style.color = '#28a745';
+                msgFeedback.style.display = 'block';
+                carregarDesafiosAdmin();
+                setTimeout(() => { fecharModal('modalEditarDesafio'); }, 1500);
+            } else {
+                msgFeedback.innerText = 'Erro ao atualizar. Verifica as permissões.';
+                msgFeedback.style.color = '#d9534f';
+                msgFeedback.style.display = 'block';
+            }
+        } catch (err) {
+            msgFeedback.innerText = 'Servidor indisponível.';
+            msgFeedback.style.color = '#d9534f';
+            msgFeedback.style.display = 'block';
+        }
+    });
+}
+
+window.excluirDesafio = function(id) {
+    document.getElementById('idParaExcluirDesafio').value = id;
+    abrirModal('modalConfirmacaoDesafio');
+};
+
+window.confirmarExclusaoDesafio = async function() {
+    const id = document.getElementById('idParaExcluirDesafio').value;
+    const token = localStorage.getItem('token');
+    
+    try {
+        const response = await fetch(`http://localhost:3000/api/desafios/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!window.verificarStatusResponse(response)) return;
+
+        if (response.ok) {
+            fecharModal('modalConfirmacaoDesafio');
+            carregarDesafiosAdmin();
+        } else {
+            alert("Erro ao excluir o desafio.");
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Servidor indisponível.");
+    }
+};
+
+window.verSolucoes = async function(desafioId) {
+    const tbody = document.getElementById('corpoTabelaSolucoes');
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">A carregar soluções...</td></tr>';
+    abrirModal('modalVerSolucoes');
+    
+    const token = localStorage.getItem('token');
+    
+    try {
+        const response = await fetch(`http://localhost:3000/api/desafios/${desafioId}/solucoes`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('Erro ao buscar soluções');
+        
+        const solucoes = await response.json();
+        tbody.innerHTML = '';
+        
+        if (solucoes.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Nenhuma solução submetida para este desafio.</td></tr>';
+            return;
+        }
+
+        solucoes.forEach(sol => {
+            const dataSub = new Date(sol.enviado_em).toLocaleString('pt-BR');
+            let linkGithubStr = sol.link_github ? `<a href="${sol.link_github}" target="_blank" style="color:var(--primary);">GitHub</a>` : '';
+            let arquivoStr = sol.arquivo_path ? `<a href="http://localhost:3000/api/desafios/solucoes/download/${sol.arquivo_path.split(/[\/\\]/).pop()}" target="_blank" style="color:#ef4444; margin-left: 10px;">Baixar Arquivo</a>` : '';
+            
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>${sol.nome}</strong><br><small>${sol.email}</small></td>
+                    <td>${dataSub}</td>
+                    <td>${linkGithubStr} ${arquivoStr}</td>
+                    <td>
+                        <span style="font-weight:600; color:${sol.status === 'Em Avaliação' ? 'orange' : (sol.status === 'Aprovado' ? 'green' : 'red')}">${sol.status}</span><br>
+                        Nota: ${sol.nota || '-'}
+                    </td>
+                    <td>
+                        <div style="display:flex; flex-direction:column; gap:5px;">
+                            <input type="number" id="nota_${sol.id}" value="${sol.nota || ''}" min="0" max="10" step="0.1" class="admin-input" style="padding:4px; font-size:12px; margin:0;" placeholder="Nota">
+                            <select id="status_${sol.id}" class="admin-input" style="padding:4px; font-size:12px; margin:0;">
+                                <option value="Em Avaliação" ${sol.status === 'Em Avaliação' ? 'selected' : ''}>Em Avaliação</option>
+                                <option value="Aprovado" ${sol.status === 'Aprovado' ? 'selected' : ''}>Aprovado</option>
+                                <option value="Reprovado" ${sol.status === 'Reprovado' ? 'selected' : ''}>Reprovado</option>
+                            </select>
+                            <button class="btn-sm btn-primary" onclick="salvarNotaSolucao(${sol.id}, ${desafioId})">Salvar</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+        
+    } catch (error) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Erro ao carregar soluções.</td></tr>';
+    }
+};
+
+window.salvarNotaSolucao = async function(solucaoId, desafioId) {
+    const nota = document.getElementById(`nota_${solucaoId}`).value;
+    const status = document.getElementById(`status_${solucaoId}`).value;
+    const token = localStorage.getItem('token');
+    
+    try {
+        const response = await fetch(`http://localhost:3000/api/desafios/solucoes/${solucaoId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ nota, status })
+        });
+        
+        if (!window.verificarStatusResponse(response)) return;
+        
+        if (response.ok) {
+            alert('Avaliação salva com sucesso!');
+            verSolucoes(desafioId); // recarregar
+        } else {
+            const err = await response.json();
+            alert(`Erro: ${err.erro}`);
+        }
+    } catch (err) {
+        alert('Servidor indisponível.');
+    }
+};

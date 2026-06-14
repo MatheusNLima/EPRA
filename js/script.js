@@ -319,6 +319,84 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { console.error(error); }
     }
 
+    async function carregarDesafiosHome() {
+        const destContainer = document.getElementById('desafio-destaque-container');
+        const prevGrid = document.getElementById('desafios-anteriores-grid');
+        if (!destContainer || !prevGrid) return;
+
+        try {
+            const response = await fetch('http://localhost:3000/api/desafios');
+            if (!response.ok) throw new Error('Erro ao carregar desafios');
+            const desafios = await response.json();
+
+            if (desafios.length === 0) {
+                destContainer.innerHTML = '<p style="text-align:center;">Nenhum desafio no momento. Fique atento!</p>';
+                return;
+            }
+
+            const agora = new Date();
+            const desafiosAtivos = [];
+            const desafiosEncerrados = [];
+
+            desafios.forEach(d => {
+                if (d.datalimite) {
+                    const prazo = new Date(d.datalimite);
+                    if (prazo >= agora) {
+                        desafiosAtivos.push(d);
+                    } else {
+                        desafiosEncerrados.push(d);
+                    }
+                } else {
+                    desafiosAtivos.push(d);
+                }
+            });
+
+            // Ativos - exibe apenas o primeiro (destaque)
+            if (desafiosAtivos.length > 0) {
+                const destaque = desafiosAtivos[0];
+                const prazoFormatado = destaque.datalimite ? new Date(destaque.datalimite).toLocaleDateString('pt-BR') : 'A definir';
+                
+                destContainer.innerHTML = `
+                    <div class="desafio-destaque">
+                        <span class="desafio-badge-pill">Desafio Atual</span>
+                        <h2>${destaque.titulo}</h2>
+                        <p>${destaque.descricao}</p>
+                        
+                        <div class="desafio-meta">
+                            <span class="desafio-chip">📅 Prazo: ${prazoFormatado}</span>
+                        </div>
+                        
+                        <button class="btn btn-desafio" onclick="abrirModalSubmissaoDesafio(${destaque.id}, '${destaque.titulo.replace(/'/g, "\\'")}')">Participar do Desafio</button>
+                    </div>
+                `;
+            } else {
+                destContainer.innerHTML = '<p style="text-align:center;">Nenhum desafio ativo no momento. Veja os anteriores abaixo.</p>';
+            }
+
+            // Encerrados
+            prevGrid.innerHTML = '';
+            if (desafiosEncerrados.length === 0) {
+                prevGrid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">Nenhum desafio anterior.</p>';
+            } else {
+                desafiosEncerrados.forEach(d => {
+                    const prazoFormatado = d.datalimite ? new Date(d.datalimite).toLocaleDateString('pt-BR') : '-';
+                    prevGrid.innerHTML += `
+                        <div class="card" style="padding: 20px;">
+                            <h4 style="margin-bottom: 10px;">${d.titulo}</h4>
+                            <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">Encerrado em: ${prazoFormatado}</p>
+                            <p style="font-size: 0.95rem;">${d.descricao.substring(0, 80)}...</p>
+                            <button class="btn btn-outline" style="margin-top:15px; width:100%; cursor:not-allowed;" disabled>Prazo Encerrado</button>
+                        </div>
+                    `;
+                });
+            }
+
+        } catch (err) {
+            console.error('Erro ao carregar desafios:', err);
+            destContainer.innerHTML = '<p style="text-align:center; color:red;">Erro ao carregar os desafios.</p>';
+        }
+    }
+
     window.atualizarVisualizacaoCursos = carregarCursos;
     carregarCursos();
     carregarVagas();
@@ -326,6 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
     carregarTutoriaisHome();
     carregarPortfolio();
     carregarImpacto();
+    carregarDesafiosHome();
 
 }); // <-- FIM DO DOMContentLoaded
 
@@ -384,6 +463,89 @@ window.fecharModalCandidatura = function() {
     document.getElementById('modalCandidaturaVaga').style.display = 'none';
     const form = document.getElementById('formCandidaturaVaga');
     if(form) form.reset();
+};
+
+// --- MODAL DE DESAFIOS ---
+window.abrirModalSubmissaoDesafio = function(id, titulo) {
+    document.getElementById('subDesafioId').value = id;
+    document.getElementById('modalSubmissaoDesafio').style.display = 'flex';
+    
+    const feedback = document.getElementById('feedbackSubmissaoDesafio');
+    if (feedback) {
+        feedback.style.display = 'none';
+        feedback.innerText = '';
+    }
+};
+
+window.fecharModalSubmissaoDesafio = function() {
+    document.getElementById('modalSubmissaoDesafio').style.display = 'none';
+    document.getElementById('formSubmissaoDesafio').reset();
+};
+
+window.submeterSolucaoDesafio = async function() {
+    const feedback = document.getElementById('feedbackSubmissaoDesafio');
+    const btnSubmit = document.getElementById('btnSubmitSolucao');
+    const desafioId = document.getElementById('subDesafioId').value;
+
+    const nome = document.getElementById('subNome').value;
+    const email = document.getElementById('subEmail').value;
+    const descricao = document.getElementById('subDescricao').value;
+    const linkGithub = document.getElementById('subLinkGithub').value;
+    const arquivo = document.getElementById('subArquivo').files[0];
+
+    if (!arquivo && !linkGithub) {
+        feedback.innerText = 'Precisas enviar um ficheiro .zip/.rar ou o link do GitHub.';
+        feedback.style.color = '#d9534f';
+        feedback.style.display = 'block';
+        return;
+    }
+
+    if (arquivo) {
+        const extensao = arquivo.name.split('.').pop().toLowerCase();
+        if (!['zip', 'rar'].includes(extensao)) {
+            feedback.innerText = 'Apenas ficheiros .zip ou .rar são permitidos.';
+            feedback.style.color = '#d9534f';
+            feedback.style.display = 'block';
+            return;
+        }
+    }
+
+    btnSubmit.disabled = true;
+    feedback.innerText = 'A enviar solução...';
+    feedback.style.color = '#333';
+    feedback.style.display = 'block';
+
+    const formData = new FormData();
+    formData.append('nome', nome);
+    formData.append('email', email);
+    formData.append('descricao', descricao);
+    if (linkGithub) formData.append('link_github', linkGithub);
+    if (arquivo) formData.append('arquivo_solucao', arquivo);
+
+    try {
+        const response = await fetch(`http://localhost:3000/api/desafios/${desafioId}/solucoes`, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            feedback.innerText = 'Solução enviada com sucesso! Fica atento ao teu e-mail para receber o resultado.';
+            feedback.style.color = '#28a745';
+            setTimeout(() => {
+                fecharModalSubmissaoDesafio();
+                btnSubmit.disabled = false;
+            }, 3000);
+        } else {
+            const err = await response.json();
+            feedback.innerText = err.erro || 'Erro ao enviar solução.';
+            feedback.style.color = '#d9534f';
+            btnSubmit.disabled = false;
+        }
+    } catch (error) {
+        feedback.innerText = 'Erro ao contactar o servidor.';
+        feedback.style.color = '#d9534f';
+        btnSubmit.disabled = false;
+    }
 };
 
 

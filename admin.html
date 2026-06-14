@@ -68,6 +68,7 @@
                 <button class="tab-link" onclick="abrirAba(event, 'abaTutoriais')"><i class="fa-solid fa-tools"></i> Tutoriais</button>
                 <button class="tab-link" onclick="abrirAba(event, 'abaBiblioteca')"><i class="fa-solid fa-folder"></i> Biblioteca</button>
                 <button class="tab-link" onclick="abrirAba(event, 'abaPortfolio')"><i class="fa-solid fa-trophy"></i> Portfólio</button>
+                <button class="tab-link" onclick="abrirAba(event, 'abaDesafios')"><i class="fa-solid fa-trophy"></i> Desafios</button>
             </div>
         </aside>
 
@@ -154,6 +155,27 @@
                         </thead>
                         <tbody id="corpoTabelaPortfolio">
                             <tr><td colspan="6" style="text-align: center;">A carregar projetos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="abaDesafios" class="tab-content">
+                <div class="header-aba">
+                    <h2>Gestão de Desafios</h2>
+                    <button class="btn btn-primary btn-sm" onclick="abrirModal('modalDesafio')">+ Novo Desafio</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Título</th>
+                                <th>Data Limite</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabelaDesafios">
+                            <tr><td colspan="3" style="text-align: center;">A carregar desafios...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -486,6 +508,83 @@
             <div class="form-group-flex" style="margin-top: 20px;">
                 <button class="btn btn-outline" onclick="fecharModal('modalConfirmacaoPortfolio')" style="flex: 1;">Cancelar</button>
                 <button class="btn btn-dark" onclick="confirmarExclusaoPortfolio()" style="flex: 1;">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modais de Gestão de Desafios -->
+    <div id="modalDesafio" class="admin-modal-overlay">
+        <div class="admin-modal-card">
+            <h3 style="margin-bottom: 20px;">Criar Novo Desafio</h3>
+            <form id="formDesafio">
+                <input type="text" id="tituloDesafio" placeholder="Título do Desafio" required class="admin-input">
+                <textarea id="descricaoDesafio" placeholder="Descrição" required class="admin-textarea"></textarea>
+                <div style="margin-bottom: 15px;">
+                    <label for="dataLimiteDesafio" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Data Limite</label>
+                    <input type="date" id="dataLimiteDesafio" required class="admin-input">
+                </div>
+                <p id="mensagemFeedbackDesafio" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
+                <div class="form-group-flex">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalDesafio')" style="flex: 1;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Guardar Desafio</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalEditarDesafio" class="admin-modal-overlay">
+        <div class="admin-modal-card">
+            <h3 style="margin-bottom: 20px;">Editar Desafio</h3>
+            <form id="formEditarDesafio">
+                <input type="hidden" id="editIdDesafio">
+                <input type="text" id="editTituloDesafio" required class="admin-input">
+                <textarea id="editDescricaoDesafio" required class="admin-textarea"></textarea>
+                <div style="margin-bottom: 15px;">
+                    <label for="editDataLimiteDesafio" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Data Limite</label>
+                    <input type="date" id="editDataLimiteDesafio" required class="admin-input">
+                </div>
+                <p id="msgEditFeedbackDesafio" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
+                <div class="form-group-flex">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalEditarDesafio')" style="flex: 1;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Atualizar Desafio</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalConfirmacaoDesafio" class="admin-modal-overlay">
+        <div class="admin-modal-card">
+            <h3>Excluir Desafio</h3>
+            <p>Tem certeza que deseja excluir este desafio? Esta ação não pode ser desfeita.</p>
+            <input type="hidden" id="idParaExcluirDesafio">
+            <div class="form-group-flex" style="margin-top: 20px;">
+                <button class="btn btn-outline" onclick="fecharModal('modalConfirmacaoDesafio')" style="flex: 1;">Cancelar</button>
+                <button class="btn btn-dark" onclick="confirmarExclusaoDesafio()" style="flex: 1;">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalVerSolucoes" class="admin-modal-overlay">
+        <div class="admin-modal-card large">
+            <h3 style="margin-bottom: 20px;">Soluções do Desafio</h3>
+            <div style="overflow-x: auto; max-height: 400px; margin-bottom: 20px;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Participante</th>
+                            <th>Submissão</th>
+                            <th>Link GitHub / Arquivo</th>
+                            <th>Status & Nota</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpoTabelaSolucoes">
+                        <tr><td colspan="5" style="text-align: center;">A carregar soluções...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="form-group-flex">
+                <button type="button" class="btn btn-outline" onclick="fecharModal('modalVerSolucoes')" style="flex: 1;">Fechar Janela</button>
             </div>
         </div>
     </div>

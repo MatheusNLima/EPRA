@@ -113,8 +113,15 @@ CREATE TABLE solucao_desafio (
     id SERIAL PRIMARY KEY,
     usuario_id INTEGER REFERENCES usuario(id) ON DELETE CASCADE,
     desafio_id INTEGER REFERENCES desafio(id) ON DELETE CASCADE,
-    link_github VARCHAR(255) NOT NULL,
-    enviado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    nome VARCHAR(100),
+    email VARCHAR(100),
+    descricao TEXT,
+    link_github VARCHAR(255),
+    arquivo_path VARCHAR(255),
+    nota NUMERIC(4, 2),
+    status VARCHAR(50) DEFAULT 'Em Avaliação',
+    enviado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (usuario_id, desafio_id)
 );
 
 -- Inserir Dados Iniciais (Seeding)
