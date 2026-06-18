@@ -15,6 +15,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- MÁSCARA PARA O CPF AUTOMÁTICA ---
+    const inputCpf = document.getElementById('inscDocumento');
+    if (inputCpf) {
+        inputCpf.addEventListener('input', (e) => {
+            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,3})(\d{0,2})/);
+            e.target.value = !x[2] ? x[1] : x[1] + '.' + x[2] + (x[3] ? '.' + x[3] : '') + (x[4] ? '-' + x[4] : '');
+        });
+    }
+
+    const inputTelefone = document.getElementById('inscTelefone');
+    if (inputTelefone) {
+        inputTelefone.addEventListener('input', (e) => {
+            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
+            e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+        });
+    }
+
+    const inputTelefoneCand = document.getElementById('candidaturaTelefone');
+    if (inputTelefoneCand) {
+        inputTelefoneCand.addEventListener('input', (e) => {
+            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
+            e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+        });
+    }
+
     function checkAuthStatus() {
         const token = localStorage.getItem('token');
         const userStr = localStorage.getItem('usuario');
@@ -43,14 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             window.abrirModalCandidatura(pendingId, pendingTitulo);
         }, 200);
-    }
-
-    const inputTelefone = document.getElementById('candidaturaTelefone');
-    if (inputTelefone) {
-        inputTelefone.addEventListener('input', (e) => {
-            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
-            e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
-        });
     }
 
     window.logout = function() {
@@ -115,7 +132,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 let statusBandeira = `<span class="status-green">Inscrições Abertas</span>`;
                 let vagasInfo = `<span class="slots">${curso.vagas} vagas disponíveis</span>`;
-                let botaoAcao = `<button class="btn btn-dark" style="flex: 1;" onclick="abrirFormularioInscricao(${curso.id})">Inscrever-se</button>`;
+                
+                // Envia o título do curso para guardar no pop-up
+                const tituloSeguro = curso.titulo.replace(/'/g, "\\'");
+                let botaoAcao = `<button class="btn btn-dark" style="flex: 1;" onclick="abrirFormularioInscricao(${curso.id}, '${tituloSeguro}')">Inscrever-se</button>`;
 
                 if (curso.vagas <= 0) {
                     statusBandeira = `<span class="status-green" style="background-color: #d9534f;">Turma Cheia</span>`;
@@ -297,23 +317,17 @@ document.addEventListener('DOMContentLoaded', () => {
     carregarPortfolio();
     carregarImpacto();
 
-}); // <-- FIM DO DOMContentLoaded
+}); // FIM DO DOMContentLoaded
 
 
 // ============================================================================
-// --- FUNÇÕES GLOBAIS DE INSCRIÇÃO & CANDIDATURA (Fora do DOMContentLoaded) ---
+// --- FUNÇÕES GLOBAIS DE INTERAÇÃO DOS MODAIS ---
 // ============================================================================
 
-window.abrirFormularioInscricao = function(idCurso) {
+window.abrirFormularioInscricao = function(idCurso, tituloCurso) {
     document.getElementById('inscricaoCursoId').value = idCurso;
+    document.getElementById('inscricaoCursoTitulo').value = tituloCurso || '';
     document.getElementById('modalInscricaoPublica').style.display = 'flex';
-    
-    // Limpa a caixa de feedback sempre que a janela abrir
-    const feedback = document.getElementById('msgFeedbackInscricao');
-    if(feedback) {
-        feedback.style.display = 'none';
-        feedback.innerText = '';
-    }
 };
 
 window.fecharModalInscricao = function() {
@@ -333,20 +347,12 @@ window.abrirModalCandidatura = function(id, titulo) {
 
     document.getElementById('candidaturaVagaId').value = id;
     document.getElementById('candidaturaVagaTitulo').value = titulo;
-    
     document.getElementById('candidaturaNome').value = '';
     document.getElementById('candidaturaEmail').value = '';
     document.getElementById('candidaturaCurso').value = '';
     document.getElementById('candidaturaTelefone').value = '';
     document.getElementById('candidaturaLinkedin').value = '';
     document.getElementById('candidaturaCurriculo').value = '';
-    
-    const feedback = document.getElementById('feedbackCandidatura');
-    if(feedback) {
-        feedback.innerText = '';
-        feedback.style.display = 'none';
-    }
-
     document.getElementById('modalCandidaturaVaga').style.display = 'flex';
 };
 
@@ -356,18 +362,38 @@ window.fecharModalCandidatura = function() {
     if(form) form.reset();
 };
 
+window.fecharModalAviso = function() {
+    document.getElementById('modalAviso').style.display = 'none';
+};
 
-// 🛡️ A MÁGICA: A FUNÇÃO CHAMADA DIRETAMENTE PELO HTML
-window.submeterInscricao = async function() {
+window.mostrarAviso = function(titulo, texto, corTitulo = '#0056b3') {
+    const elTitulo = document.getElementById('tituloAviso');
+    elTitulo.innerText = titulo;
+    elTitulo.style.color = corTitulo;
+    document.getElementById('textoAviso').innerText = texto;
+    document.getElementById('modalAviso').style.display = 'flex';
+};
+
+// ============================================================================
+// --- LÓGICA DE SUBMISSÃO (ÚNICA, CEGA E BLINDADA) ---
+// ============================================================================
+
+window.enviarInscricaoPublica = async function() {
     const form = document.getElementById('formInscricaoPublica');
-    const btnSubmit = form.querySelector('button[type="submit"]');
+    
+    // Força o navegador a verificar os campos "required" sem usar o submit nativo
+    if (!form.reportValidity()) {
+        return; 
+    }
+
+    const btnSubmit = document.getElementById('btnEnviarInscricao');
     const textoOriginal = btnSubmit.innerText;
     
     btnSubmit.innerText = 'A enviar...';
     btnSubmit.disabled = true;
 
-    const feedback = document.getElementById('msgFeedbackInscricao');
-    if (feedback) feedback.style.display = 'none';
+    // Recupera o título do curso
+    const tituloCurso = document.getElementById('inscricaoCursoTitulo').value || 'selecionado';
 
     const formData = new FormData();
     formData.append('curso_id', document.getElementById('inscricaoCursoId').value);
@@ -395,67 +421,44 @@ window.submeterInscricao = async function() {
             body: formData
         });
 
-        if (response.ok) {
-            // DEU CERTO: Mostramos o aviso a verde
-            if (feedback) {
-                feedback.style.display = 'block';
-                feedback.style.backgroundColor = '#d4edda';
-                feedback.style.color = '#155724';
-                feedback.style.border = '1px solid #c3e6cb';
-                feedback.innerText = 'Inscrição realizada com sucesso!';
-            }
-            // Esperamos 2 segundos para o utilizador ler, e só depois fechamos a janela
-            setTimeout(() => {
-                window.fecharModalInscricao(); 
-                if (window.atualizarVisualizacaoCursos) window.atualizarVisualizacaoCursos();
-                btnSubmit.innerText = textoOriginal;
-                btnSubmit.disabled = false;
-            }, 2000);
+        const responseData = await response.json();
 
+        if (response.ok || response.status === 201) {
+            // SUCESSO: A ficha de inscrição FECHA e o aviso Verde surge!
+            window.fecharModalInscricao(); 
+            window.mostrarAviso('Sucesso!', `Inscrição no curso ${tituloCurso} concluída! Verifique seu email em breve, entraremos em contato.`, '#28a745');
+            if (window.atualizarVisualizacaoCursos) window.atualizarVisualizacaoCursos();
         } else {
-            // DEU ERRO (Duplicado, Falta de Vagas): Mostramos o aviso a vermelho e deixamos o formulário ABERTO!
-            const errorData = await response.json();
-            if (feedback) {
-                feedback.style.display = 'block';
-                feedback.style.backgroundColor = '#f8d7da';
-                feedback.style.color = '#721c24';
-                feedback.style.border = '1px solid #f5c6cb';
-                feedback.innerHTML = `⚠️ <b>Atenção:</b> ${errorData.erro}`;
+            // ERRO (DUPLICADO): A ficha FICA ABERTA e o aviso Vermelho surge por cima!
+            if (responseData.erro === 'DUPLICADO') {
+                window.mostrarAviso('Atenção!', `Esse CPF já está inscrito no curso ${tituloCurso}. Verifique seu email e aguarde atualizações. Caso não tenha feito essa inscrição, entre em contato com os nossos coordenadores.`, '#d9534f');
+            } else {
+                window.mostrarAviso('Atenção!', responseData.erro || 'Erro na inscrição.', '#d9534f');
             }
-            btnSubmit.innerText = textoOriginal;
-            btnSubmit.disabled = false;
         }
 
     } catch (error) {
-        // SERVIDOR FORA DO AR
-        console.error(error);
-        if (feedback) {
-            feedback.style.display = 'block';
-            feedback.style.backgroundColor = '#f8d7da';
-            feedback.style.color = '#721c24';
-            feedback.style.border = '1px solid #f5c6cb';
-            feedback.innerText = 'Erro de ligação ao servidor. Tente novamente.';
-        }
+        window.mostrarAviso('Erro de Ligação', 'Não foi possível conectar ao servidor. Tente novamente mais tarde.', '#d9534f');
+    } finally {
         btnSubmit.innerText = textoOriginal;
         btnSubmit.disabled = false;
     }
 };
 
-window.submeterCandidaturaVaga = async function() {
-    const userToken = localStorage.getItem('token');
+window.enviarCandidaturaVaga = async function() {
     const form = document.getElementById('formCandidaturaVaga');
-    const btnSubmit = form.querySelector('button[type="submit"]');
+    
+    // Força o navegador a verificar os campos
+    if (!form.reportValidity()) {
+        return;
+    }
+
+    const userToken = localStorage.getItem('token');
+    const btnSubmit = document.getElementById('btnEnviarCandidatura');
     const textoOriginal = btnSubmit.innerText;
     
     btnSubmit.innerText = 'A enviar...';
     btnSubmit.disabled = true;
-
-    const feedback = document.getElementById('feedbackCandidatura');
-    if (feedback) {
-        feedback.style.display = 'block';
-        feedback.innerText = 'Enviando candidatura...';
-        feedback.style.color = '#666';
-    }
 
     const idVaga = document.getElementById('candidaturaVagaId').value;
     const formData = new FormData();
@@ -473,38 +476,21 @@ window.submeterCandidaturaVaga = async function() {
     try {
         const response = await fetch(`http://localhost:3000/api/vagas/${idVaga}/candidaturas`, {
             method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + userToken
-            },
+            headers: { 'Authorization': 'Bearer ' + userToken },
             body: formData
         });
 
         const data = await response.json();
 
-        if (response.status === 201) {
-            if (feedback) {
-                feedback.innerText = 'Candidatura enviada com sucesso!';
-                feedback.style.color = '#28a745';
-            }
-            setTimeout(() => { 
-                window.fecharModalCandidatura(); 
-                btnSubmit.innerText = textoOriginal;
-                btnSubmit.disabled = false;
-            }, 1500);
+        if (response.status === 201 || response.ok) {
+            window.fecharModalCandidatura();
+            window.mostrarAviso('Sucesso', 'Candidatura enviada com sucesso!', '#28a745');
         } else {
-            // Erro 400 (Duplicado)
-            if (feedback) {
-                feedback.innerText = data.erro || 'Você já se candidatou a esta vaga.';
-                feedback.style.color = '#d9534f';
-            }
-            btnSubmit.innerText = textoOriginal;
-            btnSubmit.disabled = false;
+            window.mostrarAviso('Atenção', data.erro || 'Você já se candidatou a esta vaga.', '#d9534f');
         }
     } catch (err) {
-        if (feedback) {
-            feedback.innerText = 'Servidor indisponível no momento.';
-            feedback.style.color = '#d9534f';
-        }
+        window.mostrarAviso('Erro', 'Servidor indisponível no momento.', '#d9534f');
+    } finally {
         btnSubmit.innerText = textoOriginal;
         btnSubmit.disabled = false;
     }

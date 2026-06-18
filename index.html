@@ -319,20 +319,21 @@
     <div id="modalInscricaoPublica" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 40px 0;">
         <div style="background: white; padding: 40px; border-radius: 8px; width: 90%; max-width: 600px; margin: auto; position: relative;">
             
-            <button onclick="fecharModalInscricao()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            <button type="button" onclick="fecharModalInscricao()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
             
             <h2 style="margin-bottom: 10px; color: #0056b3;">Ficha de Inscrição</h2>
             <p style="color: #666; margin-bottom: 30px;">Preencha os dados abaixo para submeter a sua candidatura ao curso.</p>
             
-            <form id="formInscricaoPublica" onsubmit="event.preventDefault(); window.submeterInscricao();">
+            <form id="formInscricaoPublica">
                 <input type="hidden" id="inscricaoCursoId">
+                <input type="hidden" id="inscricaoCursoTitulo">
                 
                 <h4 style="margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 5px;">Dados Pessoais</h4>
                 <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nome Completo *</label>
                 <input type="text" id="inscNome" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
                 
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Documento (CPF ou RG) *</label>
-                <input type="text" id="inscDocumento" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">CPF *</label>
+                <input type="text" id="inscDocumento" placeholder="000.000.000-00" maxlength="14" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
 
                 <label style="display: block; margin-bottom: 5px; font-weight: bold;">E-mail para contato *</label>
                 <input type="email" id="inscEmail" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
@@ -366,11 +367,9 @@
                     <input type="file" id="inscTermo" accept=".pdf, image/*" required style="width: 100%;">
                 </div>
 
-                <div id="msgFeedbackInscricao" style="display: none; padding: 12px; margin-bottom: 20px; border-radius: 5px; font-weight: 500; text-align: center;"></div>
-
                 <div style="display: flex; gap: 10px;">
                     <button type="button" class="btn btn-outline" onclick="fecharModalInscricao()" style="flex: 1; padding: 12px; border-radius: 5px; cursor: pointer;">Cancelar</button>
-                    <button type="submit" class="btn btn-dark" style="flex: 2; padding: 12px; background: #0056b3; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem;">Enviar Inscrição</button>
+                    <button type="button" id="btnEnviarInscricao" class="btn btn-dark" onclick="enviarInscricaoPublica()" style="flex: 2; padding: 12px; background: #0056b3; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem;">Enviar Inscrição</button>
                 </div>
             </form>
         </div>
@@ -380,7 +379,7 @@
         <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:500px;">
             <h3 style="margin-bottom: 20px;">Candidatar-se à Vaga</h3>
             
-            <form id="formCandidaturaVaga" enctype="multipart/form-data" onsubmit="event.preventDefault(); window.submeterCandidaturaVaga();">
+            <form id="formCandidaturaVaga" enctype="multipart/form-data">
                 <input type="hidden" id="candidaturaVagaId">
 
                 <div style="margin-bottom: 15px;">
@@ -418,13 +417,19 @@
                     <input type="file" id="candidaturaCurriculo" accept=".pdf" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
                 </div>
 
-                <p id="feedbackCandidatura" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
-
                 <div style="display:flex; gap:10px;">
                     <button type="button" class="btn btn-outline" onclick="fecharModalCandidatura()" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
-                    <button type="submit" class="btn btn-dark" style="flex: 1; padding: 10px; background: #333; color: white; border: none; cursor: pointer; border-radius: 5px;">Confirmar Candidatura</button>
+                    <button type="button" id="btnEnviarCandidatura" class="btn btn-dark" onclick="enviarCandidaturaVaga()" style="flex: 1; padding: 10px; background: #333; color: white; border: none; cursor: pointer; border-radius: 5px;">Confirmar Candidatura</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div id="modalAviso" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 30px; border-radius: 8px; width: 90%; max-width: 450px; text-align: center; position: relative;">
+            <h3 id="tituloAviso" style="margin-bottom: 15px; color: #0056b3; font-size: 1.5rem;">Aviso</h3>
+            <p id="textoAviso" style="color: #444; margin-bottom: 25px; line-height: 1.6; font-size: 1.1rem; font-weight: 500;"></p>
+            <button type="button" onclick="fecharModalAviso()" class="btn btn-dark" style="width: 100%; padding: 12px; border-radius: 5px; cursor: pointer; font-size: 1.1rem;">Entendi</button>
         </div>
     </div>
 

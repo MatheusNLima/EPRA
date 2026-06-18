@@ -6,17 +6,14 @@ const path = require('path');
 const criarInscricao = async (req, res) => {
     const { curso_id, nome, documento, email } = req.body;
     try {
-        // 🔒 VALIDAÇÃO: Verifica se o Documento ou Email já existem neste curso
+        // 🔒 VALIDAÇÃO: Verifica APENAS se o CPF já existe neste curso
         const checkDuplicado = await db.query(
-            'SELECT documento, email FROM inscricao WHERE curso_id = $1 AND (documento = $2 OR email = $3)',
-            [curso_id, documento, email]
+            'SELECT documento FROM inscricao WHERE curso_id = $1 AND documento = $2',
+            [curso_id, documento]
         );
 
         if (checkDuplicado.rowCount > 0) {
-            const erroMsg = checkDuplicado.rows[0].documento === documento 
-                ? 'Este documento já está inscrito neste curso.' 
-                : 'Este e-mail já está cadastrado neste curso.';
-            return res.status(400).json({ erro: erroMsg });
+            return res.status(400).json({ erro: 'Este CPF já está inscrito neste curso.' });
         }
 
         const resultado = await db.query(
@@ -36,10 +33,10 @@ const criarInscricaoPublica = async (req, res) => {
     const termo_consentimento = req.file ? req.file.path : null;
 
     try {
-        // 🔒 VALIDAÇÃO 1: Bloquear Documento ou E-mail duplicado no mesmo curso
+        // 🔒 VALIDAÇÃO 1: Bloquear APENAS CPF duplicado no mesmo curso
         const checkDuplicado = await db.query(
-            'SELECT documento, email FROM inscricao WHERE curso_id = $1 AND (documento = $2 OR email = $3)',
-            [curso_id, documento, email]
+            'SELECT documento FROM inscricao WHERE curso_id = $1 AND documento = $2',
+            [curso_id, documento]
         );
 
         if (checkDuplicado.rowCount > 0) {
@@ -47,10 +44,8 @@ const criarInscricaoPublica = async (req, res) => {
             if (termo_consentimento && fs.existsSync(termo_consentimento)) {
                 fs.unlinkSync(termo_consentimento);
             }
-            const erroMsg = checkDuplicado.rows[0].documento === documento 
-                ? 'O documento informado já possui inscrição para esta turma.' 
-                : 'Este e-mail já foi utilizado em uma inscrição para esta turma.';
-            return res.status(400).json({ erro: erroMsg });
+            // Retorna a palavra-chave "DUPLICADO" para o JS acionar o pop-up com o nome do curso
+            return res.status(400).json({ erro: 'DUPLICADO' });
         }
 
         // 🔒 VALIDAÇÃO 2: Verifica as vagas matemáticas
@@ -81,7 +76,6 @@ const criarInscricaoPublica = async (req, res) => {
         res.status(201).json({ mensagem: 'Inscrição pública recebida com sucesso!', inscricao: resultado.rows[0] });
     } catch (err) {
         console.error('❌ ERRO DETALHADO (INSCRIÇÃO PÚBLICA):', err);
-        // Proteção extra contra lixo no disco: se a base de dados falhar (ex: fora do ar), apagamos o PDF.
         if (termo_consentimento && fs.existsSync(termo_consentimento)) fs.unlinkSync(termo_consentimento);
         res.status(500).json({ erro: 'Erro ao processar o formulário público.' });
     }
@@ -94,7 +88,6 @@ const listarInscritosPorCurso = async (req, res) => {
         const resultado = await db.query('SELECT * FROM inscricao WHERE curso_id = $1 ORDER BY id DESC', [curso_id]);
         res.json(resultado.rows);
     } catch (err) {
-        console.error('❌ ERRO AO LISTAR INSCRITOS:', err);
         res.status(500).json({ erro: 'Erro ao procurar inscrições.' });
     }
 };
@@ -110,14 +103,11 @@ const deletarInscricao = async (req, res) => {
 
         if (inscricaoApagada.termo_consentimento) {
             const caminhoFicheiro = path.resolve(__dirname, '../../', inscricaoApagada.termo_consentimento);
-            fs.unlink(caminhoFicheiro, (erroFS) => {
-                if (!erroFS) console.log(`🗑️ Ficheiro físico removido: ${inscricaoApagada.termo_consentimento}`);
-            });
+            fs.unlink(caminhoFicheiro, (erroFS) => {});
         }
 
         res.json({ mensagem: 'Inscrição e documento removidos com sucesso!' });
     } catch (err) {
-        console.error('❌ ERRO AO DELETAR INSCRIÇÃO:', err);
         res.status(500).json({ erro: 'Erro ao processar remoção.' });
     }
 };
@@ -127,16 +117,16 @@ const atualizarInscricao = async (req, res) => {
     const { id } = req.params;
     const { nome, documento, email } = req.body;
     try {
-        // Validação extra: Ao editar, garantir que não estamos usando o email/doc de OUTRO aluno no mesmo curso
+        // Validação extra: Bloquear APENAS se o CPF for de outro aluno
         const verificado = await db.query('SELECT curso_id FROM inscricao WHERE id = $1', [id]);
         if(verificado.rowCount > 0) {
             const curso_id = verificado.rows[0].curso_id;
             const checkDuplicado = await db.query(
-                'SELECT id FROM inscricao WHERE curso_id = $1 AND id != $2 AND (documento = $3 OR email = $4)',
-                [curso_id, id, documento, email]
+                'SELECT id FROM inscricao WHERE curso_id = $1 AND id != $2 AND documento = $3',
+                [curso_id, id, documento]
             );
             if(checkDuplicado.rowCount > 0) {
-                return res.status(400).json({ erro: 'Este documento ou email já pertencem a outro aluno na mesma turma.' });
+                return res.status(400).json({ erro: 'Este CPF já pertence a outro aluno na mesma turma.' });
             }
         }
 
@@ -147,7 +137,6 @@ const atualizarInscricao = async (req, res) => {
         if (resultado.rowCount === 0) return res.status(404).json({ erro: 'Inscrição não encontrada' });
         res.json({ mensagem: 'Inscrição atualizada com sucesso!', inscricao: resultado.rows[0] });
     } catch (err) {
-        console.error('❌ ERRO AO ATUALIZAR INSCRIÇÃO:', err);
         res.status(500).json({ erro: 'Erro ao atualizar a inscrição.' });
     }
 };

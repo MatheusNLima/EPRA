@@ -93,6 +93,7 @@
         </aside>
 
         <main class="main-content">
+            <!-- ABA CURSOS -->
             <div id="abaCursos" class="tab-content active">
                 <div class="header-aba">
                     <h2>Gestão de Cursos</h2>
@@ -115,6 +116,7 @@
                 </div>
             </div>
             
+            <!-- ABA VAGAS -->
             <div id="abaVagas" class="tab-content">
                 <div class="header-aba">
                     <h2>Gestão de Vagas</h2>
@@ -135,6 +137,8 @@
                     </table>
                 </div>
             </div>
+
+            <!-- ABA TUTORIAIS -->
             <div id="abaTutoriais" class="tab-content">
                 <div class="header-aba">
                     <h2>Gestão de Tutoriais</h2>
@@ -155,11 +159,58 @@
                     </table>
                 </div>
             </div>
-            <div id="abaBiblioteca" class="tab-content"><h2>Biblioteca</h2><p>Área em construção...</p></div>
-            <div id="abaPortfolio" class="tab-content"><h2>Portfólio</h2><p>Área em construção...</p></div>
+
+            <!-- ABA BIBLIOTECA -->
+            <div id="abaBiblioteca" class="tab-content">
+                <div class="header-aba">
+                    <h2>Gestão da Biblioteca</h2>
+                    <button class="btn btn-dark" onclick="abrirModal('modalBiblioteca')" style="padding: 10px 20px; background-color: #333; color: white; border: none; border-radius: 5px; cursor: pointer;">+ Novo Material</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Título do Material</th>
+                                <th>Categoria</th>
+                                <th>Tipo</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabelaBiblioteca">
+                            <tr><td colspan="4" style="text-align: center;">A carregar materiais...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ABA PORTFÓLIO -->
+            <div id="abaPortfolio" class="tab-content">
+                <div class="header-aba">
+                    <h2>Gestão do Portfólio</h2>
+                    <button class="btn btn-dark" onclick="abrirModal('modalPortfolio')" style="padding: 10px 20px; background-color: #333; color: white; border: none; border-radius: 5px; cursor: pointer;">+ Novo Projeto</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Título do Projeto</th>
+                                <th>Autor/Turma</th>
+                                <th>Link GitHub</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabelaPortfolio">
+                            <tr><td colspan="4" style="text-align: center;">A carregar projetos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </main>
     </div>
 
+    <!-- ========================================== -->
+    <!-- MODAIS DE GESTÃO DE CURSOS E INSCRIÇÕES    -->
+    <!-- ========================================== -->
     <div id="modalCurso" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
         <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:500px;">
             <h3 style="margin-bottom: 20px;">Criar Novo Curso</h3>
@@ -173,7 +224,7 @@
                 <p id="mensagemFeedback" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
                 <div style="display:flex; gap:10px;">
                     <button type="button" class="btn btn-outline" onclick="fecharModal('modalCurso')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
-                    <button type="submit" class="btn btn-dark" style="flex: 1; padding: 10px; background: #333; color: white; border: none; cursor: pointer; border-radius: 5px;">Guardar Curso</button>
+                    <button type="button" class="btn btn-dark" onclick="salvarNovoCurso()" style="flex: 1; padding: 10px; background: #333; color: white; border: none; cursor: pointer; border-radius: 5px;">Guardar Curso</button>
                 </div>
             </form>
         </div>
@@ -193,9 +244,21 @@
                 <p id="msgEditFeedback" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
                 <div style="display:flex; gap:10px;">
                     <button type="button" class="btn btn-outline" onclick="fecharModal('modalEditarCurso')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
-                    <button type="submit" class="btn btn-dark" style="flex: 1; padding: 10px; background: #f0ad4e; color: white; border: none; cursor: pointer; border-radius: 5px;">Atualizar Curso</button>
+                    <button type="button" class="btn btn-dark" onclick="salvarEdicaoCurso()" style="flex: 1; padding: 10px; background: #f0ad4e; color: white; border: none; cursor: pointer; border-radius: 5px;">Atualizar Curso</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div id="modalConfirmacao" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:3000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:400px; text-align: center;">
+            <h3>Excluir Curso</h3>
+            <p>Tem certeza que deseja excluir este curso? Esta ação não pode ser desfeita.</p>
+            <input type="hidden" id="idParaExcluir">
+            <div style="display:flex; gap:10px; margin-top: 20px;">
+                <button class="btn btn-outline" onclick="fecharModal('modalConfirmacao')" style="flex: 1; padding: 10px; cursor: pointer; border: 1px solid #333; background: white; border-radius: 5px;">Cancelar</button>
+                <button class="btn btn-dark" onclick="confirmarExclusao()" style="flex: 1; padding: 10px; background: #d9534f; color: white; border: none; cursor: pointer; border-radius: 5px;">Excluir</button>
+            </div>
         </div>
     </div>
 
@@ -210,12 +273,12 @@
                 <input type="hidden" id="manualCursoId">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
                     <input type="text" id="manualNome" placeholder="Nome Completo" required style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                    <input type="text" id="manualDocumento" placeholder="Documento (CPF/RG)" required style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <input type="text" id="manualDocumento" placeholder="Documento (CPF)" required style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                 </div>
                 <input type="email" id="manualEmail" placeholder="E-mail do Aluno" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; margin-bottom: 10px;">
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">
                     <button type="button" class="btn-sm" onclick="this.parentElement.parentElement.style.display='none'" style="background: #ccc;">Cancelar</button>
-                    <button type="submit" class="btn-sm btn-info">Salvar Aluno</button>
+                    <button type="button" onclick="salvarInscricaoManual()" class="btn-sm btn-info">Salvar Aluno</button>
                 </div>
             </form>
 
@@ -225,11 +288,11 @@
                         <th>Nome</th>
                         <th>Documento</th>
                         <th>E-mail</th>
-                        <th>Termo</th> <th>Ações</th>
+                        <th>Termo</th> 
+                        <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody id="corpoTabelaInscritos">
-                    </tbody>
+                <tbody id="corpoTabelaInscritos"></tbody>
             </table>
             
             <div style="margin-top: 20px; text-align: right;">
@@ -251,25 +314,15 @@
                 
                 <div style="display:flex; gap:10px;">
                     <button type="button" class="btn btn-outline" onclick="fecharModal('modalEditarInscrito')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
-                    <button type="submit" class="btn btn-dark" style="flex: 1; padding: 10px; background: #f0ad4e; color: white; border: none; cursor: pointer; border-radius: 5px;">Salvar Alterações</button>
+                    <button type="button" onclick="salvarEdicaoInscrito()" class="btn btn-dark" style="flex: 1; padding: 10px; background: #f0ad4e; color: white; border: none; cursor: pointer; border-radius: 5px;">Salvar Alterações</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="modalConfirmacao" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:3000; justify-content:center; align-items:center;">
-        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:400px; text-align: center;">
-            <h3>Excluir Curso</h3>
-            <p>Tem certeza que deseja excluir este curso? Esta ação não pode ser desfeita.</p>
-            <input type="hidden" id="idParaExcluir">
-            <div style="display:flex; gap:10px; margin-top: 20px;">
-                <button class="btn btn-outline" onclick="fecharModal('modalConfirmacao')" style="flex: 1; padding: 10px; cursor: pointer; border: 1px solid #333; background: white; border-radius: 5px;">Cancelar</button>
-                <button class="btn btn-dark" onclick="confirmarExclusao()" style="flex: 1; padding: 10px; background: #d9534f; color: white; border: none; cursor: pointer; border-radius: 5px;">Excluir</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modais de Gestão de Vagas -->
+    <!-- ========================================== -->
+    <!-- MODAIS DE GESTÃO DE VAGAS                  -->
+    <!-- ========================================== -->
     <div id="modalVaga" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
         <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:500px;">
             <h3 style="margin-bottom: 20px;">Criar Nova Vaga</h3>
@@ -283,7 +336,7 @@
                 <p id="mensagemFeedbackVaga" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
                 <div style="display:flex; gap:10px;">
                     <button type="button" class="btn btn-outline" onclick="fecharModal('modalVaga')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
-                    <button type="submit" class="btn btn-dark" style="flex: 1; padding: 10px; background: #333; color: white; border: none; cursor: pointer; border-radius: 5px;">Guardar Vaga</button>
+                    <button type="button" onclick="salvarNovaVaga()" class="btn btn-dark" style="flex: 1; padding: 10px; background: #333; color: white; border: none; cursor: pointer; border-radius: 5px;">Guardar Vaga</button>
                 </div>
             </form>
         </div>
@@ -303,7 +356,7 @@
                 <p id="msgEditFeedbackVaga" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
                 <div style="display:flex; gap:10px;">
                     <button type="button" class="btn btn-outline" onclick="fecharModal('modalEditarVaga')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
-                    <button type="submit" class="btn btn-dark" style="flex: 1; padding: 10px; background: #f0ad4e; color: white; border: none; cursor: pointer; border-radius: 5px;">Atualizar Vaga</button>
+                    <button type="button" onclick="salvarEdicaoVaga()" class="btn btn-dark" style="flex: 1; padding: 10px; background: #f0ad4e; color: white; border: none; cursor: pointer; border-radius: 5px;">Atualizar Vaga</button>
                 </div>
             </form>
         </div>
@@ -321,7 +374,9 @@
         </div>
     </div>
 
-    <!-- Modais de Gestão de Tutoriais -->
+    <!-- ========================================== -->
+    <!-- MODAIS DE GESTÃO DE TUTORIAIS              -->
+    <!-- ========================================== -->
     <div id="modalTutorial" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
         <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:600px; max-height:90vh; overflow-y:auto; box-sizing: border-box;">
             <h3 style="margin-bottom: 20px;">Criar Novo Tutorial</h3>
@@ -349,7 +404,7 @@
                 
                 <div style="display:flex; gap:10px;">
                     <button type="button" class="btn btn-outline" onclick="fecharModal('modalTutorial')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
-                    <button type="submit" id="btnSalvarTutorial" class="btn btn-dark" style="flex: 1; padding: 10px; background: #333; color: white; border: none; cursor: pointer; border-radius: 5px;">Guardar Tutorial</button>
+                    <button type="button" onclick="salvarNovoTutorial()" id="btnSalvarTutorial" class="btn btn-dark" style="flex: 1; padding: 10px; background: #333; color: white; border: none; cursor: pointer; border-radius: 5px;">Guardar Tutorial</button>
                 </div>
             </form>
         </div>
@@ -391,7 +446,7 @@
                 
                 <div style="display:flex; gap:10px;">
                     <button type="button" class="btn btn-outline" onclick="fecharModal('modalEditarTutorial')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
-                    <button type="submit" id="btnAtualizarTutorial" class="btn btn-dark" style="flex: 1; padding: 10px; background: #f0ad4e; color: white; border: none; cursor: pointer; border-radius: 5px;">Atualizar Tutorial</button>
+                    <button type="button" onclick="salvarEdicaoTutorial()" id="btnAtualizarTutorial" class="btn btn-dark" style="flex: 1; padding: 10px; background: #f0ad4e; color: white; border: none; cursor: pointer; border-radius: 5px;">Atualizar Tutorial</button>
                 </div>
             </form>
         </div>
@@ -405,6 +460,91 @@
             <div style="display:flex; gap:10px; margin-top: 20px;">
                 <button class="btn btn-outline" onclick="fecharModal('modalConfirmacaoTutorial')" style="flex: 1; padding: 10px; cursor: pointer; border: 1px solid #333; background: white; border-radius: 5px;">Cancelar</button>
                 <button class="btn btn-dark" onclick="confirmarExclusaoTutorial()" style="flex: 1; padding: 10px; background: #d9534f; color: white; border: none; cursor: pointer; border-radius: 5px;">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAIS DE GESTÃO DA BIBLIOTECA             -->
+    <!-- ========================================== -->
+    <div id="modalBiblioteca" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:500px;">
+            <h3 id="tituloModalBiblioteca" style="margin-bottom: 20px;">Novo Material</h3>
+            <form id="formBiblioteca">
+                <input type="hidden" id="bibId">
+                <label style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Título *</label>
+                <input type="text" id="bibTitulo" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                
+                <label style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Categoria *</label>
+                <select id="bibCategoria" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                    <option value="codigos">Códigos</option>
+                    <option value="bibliotecas">Bibliotecas</option>
+                    <option value="materiais">Materiais de Curso</option>
+                </select>
+
+                <label style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Tipo (Ex: PDF, C++, Link) *</label>
+                <input type="text" id="bibTipo" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+
+                <label style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Link Externo (Drive, GitHub, etc) *</label>
+                <input type="url" id="bibLink" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalBiblioteca')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
+                    <button type="button" class="btn btn-dark" onclick="salvarBiblioteca()" style="flex: 1; padding: 10px; background: #333; color: white; border: none; cursor: pointer; border-radius: 5px;">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalConfirmacaoBiblioteca" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:3000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:400px; text-align: center;">
+            <h3>Excluir Material</h3>
+            <p>Tem certeza que deseja excluir este material?</p>
+            <input type="hidden" id="idParaExcluirBiblioteca">
+            <div style="display:flex; gap:10px; margin-top: 20px;">
+                <button class="btn btn-outline" onclick="fecharModal('modalConfirmacaoBiblioteca')" style="flex: 1; padding: 10px; cursor: pointer; border: 1px solid #333; background: white; border-radius: 5px;">Cancelar</button>
+                <button class="btn btn-dark" onclick="confirmarExclusaoBiblioteca()" style="flex: 1; padding: 10px; background: #d9534f; color: white; border: none; cursor: pointer; border-radius: 5px;">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAIS DE GESTÃO DO PORTFÓLIO              -->
+    <!-- ========================================== -->
+    <div id="modalPortfolio" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:500px;">
+            <h3 id="tituloModalPortfolio" style="margin-bottom: 20px;">Novo Projeto</h3>
+            <form id="formPortfolio">
+                <input type="hidden" id="portId">
+                
+                <label style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Título do Projeto *</label>
+                <input type="text" id="portTitulo" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                
+                <label style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Autor / Turma *</label>
+                <input type="text" id="portAutor" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+
+                <label style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Descrição Breve *</label>
+                <textarea id="portDescricao" rows="3" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;"></textarea>
+
+                <label style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Link do Repositório (GitHub) *</label>
+                <input type="url" id="portLink" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalPortfolio')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
+                    <button type="button" class="btn btn-dark" onclick="salvarPortfolio()" style="flex: 1; padding: 10px; background: #333; color: white; border: none; cursor: pointer; border-radius: 5px;">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalConfirmacaoPortfolio" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:3000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:400px; text-align: center;">
+            <h3>Excluir Projeto</h3>
+            <p>Tem certeza que deseja excluir este projeto?</p>
+            <input type="hidden" id="idParaExcluirPortfolio">
+            <div style="display:flex; gap:10px; margin-top: 20px;">
+                <button class="btn btn-outline" onclick="fecharModal('modalConfirmacaoPortfolio')" style="flex: 1; padding: 10px; cursor: pointer; border: 1px solid #333; background: white; border-radius: 5px;">Cancelar</button>
+                <button class="btn btn-dark" onclick="confirmarExclusaoPortfolio()" style="flex: 1; padding: 10px; background: #d9534f; color: white; border: none; cursor: pointer; border-radius: 5px;">Excluir</button>
             </div>
         </div>
     </div>
