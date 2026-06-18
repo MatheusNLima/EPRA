@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPRA - Detalhes do Projeto</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Marked para renderização de Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo logo gradient-text"><a href="index.html" style="color: inherit; text-decoration: none;">EPRA</a></div>
+
+            <button id="mobile-menu" class="menu-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+
+            <ul class="nav-links">
+                <li><a href="index.html#inicio">Início</a></li>
+                <li><a href="index.html#sobre">Sobre</a></li>
+                <li><a href="index.html#tutoriais">Tutoriais</a></li>
+                <li><a href="index.html#desafios">Desafios</a></li>
+                <li><a href="index.html#biblioteca">Biblioteca</a></li>
+                <li><a href="index.html#cursos">Cursos</a></li>
+                <li><a href="index.html#portfolio" class="active">Portfólio</a></li>
+                <li><a href="index.html#impacto">Impacto</a></li>
+                
+                <li id="loginLink"><a href="login.html" class="btn btn-nav btn-sm">Login</a></li>
+                <li id="adminLink" style="display: none;"><a href="admin.html" class="btn btn-nav btn-sm">Painel</a></li>
+                <li id="logoutLink" style="display: none;"><a href="#" onclick="logout()" class="btn btn-nav btn-sm" style="color: #ff4757; border-color: #ff4757;">Sair</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container section-padding" style="margin-top: 110px; margin-bottom: 60px; min-height: 70vh;" data-aos="fade-up">
+        
+        <!-- Voltar link -->
+        <div style="margin-bottom: 20px;">
+            <a href="index.html#portfolio" class="link-arrow" style="display: inline-flex; align-items: center; gap: 5px; margin-top: 0;">
+                <i class="fas fa-arrow-left"></i> Voltar para Portfólio
+            </a>
+        </div>
+
+        <!-- Feedback Container (para erros e loading) -->
+        <div id="feedbackContainer" style="display: none;"></div>
+
+        <!-- Projeto Container -->
+        <div id="detalhesProjeto" class="tutorial-details-container" style="display: none;">
+            
+            <!-- Coluna Principal (Conteúdo) -->
+            <div class="tutorial-main-column">
+                
+                <h1 id="projetoTitulo">Carregando...</h1>
+                
+                <div id="projetoMeta" style="margin-bottom: 15px; font-size: 0.95rem; color: var(--text-light); font-weight: 500;">
+                    <!-- Autor e Turma injetados dinamicamente -->
+                </div>
+
+                <div id="projetoTags" style="margin-bottom: 20px; display: flex; gap: 8px; flex-wrap: wrap;"></div>
+                
+                <!-- Media Block Principal -->
+                <div class="tutorial-media-block">
+                    <img id="imagemDestaque" src="images/default-portfolio.jpg" alt="Imagem do Projeto">
+                    <div id="videoContainer" style="display: none; position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+                        <!-- Iframe do vídeo carregado dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Galeria de Imagens Secundárias -->
+                <div id="galeriaContainer" style="display: none; margin-bottom: 30px;">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 10px; color: #555;">Galeria do Projeto</h3>
+                    <div id="projetoGaleria" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px;">
+                        <!-- Miniaturas geradas dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Conteúdo de texto -->
+                <div id="projetoConteudo" class="tutorial-text-content">
+                    <!-- Injetado dinamicamente -->
+                </div>
+            </div>
+
+            <!-- Coluna Lateral (Sidebar) -->
+            <div class="tutorial-sidebar-column">
+                <div class="tutorial-sidebar-card">
+                    <h3 style="font-size: 1.2rem; margin-bottom: 15px; color: #333; border-bottom: 2px solid #007bff; padding-bottom: 8px;">
+                        Links do Projeto
+                    </h3>
+                    
+                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px;">
+                        Explore o repositório oficial do código ou assista à demonstração em vídeo.
+                    </p>
+
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <!-- Botão GitHub -->
+                        <a id="btnGithub" href="#" target="_blank" class="btn btn-outline" style="display: none; text-align: center; justify-content: center; align-items: center; gap: 8px; width: 100%;">
+                            <i class="fab fa-github" style="font-size: 1.1rem;"></i> Acessar Repositório
+                        </a>
+
+                        <!-- Botão Vídeo Explicativo -->
+                        <a id="btnVideo" href="#" target="_blank" class="btn btn-primary" style="display: none; text-align: center; justify-content: center; align-items: center; gap: 8px; width: 100%;">
+                            <i class="fas fa-play" style="font-size: 0.9rem;"></i> Assistir Vídeo
+                        </a>
+                    </div>
+
+                    <div style="margin-top: 25px; border-top: 1px solid #e9ecef; padding-top: 15px; font-size: 0.85rem; color: #888;">
+                        <p><i class="far fa-calendar-alt"></i> Desenvolvido por Alunos EPRA</p>
+                        <p style="margin-top: 5px;"><i class="fas fa-shield-alt"></i> UFC - Campus Russas</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="nav-logo">EPRA</a>
+                    <p>Democratizando o conhecimento em tecnologia através da Robótica e Programação. Um projeto de extensão da UFC - Campus Russas.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Links Úteis</h4>
+                    <ul>
+                        <li><a href="index.html#inicio">Início</a></li>
+                        <li><a href="index.html#sobre">Sobre Nós</a></li>
+                        <li><a href="index.html#cursos">Cursos Abertos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Comunidade</h4>
+                    <ul>
+                        <li><a href="index.html#tutoriais">Tutoriais</a></li>
+                        <li><a href="index.html#portfolio">Portfólio de Alunos</a></li>
+                        <li><a href="index.html#desafios">Desafios</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contato</h4>
+                    <ul>
+                        <li><a href="mailto:contato@epra.ufc.br">contato@epra.ufc.br</a></li>
+                    </ul>
+                    <div class="social-links" style="margin-top: 16px;">
+                        <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 EPRA - Todos os direitos reservados.</p>
+                <p class="designer">Desenvolvido com 💙 pela equipe de extensão</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+      AOS.init({ duration: 700, once: true, offset: 80 });
+    </script>
+    <script src="js/projeto.js"></script>
+</body>
+</html>
