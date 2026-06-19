@@ -156,4 +156,25 @@ const obterMinhasCandidaturas = async (req, res) => {
     }
 };
 
-module.exports = { listarVagas, obterVaga, criarVaga, atualizarVaga, excluirVaga, candidatarVaga, obterMinhasCandidaturas };
+// 7. Listar todos os candidatos de uma vaga específica (Painel Admin)
+const listarCandidaturasPorVaga = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const resultado = await db.query('SELECT * FROM candidatura_vaga WHERE vaga_id = $1 ORDER BY id DESC', [id]);
+        res.json(resultado.rows);
+    } catch (err) {
+        console.error('❌ ERRO AO BUSCAR CANDIDATOS:', err);
+        res.status(500).json({ erro: 'Erro ao buscar candidatos para esta vaga.' });
+    }
+};
+
+module.exports = { 
+    listarVagas, 
+    obterVaga, 
+    criarVaga, 
+    atualizarVaga, 
+    excluirVaga, 
+    candidatarVaga, 
+    obterMinhasCandidaturas,
+    listarCandidaturasPorVaga
+};

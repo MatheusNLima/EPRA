@@ -85,7 +85,7 @@ window.logout = function() {
 
 window.verificarStatusResponse = function(response) {
     if (response.status === 401 || response.status === 403) {
-        alert('Sua sessão expirou ou é inválida. Por favor, faça login novamente.');
+        alert('Sua sessão expirou ou é inválida. Por favor, inicie sessão novamente.');
         window.logout();
         return false;
     }
@@ -464,6 +464,7 @@ async function carregarVagasAdmin() {
                     <td style="font-weight: 500;">${vaga.titulo}</td>
                     <td>${dataFormatada}</td>
                     <td>
+                        <button class="btn-sm btn-info" onclick="gerenciarCandidatos(${vaga.id}, '${vaga.titulo.replace(/'/g, "\\'")}')">👥 Candidatos</button>
                         <button class="btn-sm btn-edit" onclick="editarVaga(${vaga.id})">Editar</button>
                         <button class="btn-sm btn-delete" onclick="excluirVaga(${vaga.id})">Excluir</button>
                     </td>
@@ -1023,7 +1024,6 @@ window.confirmarExclusaoBiblioteca = async function() {
     }
 };
 
-
 // ============================================================================
 // --- CRUD PORTFÓLIO ---
 // ============================================================================
@@ -1130,5 +1130,56 @@ window.confirmarExclusaoPortfolio = async function() {
         carregarPortfolioAdmin();
     } catch (error) {
         alert('Servidor indisponível.');
+    }
+};
+
+// ============================================================================
+// --- GESTÃO DE CANDIDATOS (Vagas) ---
+// ============================================================================
+
+window.gerenciarCandidatos = async function(vagaId, tituloVaga) {
+    document.getElementById('tituloModalCandidatos').innerText = `Candidatos à Vaga: ${tituloVaga}`;
+    const tbody = document.getElementById('corpoTabelaCandidatos');
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">A procurar candidatos...</td></tr>';
+    
+    abrirModal('modalCandidatos');
+
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`http://localhost:3000/api/vagas/${vagaId}/candidaturas-admin`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Falha ao carregar');
+
+        const candidatos = await response.json();
+        tbody.innerHTML = '';
+
+        if (candidatos.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Ninguém se candidatou a esta vaga ainda.</td></tr>';
+            return;
+        }
+
+        candidatos.forEach(cand => {
+            let linkLinkedin = cand.linkedin ? `<a href="${cand.linkedin}" target="_blank" style="color: #007bff; text-decoration: underline;">Ver Perfil</a>` : '-';
+            
+            // Corrige as barras no caminho do arquivo para o navegador conseguir ler
+            let caminhoPDF = cand.curriculo_path ? cand.curriculo_path.replace(/\\/g, '/') : '';
+            let btnCurriculo = caminhoPDF ? `<a href="http://localhost:3000/uploads/${caminhoPDF}" target="_blank" class="btn-sm btn-info" style="text-decoration:none; display:inline-block;">Ver PDF</a>` : 'Sem anexo';
+
+            tbody.innerHTML += `
+                <tr>
+                    <td style="font-weight: 500;">${cand.nome}</td>
+                    <td>${cand.curso}</td>
+                    <td>${cand.email}</td>
+                    <td>${cand.telefone}</td>
+                    <td>${linkLinkedin}</td>
+                    <td>${btnCurriculo}</td>
+                </tr>
+            `;
+        });
+    } catch (error) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Erro ao carregar dados.</td></tr>';
     }
 };

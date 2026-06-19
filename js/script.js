@@ -104,14 +104,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     const itemCategory = item.getAttribute('data-category');
                     if (filterValue === 'all' || filterValue === itemCategory) {
                         item.classList.remove('hidden');
+                        item.style.display = ''; // Garante que volta a aparecer
                         item.style.opacity = '0';
                         setTimeout(() => item.style.opacity = '1', 50);
                     } else {
                         item.classList.add('hidden');
+                        item.style.display = 'none'; // Esconde de vez para não se misturar
                     }
                 });
             });
         });
+
+        // Clica automaticamente na aba que estiver ativa ao carregar a página
+        const botaoAtivoInicial = document.querySelector(buttonClass + '.active');
+        if (botaoAtivoInicial) {
+            botaoAtivoInicial.click();
+        }
     }
 
     async function carregarCursos() {
@@ -210,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
             grid.innerHTML = '';
             materiais.forEach(mat => {
                 grid.innerHTML += `
-                    <div class="lib-card" data-category="materiais">
+                    <div class="lib-card" data-category="${mat.categoria}">
                         <div class="lib-icon">📁</div>
                         <h3 style="margin-top: 10px;">${mat.titulo}</h3>
                         <span class="lib-meta" style="color: #666; font-size: 0.9rem;">Formato: ${mat.tipo}</span>

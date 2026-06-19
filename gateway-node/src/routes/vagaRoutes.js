@@ -11,7 +11,8 @@ const {
     atualizarVaga, 
     excluirVaga,
     candidatarVaga,
-    obterMinhasCandidaturas
+    obterMinhasCandidaturas,
+    listarCandidaturasPorVaga
 } = require('../controllers/vagaController');
 
 // Configuração do Multer para salvamento de PDF
@@ -61,5 +62,8 @@ router.delete('/:id', authMiddleware, excluirVaga);
 
 // Candidatura a vaga específica
 router.post('/:id/candidaturas', authMiddleware, uploadSingle, candidatarVaga);
+
+// Rota do painel de administrador para listar os candidatos de uma vaga
+router.get('/:id/candidaturas-admin', authMiddleware, listarCandidaturasPorVaga);
 
 module.exports = router;
