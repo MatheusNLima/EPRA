@@ -39,7 +39,6 @@ A plataforma conecta orientadores, alunos internos (bolsistas/voluntários) e al
 
 ## 📸 Demonstração das Telas
 
-> *Nota: Insira aqui os prints reais das telas do projeto. Abaixo estão as tags preparadas para receber as imagens.*
 
 <details>
 <summary><b>1. Página Inicial (Landing Page)</b></summary>
@@ -226,7 +225,6 @@ A API está organizada sob as seguintes rotas base (exemplo de arquitetura REST)
 
 ## 🧪 Testes
 
-*(Seção a ser preenchida caso testes automatizados como Jest, Mocha ou Cypress sejam implementados)*
 
 Atualmente, os testes devem ser realizados manualmente utilizando ferramentas como **Postman** ou **Insomnia** para a API, importando as rotas da aplicação, e testes exploratórios no Frontend.
 
