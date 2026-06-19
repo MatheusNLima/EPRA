@@ -90,6 +90,7 @@
             <button class="tab-link" onclick="abrirAba(event, 'abaTutoriais')">🛠️ Tutoriais</button>
             <button class="tab-link" onclick="abrirAba(event, 'abaBiblioteca')">📁 Biblioteca</button>
             <button class="tab-link" onclick="abrirAba(event, 'abaPortfolio')">🏆 Portfólio</button>
+            <button class="tab-link" onclick="abrirAba(event, 'abaDesafios')">🎯 Desafios</button>
         </aside>
 
         <main class="main-content">
@@ -196,6 +197,28 @@
                         </thead>
                         <tbody id="corpoTabelaPortfolio">
                             <tr><td colspan="4" style="text-align: center;">A carregar projetos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ABA DESAFIOS -->
+            <div id="abaDesafios" class="tab-content">
+                <div class="header-aba">
+                    <h2>Gestão de Desafios</h2>
+                    <button class="btn btn-dark" onclick="abrirModal('modalDesafio')" style="padding: 10px 20px; background-color: #333; color: white; border: none; border-radius: 5px; cursor: pointer;">+ Novo Desafio</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Título</th>
+                                <th>Data Limite</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabelaDesafios">
+                            <tr><td colspan="3" style="text-align: center;">A carregar desafios...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -553,6 +576,86 @@
         </div>
     </div>
 
+    <!-- ========================================== -->
+    <!-- MODAIS DE GESTÃO DE DESAFIOS               -->
+    <!-- ========================================== -->
+    <div id="modalDesafio" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:500px;">
+            <h3 style="margin-bottom: 20px;">Criar Novo Desafio</h3>
+            <form id="formDesafio">
+                <input type="text" id="tituloDesafio" placeholder="Título do Desafio" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                <textarea id="descricaoDesafio" placeholder="Descrição" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; min-height:100px; box-sizing: border-box;"></textarea>
+                <div style="margin-bottom: 15px;">
+                    <label for="dataLimiteDesafio" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Data Limite</label>
+                    <input type="date" id="dataLimiteDesafio" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                </div>
+                <p id="mensagemFeedbackDesafio" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalDesafio')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
+                    <button type="button" class="btn btn-dark" onclick="salvarNovoDesafio()" style="flex: 1; padding: 10px; background: #333; color: white; border: none; cursor: pointer; border-radius: 5px;">Guardar Desafio</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalEditarDesafio" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:500px;">
+            <h3 style="margin-bottom: 20px;">Editar Desafio</h3>
+            <form id="formEditarDesafio">
+                <input type="hidden" id="editIdDesafio">
+                <input type="text" id="editTituloDesafio" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                <textarea id="editDescricaoDesafio" required style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #ddd; border-radius:5px; min-height:100px; box-sizing: border-box;"></textarea>
+                <div style="margin-bottom: 15px;">
+                    <label for="editDataLimiteDesafio" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Data Limite</label>
+                    <input type="date" id="editDataLimiteDesafio" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                </div>
+                <p id="msgEditFeedbackDesafio" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="btn btn-outline" onclick="fecharModal('modalEditarDesafio')" style="flex: 1; padding: 10px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Cancelar</button>
+                    <button type="button" class="btn btn-dark" onclick="salvarEdicaoDesafio()" style="flex: 1; padding: 10px; background: #f0ad4e; color: white; border: none; cursor: pointer; border-radius: 5px;">Atualizar Desafio</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalConfirmacaoDesafio" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:3000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:400px; text-align: center;">
+            <h3>Excluir Desafio</h3>
+            <p>Tem certeza que deseja excluir este desafio? Esta ação não pode ser desfeita.</p>
+            <input type="hidden" id="idParaExcluirDesafio">
+            <div style="display:flex; gap:10px; margin-top: 20px;">
+                <button class="btn btn-outline" onclick="fecharModal('modalConfirmacaoDesafio')" style="flex: 1; padding: 10px; cursor: pointer; border: 1px solid #333; background: white; border-radius: 5px;">Cancelar</button>
+                <button class="btn btn-dark" onclick="confirmarExclusaoDesafio()" style="flex: 1; padding: 10px; background: #d9534f; color: white; border: none; cursor: pointer; border-radius: 5px;">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalVerSolucoes" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:95%; max-width:800px; max-height: 85vh; overflow-y: auto;">
+            <h3 style="margin-bottom: 20px;">Soluções do Desafio</h3>
+            <div style="overflow-x: auto; max-height: 400px; margin-bottom: 20px;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Participante</th>
+                            <th>Submissão</th>
+                            <th>Link GitHub / Arquivo</th>
+                            <th>Status & Nota</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpoTabelaSolucoes">
+                        <tr><td colspan="5" style="text-align: center;">A carregar soluções...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="display:flex; justify-content:flex-end;">
+                <button type="button" class="btn btn-outline" onclick="fecharModal('modalVerSolucoes')" style="padding: 10px 20px; background: white; border: 1px solid #333; cursor: pointer; border-radius: 5px;">Fechar Janela</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
     <script src="js/admin.js"></script>
 </body>
 </html>

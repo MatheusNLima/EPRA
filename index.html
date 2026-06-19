@@ -117,24 +117,22 @@
     </div>
     </section>
 
-    <section id="desafios" class="section-light">
+    <section id="desafios" class="section-light section-padding" data-aos="fade-up">
     <div class="container">
         <div class="section-title">
             <h2>Desafios EPRA</h2>
             <p>Participe, teste seus conhecimentos e ganhe destaque na comunidade.</p>
         </div>
-
-        <div class="challenge-box-yellow">
-            <span class="badge-gold">Desafio Atual</span>
-            <h3>Desafio de Dezembro: Sistema de Alarme Inteligente</h3>
-            <p>Crie um sistema de alarme completo utilizando Arduino que detecte movimento através de sensores PIR e envie notificações visuais e sonoras.</p>
-            
-            <div class="challenge-meta">
-                <span>📅 Prazo: 31 Dez 2025</span>
-                <span>👥 Participantes: 42</span>
+        <div id="secao-desafio-container">
+            <div id="desafio-destaque-container">
+                <!-- Preenchido via JS -->
+                <p style="text-align:center;">A carregar desafio ativo...</p>
             </div>
             
-            <button class="btn btn-primary">Participar do Desafio</button>
+            <h3 style="margin-top: 50px; margin-bottom: 20px; font-weight: 600;">Desafios Anteriores</h3>
+            <div id="desafios-anteriores-grid" class="grid-3">
+                <!-- Preenchido via JS -->
+            </div>
         </div>
 
     </div>
@@ -294,7 +292,22 @@
                 <h2>Nossos Resultados & Impacto</h2>
                 <p>Números que refletem nosso compromisso em transformar a educação através da tecnologia e inovação.</p>
             </div>
+            
+            <div class="grid-3 stats-grid" style="margin-top: 40px; text-align: center;">
+                <div class="stat-card" style="padding: 30px; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                    <h3 id="num-escolas" style="font-size: 3rem; color: var(--primary-blue); margin-bottom: 10px;">12</h3>
+                    <p style="font-size: 1.1rem; color: #555; font-weight: 500;">Escolas Atendidas</p>
+                </div>
+                <div class="stat-card" style="padding: 30px; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                    <h3 id="num-alunos" style="font-size: 3rem; color: var(--primary-blue); margin-bottom: 10px;">-</h3>
+                    <p style="font-size: 1.1rem; color: #555; font-weight: 500;">Alunos Alcançados</p>
+                </div>
+                <div class="stat-card" style="padding: 30px; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                    <h3 id="num-horas" style="font-size: 3rem; color: var(--primary-blue); margin-bottom: 10px;">-</h3>
+                    <p style="font-size: 1.1rem; color: #555; font-weight: 500;">Certificados Emitidos</p>
+                </div>
             </div>
+        </div>
     </section>
 
     <section id="oportunidades" class="section-white">
@@ -434,6 +447,50 @@
         </div>
     </div>
 
+    <div id="modalSubmissaoDesafio" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:8px; width:90%; max-width:500px;">
+            <h3 style="margin-bottom: 20px;">Submeter Solução</h3>
+            
+            <form id="formSubmissaoDesafio" enctype="multipart/form-data" onsubmit="event.preventDefault(); window.submeterSolucaoDesafio();">
+                <input type="hidden" id="subDesafioId">
+
+                <div style="margin-bottom: 15px;">
+                    <label for="subNome" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Nome Completo *</label>
+                    <input type="text" id="subNome" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label for="subEmail" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">E-mail *</label>
+                    <input type="email" id="subEmail" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label for="subDescricao" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Descrição da Solução *</label>
+                    <textarea id="subDescricao" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box; min-height:80px; resize:vertical;"></textarea>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label for="subLinkGithub" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Link do Repositório GitHub</label>
+                    <input type="url" id="subLinkGithub" placeholder="https://github.com/seu-perfil/projeto" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label for="subArquivo" style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Arquivo Compactado (.zip, .rar)</label>
+                    <input type="file" id="subArquivo" accept=".zip,.rar" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                    <small style="color:#888; font-size:0.8rem;">Envie um arquivo ou preencha o link do GitHub (ou ambos).</small>
+                </div>
+
+                <p id="feedbackSubmissaoDesafio" style="display: none; margin-bottom: 15px; font-size: 0.9rem; text-align: center;"></p>
+
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="btn btn-outline" onclick="fecharModalSubmissaoDesafio()" style="flex: 1; padding: 10px; cursor: pointer; border-radius: 5px;">Cancelar</button>
+                    <button type="submit" id="btnSubmitSolucao" class="btn btn-dark" style="flex: 1; padding: 10px; cursor: pointer; border-radius: 5px;">Enviar Solução</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
     <script src="js/script.js"></script>
 </body>
 </html>

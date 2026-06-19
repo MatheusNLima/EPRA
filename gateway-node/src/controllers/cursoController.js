@@ -27,7 +27,7 @@ const listarCursos = async (req, res) => {
             FROM curso c
             LEFT JOIN (
                 SELECT curso_id, COUNT(*) AS qtd 
-                FROM inscricao 
+                FROM inscricao_curso 
                 GROUP BY curso_id
             ) i ON c.id = i.curso_id
             ORDER BY c.datainicio ASC

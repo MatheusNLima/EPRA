@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         try {
-            const response = await fetch(`http://localhost:3000/api/tutoriais/${id}`);
+            const response = await fetch(`${API_BASE_URL}/tutoriais/${id}`);
             
             if (response.status === 404) {
                 exibirFeedback(

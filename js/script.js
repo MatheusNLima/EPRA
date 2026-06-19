@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function carregarCursos() {
         try {
-            const response = await fetch('http://localhost:3000/api/cursos');
+            const response = await fetch(`${API_BASE_URL}/cursos`);
             const cursos = await response.json();
             const containerDinamico = document.getElementById('cursos-container');
             if(containerDinamico) containerDinamico.innerHTML = '';
@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function carregarVagas() {
         try {
-            const response = await fetch('http://localhost:3000/api/vagas');
+            const response = await fetch(`${API_BASE_URL}/vagas`);
             const vagas = await response.json();
             const grid = document.querySelector('#oportunidades .grid-3');
             if (!grid) return;
@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function carregarMateriais() {
         try {
-            const response = await fetch('http://localhost:3000/api/materiais');
+            const response = await fetch(`${API_BASE_URL}/materiais`);
             const materiais = await response.json();
             const grid = document.querySelector('.library-grid');
             if (!grid) return;
@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!grid) return;
 
         try {
-            const response = await fetch('http://localhost:3000/api/tutoriais');
+            const response = await fetch(`${API_BASE_URL}/tutoriais`);
             if (!response.ok) throw new Error('Erro na resposta');
             const tutoriais = await response.json();
 
@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function carregarPortfolio() {
         try {
-            const response = await fetch('http://localhost:3000/api/portfolio');
+            const response = await fetch(`${API_BASE_URL}/portfolio`);
             const portfolio = await response.json();
             const grid = document.querySelector('#portfolio .grid-3');
             if (!grid) return;
@@ -302,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function carregarImpacto() {
         try {
-            const response = await fetch('http://localhost:3000/api/impacto');
+            const response = await fetch(`${API_BASE_URL}/impacto`);
             const metricas = await response.json();
             
             const elEscolas = document.getElementById('num-escolas');
@@ -325,6 +325,87 @@ document.addEventListener('DOMContentLoaded', () => {
     carregarPortfolio();
     carregarImpacto();
 
+
+    async function carregarDesafiosHome() {
+        const destContainer = document.getElementById('desafio-destaque-container');
+        const prevGrid = document.getElementById('desafios-anteriores-grid');
+        if (!destContainer || !prevGrid) return;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/desafios`);
+            if (!response.ok) throw new Error('Erro ao carregar desafios');
+            const desafios = await response.json();
+
+            if (desafios.length === 0) {
+                destContainer.innerHTML = '<p style="text-align:center;">Nenhum desafio no momento. Fique atento!</p>';
+                return;
+            }
+
+            const agora = new Date();
+            const desafiosAtivos = [];
+            const desafiosEncerrados = [];
+
+            desafios.forEach(d => {
+                if (d.datalimite) {
+                    const prazo = new Date(d.datalimite);
+                    if (prazo >= agora) {
+                        desafiosAtivos.push(d);
+                    } else {
+                        desafiosEncerrados.push(d);
+                    }
+                } else {
+                    desafiosAtivos.push(d);
+                }
+            });
+
+            // Ativos - exibe apenas o primeiro (destaque)
+            if (desafiosAtivos.length > 0) {
+                const destaque = desafiosAtivos[0];
+                const prazoFormatado = destaque.datalimite ? new Date(destaque.datalimite).toLocaleDateString('pt-BR') : 'A definir';
+                
+                destContainer.innerHTML = `
+                    <div class="desafio-destaque">
+                        <span class="desafio-badge-pill">Desafio Atual</span>
+                        <h2>${destaque.titulo}</h2>
+                        <p>${destaque.descricao}</p>
+                        
+                        <div class="desafio-meta">
+                            <span class="desafio-chip">📅 Prazo: ${prazoFormatado}</span>
+                        </div>
+                        
+                        <button class="btn btn-desafio" onclick="abrirModalSubmissaoDesafio(${destaque.id}, '${destaque.titulo.replace(/'/g, "\\'")}')">Participar do Desafio</button>
+                    </div>
+                `;
+            } else {
+                destContainer.innerHTML = '<p style="text-align:center;">Nenhum desafio ativo no momento. Veja os anteriores abaixo.</p>';
+            }
+
+            // Encerrados
+            prevGrid.innerHTML = '';
+            if (desafiosEncerrados.length === 0) {
+                prevGrid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">Nenhum desafio anterior.</p>';
+            } else {
+                desafiosEncerrados.forEach(d => {
+                    const prazoFormatado = d.datalimite ? new Date(d.datalimite).toLocaleDateString('pt-BR') : '-';
+                    prevGrid.innerHTML += `
+                        <div class="card" style="padding: 20px;">
+                            <h4 style="margin-bottom: 10px;">${d.titulo}</h4>
+                            <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">Encerrado em: ${prazoFormatado}</p>
+                            <p style="font-size: 0.95rem;">${d.descricao.substring(0, 80)}...</p>
+                            <button class="btn btn-outline" style="margin-top:15px; width:100%; cursor:not-allowed;" disabled>Prazo Encerrado</button>
+                        </div>
+                    `;
+                });
+            }
+
+        } catch (err) {
+            console.error('Erro ao carregar desafios:', err);
+            destContainer.innerHTML = '<p style="text-align:center; color:red;">Erro ao carregar os desafios.</p>';
+        }
+    }
+
+
+    carregarDesafiosHome();
 }); // FIM DO DOMContentLoaded
 
 
@@ -424,7 +505,7 @@ window.enviarInscricaoPublica = async function() {
     }
 
     try {
-        const response = await fetch('http://localhost:3000/api/inscricoes/publica', {
+        const response = await fetch(`${API_BASE_URL}/inscricoes/publica`, {
             method: 'POST',
             body: formData
         });
@@ -482,7 +563,7 @@ window.enviarCandidaturaVaga = async function() {
     }
 
     try {
-        const response = await fetch(`http://localhost:3000/api/vagas/${idVaga}/candidaturas`, {
+        const response = await fetch(`${API_BASE_URL}/vagas/${idVaga}/candidaturas`, {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + userToken },
             body: formData
@@ -499,6 +580,243 @@ window.enviarCandidaturaVaga = async function() {
     } catch (err) {
         window.mostrarAviso('Erro', 'Servidor indisponível no momento.', '#d9534f');
     } finally {
+        btnSubmit.innerText = textoOriginal;
+        btnSubmit.disabled = false;
+    }
+};
+
+// --- MODAL DE DESAFIOS ---
+window.abrirModalSubmissaoDesafio = function(id, titulo) {
+    document.getElementById('subDesafioId').value = id;
+    document.getElementById('modalSubmissaoDesafio').style.display = 'flex';
+    
+    const feedback = document.getElementById('feedbackSubmissaoDesafio');
+    if (feedback) {
+        feedback.style.display = 'none';
+        feedback.innerText = '';
+    }
+};
+
+window.fecharModalSubmissaoDesafio = function() {
+    document.getElementById('modalSubmissaoDesafio').style.display = 'none';
+    document.getElementById('formSubmissaoDesafio').reset();
+};
+
+window.submeterSolucaoDesafio = async function() {
+    const feedback = document.getElementById('feedbackSubmissaoDesafio');
+    const btnSubmit = document.getElementById('btnSubmitSolucao');
+    const desafioId = document.getElementById('subDesafioId').value;
+
+    const nome = document.getElementById('subNome').value;
+    const email = document.getElementById('subEmail').value;
+    const descricao = document.getElementById('subDescricao').value;
+    const linkGithub = document.getElementById('subLinkGithub').value;
+    const arquivo = document.getElementById('subArquivo').files[0];
+
+    if (!arquivo && !linkGithub) {
+        feedback.innerText = 'Precisas enviar um ficheiro .zip/.rar ou o link do GitHub.';
+        feedback.style.color = '#d9534f';
+        feedback.style.display = 'block';
+        return;
+    }
+
+    if (arquivo) {
+        const extensao = arquivo.name.split('.').pop().toLowerCase();
+        if (!['zip', 'rar'].includes(extensao)) {
+            feedback.innerText = 'Apenas arquivos .zip ou .rar são permitidos.';
+            feedback.style.color = '#d9534f';
+            feedback.style.display = 'block';
+            return;
+        }
+    }
+
+    btnSubmit.disabled = true;
+    feedback.innerText = 'A enviar solução...';
+    feedback.style.color = '#333';
+    feedback.style.display = 'block';
+
+    const formData = new FormData();
+    formData.append('nome', nome);
+    formData.append('email', email);
+    formData.append('descricao', descricao);
+    if (linkGithub) formData.append('link_github', linkGithub);
+    if (arquivo) formData.append('arquivo_solucao', arquivo);
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/desafios/${desafioId}/solucoes`, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            feedback.innerText = 'Solução enviada com sucesso! Fica atento ao teu e-mail para receber o resultado.';
+            feedback.style.color = '#28a745';
+            setTimeout(() => {
+                fecharModalSubmissaoDesafio();
+                btnSubmit.disabled = false;
+            }, 3000);
+        } else {
+            const err = await response.json();
+            feedback.innerText = err.erro || 'Erro ao enviar solução.';
+            feedback.style.color = '#d9534f';
+            btnSubmit.disabled = false;
+        }
+    } catch (error) {
+        feedback.innerText = 'Erro ao contactar o servidor.';
+        feedback.style.color = '#d9534f';
+        btnSubmit.disabled = false;
+    }
+};
+
+
+// 🧙‍♂️ A MÁGICA: A FUNÇÃO CHAMADA DIRETAMENTE PELO HTML
+window.submeterInscricao = async function() {
+    const form = document.getElementById('formInscricaoPublica');
+    const btnSubmit = form.querySelector('button[type="submit"]');
+    const textoOriginal = btnSubmit.innerText;
+    
+    btnSubmit.innerText = 'A enviar...';
+    btnSubmit.disabled = true;
+
+    const feedback = document.getElementById('msgFeedbackInscricao');
+    if (feedback) feedback.style.display = 'none';
+
+    const formData = new FormData();
+    formData.append('curso_id', document.getElementById('inscricaoCursoId').value);
+    formData.append('nome', document.getElementById('inscNome').value);
+    formData.append('documento', document.getElementById('inscDocumento').value);
+    formData.append('email', document.getElementById('inscEmail').value);
+    formData.append('telefone', document.getElementById('inscTelefone').value);
+    
+    const progSelecionado = document.querySelector('input[name="conhecimentoProg"]:checked');
+    if (progSelecionado) formData.append('conhecimento_programacao', progSelecionado.value);
+    
+    const robSelecionado = document.querySelector('input[name="conhecimentoRob"]:checked');
+    if (robSelecionado) formData.append('conhecimento_robotica', robSelecionado.value);
+    
+    formData.append('instituicao_ensino', document.getElementById('inscInstituicao').value);
+    
+    const inputArquivo = document.getElementById('inscTermo');
+    if (inputArquivo && inputArquivo.files.length > 0) {
+        formData.append('termo_consentimento', inputArquivo.files[0]);
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/inscricoes/publica`, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            // DEU CERTO: Mostramos o aviso a verde
+            if (feedback) {
+                feedback.style.display = 'block';
+                feedback.style.backgroundColor = '#d4edda';
+                feedback.style.color = '#155724';
+                feedback.style.border = '1px solid #c3e6cb';
+                feedback.innerText = 'Inscrição realizada com sucesso!';
+            }
+            // Esperamos 2 segundos para o utilizador ler, e só depois fechamos a janela
+            setTimeout(() => {
+                window.fecharModalInscricao(); 
+                if (window.atualizarVisualizacaoCursos) window.atualizarVisualizacaoCursos();
+                btnSubmit.innerText = textoOriginal;
+                btnSubmit.disabled = false;
+            }, 2000);
+
+        } else {
+            // DEU ERRO (Duplicado, Falta de Vagas): Mostramos o aviso a vermelho e deixamos o formulário ABERTO!
+            const errorData = await response.json();
+            if (feedback) {
+                feedback.style.display = 'block';
+                feedback.style.backgroundColor = '#f8d7da';
+                feedback.style.color = '#721c24';
+                feedback.style.border = '1px solid #f5c6cb';
+                feedback.innerHTML = `⚠️ <b>Atenção:</b> ${errorData.erro}`;
+            }
+            btnSubmit.innerText = textoOriginal;
+            btnSubmit.disabled = false;
+        }
+
+    } catch (error) {
+        // SERVIDOR FORA DO AR
+        console.error(error);
+        if (feedback) {
+            feedback.style.display = 'block';
+            feedback.style.backgroundColor = '#f8d7da';
+            feedback.style.color = '#721c24';
+            feedback.style.border = '1px solid #f5c6cb';
+            feedback.innerText = 'Erro de ligação ao servidor. Tente novamente.';
+        }
+        btnSubmit.innerText = textoOriginal;
+        btnSubmit.disabled = false;
+    }
+};
+
+window.submeterCandidaturaVaga = async function() {
+    const userToken = localStorage.getItem('token');
+    const form = document.getElementById('formCandidaturaVaga');
+    const btnSubmit = form.querySelector('button[type="submit"]');
+    const textoOriginal = btnSubmit.innerText;
+    
+    btnSubmit.innerText = 'A enviar...';
+    btnSubmit.disabled = true;
+
+    const feedback = document.getElementById('feedbackCandidatura');
+    if (feedback) {
+        feedback.style.display = 'block';
+        feedback.innerText = 'Enviando candidatura...';
+        feedback.style.color = '#666';
+    }
+
+    const idVaga = document.getElementById('candidaturaVagaId').value;
+    const formData = new FormData();
+    formData.append('nome', document.getElementById('candidaturaNome').value);
+    formData.append('email', document.getElementById('candidaturaEmail').value);
+    formData.append('curso', document.getElementById('candidaturaCurso').value);
+    formData.append('telefone', document.getElementById('candidaturaTelefone').value);
+    formData.append('linkedin', document.getElementById('candidaturaLinkedin').value);
+    
+    const fileInput = document.getElementById('candidaturaCurriculo');
+    if (fileInput && fileInput.files.length > 0) {
+        formData.append('curriculo', fileInput.files[0]);
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/vagas/${idVaga}/candidaturas`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + userToken
+            },
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.status === 201) {
+            if (feedback) {
+                feedback.innerText = 'Candidatura enviada com sucesso!';
+                feedback.style.color = '#28a745';
+            }
+            setTimeout(() => { 
+                window.fecharModalCandidatura(); 
+                btnSubmit.innerText = textoOriginal;
+                btnSubmit.disabled = false;
+            }, 1500);
+        } else {
+            // Erro 400 (Duplicado)
+            if (feedback) {
+                feedback.innerText = data.erro || 'Você já se candidatou a esta vaga.';
+                feedback.style.color = '#d9534f';
+            }
+            btnSubmit.innerText = textoOriginal;
+            btnSubmit.disabled = false;
+        }
+    } catch (err) {
+        if (feedback) {
+            feedback.innerText = 'Servidor indisponível no momento.';
+            feedback.style.color = '#d9534f';
+        }
         btnSubmit.innerText = textoOriginal;
         btnSubmit.disabled = false;
     }
