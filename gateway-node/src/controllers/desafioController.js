@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-// Listar todos os desafios (Público/Admin)
+// 1. Listar todos os desafios (Público/Admin)
 const listarDesafios = async (req, res) => {
     try {
         const resultado = await db.query('SELECT * FROM desafio ORDER BY id ASC');
@@ -11,7 +11,7 @@ const listarDesafios = async (req, res) => {
     }
 };
 
-// Obter desafio por ID
+// 2. Obter desafio por ID
 const obterDesafioPorId = async (req, res) => {
     try {
         const { id } = req.params;
@@ -26,29 +26,30 @@ const obterDesafioPorId = async (req, res) => {
     }
 };
 
-// Criar desafio (Admin)
+// 3. Criar desafio (Admin)
 const criarDesafio = async (req, res) => {
     try {
-        const { titulo, descricao, dificuldade, recompensas } = req.body;
+        // Agora alinhado com o admin.js e a tabela: titulo, descricao, datalimite
+        const { titulo, descricao, datalimite } = req.body;
         const resultado = await db.query(
-            'INSERT INTO desafio (titulo, descricao, dificuldade, recompensas) VALUES ($1, $2, $3, $4) RETURNING *',
-            [titulo, descricao, dificuldade, recompensas]
+            'INSERT INTO desafio (titulo, descricao, datalimite) VALUES ($1, $2, $3) RETURNING *',
+            [titulo, descricao, datalimite]
         );
         res.status(201).json(resultado.rows[0]);
     } catch (erro) {
         console.error('Erro ao criar desafio:', erro);
-        res.status(500).json({ erro: 'Erro interno no servidor' });
+        res.status(500).json({ erro: 'Erro interno ao criar desafio' });
     }
 };
 
-// Atualizar desafio (Admin)
+// 4. Atualizar desafio (Admin)
 const atualizarDesafio = async (req, res) => {
     try {
         const { id } = req.params;
-        const { titulo, descricao, dificuldade, recompensas } = req.body;
+        const { titulo, descricao, datalimite } = req.body;
         const resultado = await db.query(
-            'UPDATE desafio SET titulo = $1, descricao = $2, dificuldade = $3, recompensas = $4 WHERE id = $5 RETURNING *',
-            [titulo, descricao, dificuldade, recompensas, id]
+            'UPDATE desafio SET titulo = $1, descricao = $2, datalimite = $3 WHERE id = $4 RETURNING *',
+            [titulo, descricao, datalimite, id]
         );
         if (resultado.rows.length === 0) {
             return res.status(404).json({ erro: 'Desafio não encontrado para atualização' });
@@ -56,11 +57,11 @@ const atualizarDesafio = async (req, res) => {
         res.json(resultado.rows[0]);
     } catch (erro) {
         console.error('Erro ao atualizar desafio:', erro);
-        res.status(500).json({ erro: 'Erro interno no servidor' });
+        res.status(500).json({ erro: 'Erro interno ao atualizar' });
     }
 };
 
-// Deletar desafio (Admin)
+// 5. Deletar desafio (Admin)
 const deletarDesafio = async (req, res) => {
     try {
         const { id } = req.params;
@@ -71,46 +72,47 @@ const deletarDesafio = async (req, res) => {
         res.json({ mensagem: 'Desafio excluído com sucesso' });
     } catch (erro) {
         console.error('Erro ao deletar desafio:', erro);
-        res.status(500).json({ erro: 'Erro interno no servidor' });
+        res.status(500).json({ erro: 'Erro interno ao deletar' });
     }
 };
 
-// Submeter Solução de Desafio
-const submeterSolucao = async (req, res) => {
+// 6. Listar as soluções submetidas por alunos para o painel Admin
+const listarSolucoes = async (req, res) => {
     try {
         const { desafio_id } = req.params;
-        const { link_repositorio } = req.body;
-        const usuario_id = req.usuario ? req.usuario.id : 1; // Ajustar se autenticação estiver habilitada
-        
+        const resultado = await db.query('SELECT * FROM solucao_desafio WHERE desafio_id = $1 ORDER BY enviado_em DESC', [desafio_id]);
+        res.json(resultado.rows);
+    } catch (erro) {
+        console.error('Erro ao listar soluções:', erro);
+        res.status(500).json({ erro: 'Erro ao buscar soluções' });
+    }
+};
+
+// 7. O Coordenador/Orientador dar Nota e mudar o Status
+const avaliarSolucao = async (req, res) => {
+    try {
+        const { solucao_id } = req.params;
+        const { nota, status } = req.body;
         const resultado = await db.query(
-            'INSERT INTO solucao_desafio (desafio_id, usuario_id, link_repositorio) VALUES ($1, $2, $3) RETURNING *',
-            [desafio_id, usuario_id, link_repositorio]
+            'UPDATE solucao_desafio SET nota = $1, status = $2 WHERE id = $3 RETURNING *',
+            [nota, status, solucao_id]
         );
-        res.status(201).json(resultado.rows[0]);
+        if (resultado.rows.length === 0) {
+            return res.status(404).json({ erro: 'Solução não encontrada.' });
+        }
+        res.json({ mensagem: 'Avaliação guardada com sucesso!' });
     } catch (erro) {
-        console.error('Erro ao submeter solução:', erro);
-        res.status(500).json({ erro: 'Erro ao submeter a solução' });
-    }
-};
-
-// Contar solucoes de um desafio
-const contarSolucoes = async (req, res) => {
-    try {
-        const { desafio_id } = req.params;
-        const resultado = await db.query('SELECT COUNT(*) FROM solucao_desafio WHERE desafio_id = $1', [desafio_id]);
-        res.json({ total: parseInt(resultado.rows[0].count, 10) });
-    } catch (erro) {
-        console.error('Erro ao contar solucoes:', erro);
-        res.status(500).json({ erro: 'Erro interno no servidor' });
+        console.error('Erro ao avaliar solução:', erro);
+        res.status(500).json({ erro: 'Erro interno ao guardar a avaliação.' });
     }
 };
 
 module.exports = {
-    contarSolucoes,
     listarDesafios,
     obterDesafioPorId,
     criarDesafio,
     atualizarDesafio,
     deletarDesafio,
-    submeterSolucao
+    listarSolucoes,
+    avaliarSolucao
 };

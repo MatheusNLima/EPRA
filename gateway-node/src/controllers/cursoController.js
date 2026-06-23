@@ -1,6 +1,6 @@
 const db = require('../config/db');
-const fs = require('fs'); // ADICIONADO: Para interagir com os ficheiros do disco
-const path = require('path'); // ADICIONADO: Para resolver os caminhos das pastas
+const fs = require('fs'); 
+const path = require('path'); 
 
 // 1. Criar um novo curso
 const criarCurso = async (req, res) => {
@@ -17,7 +17,7 @@ const criarCurso = async (req, res) => {
     }
 };
 
-// 2. Listar todos os cursos (AGORA COM CÁLCULO DINÂMICO DE VAGAS)
+// 2. Listar todos os cursos (AGORA COM NOME DA TABELA CORRIGIDO)
 const listarCursos = async (req, res) => {
     try {
         // A MÁGICA: Subtrai a quantidade de inscritos do total de vagas original do curso
@@ -27,7 +27,7 @@ const listarCursos = async (req, res) => {
             FROM curso c
             LEFT JOIN (
                 SELECT curso_id, COUNT(*) AS qtd 
-                FROM inscricao_curso 
+                FROM inscricao 
                 GROUP BY curso_id
             ) i ON c.id = i.curso_id
             ORDER BY c.datainicio ASC
@@ -102,5 +102,4 @@ const excluirCurso = async (req, res) => {
     }
 };
 
-// Repare que o excluirCurso está correto aqui para não quebrar a sua rota!
 module.exports = { criarCurso, listarCursos, obterCurso, atualizarCurso, excluirCurso };

@@ -1,7 +1,5 @@
 ﻿let tutoriaisCarregados = [];
 let imagensMantidas = [];
-let portfolioCarregados = [];
-let imagensMantidasPortfolio = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
@@ -12,23 +10,25 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     const user = JSON.parse(userStr);
+    
+    // Adicionado ALUNO_INTERNO para suportar as atualizações da equipa
     if (user.tipo !== 'COORDENADOR' && user.tipo !== 'ORIENTADOR' && user.tipo !== 'ADMIN' && user.tipo !== 'ALUNO_INTERNO') {
         window.location.href = 'login.html'; 
         return;
     }
 
-    // ­ƒøí´©Å ESCUDO DE UX: Defesa contra fecho prematuro do HTML
-    // Varremos todos os bot├Áes de submiss├úo do painel e removemos ordens diretas de fecho.
-    // Assim, apenas o JavaScript decide quando o modal pode ser fechado (apenas no sucesso!).
+    // Escudo de UX
     document.querySelectorAll('form button[type="submit"]').forEach(btn => {
         btn.removeAttribute('onclick');
         btn.removeAttribute('data-dismiss');
         btn.removeAttribute('data-bs-dismiss');
     });
 
+    // Carregar todas as abas iniciais
     carregarCursosAdmin();
     carregarVagasAdmin();
     carregarTutoriaisAdmin();
+    carregarBibliotecaAdmin();
     carregarPortfolioAdmin();
     carregarDesafiosAdmin();
 
@@ -39,7 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (inputEditData) inputEditData.min = hojeStr;
 });
 
-// --- FUN├ç├òES DE INTERFACE ---
+// ============================================================================
+// --- FUNÇÕES DE INTERFACE GERAL ---
+// ============================================================================
 window.abrirAba = function(evento, idAba) {
     const conteudos = document.getElementsByClassName("tab-content");
     for (let i = 0; i < conteudos.length; i++) conteudos[i].classList.remove("active");
@@ -63,19 +65,18 @@ window.fecharModal = function(idModal) {
     document.getElementById(idModal).style.display = 'none';
     const form = document.querySelector(`#${idModal} form`);
     if (form) form.reset();
+    
     const msgCurso = document.getElementById(idModal === 'modalCurso' ? 'mensagemFeedback' : 'msgEditFeedback');
     if (msgCurso) msgCurso.style.display = 'none';
+    
     const msgVaga = document.getElementById(idModal === 'modalVaga' ? 'mensagemFeedbackVaga' : 'msgEditFeedbackVaga');
     if (msgVaga) msgVaga.style.display = 'none';
     
-    const msgDesafio = document.getElementById(idModal === 'modalDesafio' ? 'mensagemFeedbackDesafio' : 'msgEditFeedbackDesafio');
-    if (msgDesafio) msgDesafio.style.display = 'none';
-
     const msgTutorial = document.getElementById(idModal === 'modalTutorial' ? 'mensagemFeedbackTutorial' : 'msgEditFeedbackTutorial');
     if (msgTutorial) msgTutorial.style.display = 'none';
 
-    const msgPortfolio = document.getElementById(idModal === 'modalPortfolio' ? 'mensagemFeedbackPortfolio' : 'msgEditFeedbackPortfolio');
-    if (msgPortfolio) msgPortfolio.style.display = 'none';
+    const msgDesafio = document.getElementById(idModal === 'modalDesafio' ? 'mensagemFeedbackDesafio' : 'msgEditFeedbackDesafio');
+    if (msgDesafio) msgDesafio.style.display = 'none';
 
     if (idModal === 'modalTutorial' || idModal === 'modalEditarTutorial') {
         const previewCriar = document.getElementById('previewImagensTutorial');
@@ -91,21 +92,6 @@ window.fecharModal = function(idModal) {
         const btnAtualizar = document.getElementById('btnAtualizarTutorial');
         if (btnAtualizar) btnAtualizar.disabled = false;
     }
-
-    if (idModal === 'modalPortfolio' || idModal === 'modalEditarPortfolio') {
-        const previewCriar = document.getElementById('previewImagensPortfolio');
-        if (previewCriar) previewCriar.innerHTML = '';
-        const previewNovoEditar = document.getElementById('previewNovasImagensPortfolio');
-        if (previewNovoEditar) previewNovoEditar.innerHTML = '';
-        const containerExistente = document.getElementById('containerImagensExistentesPortfolio');
-        if (containerExistente) containerExistente.innerHTML = '';
-        imagensMantidasPortfolio = [];
-        
-        const btnSalvar = document.getElementById('btnSalvarPortfolio');
-        if (btnSalvar) btnSalvar.disabled = false;
-        const btnAtualizar = document.getElementById('btnAtualizarPortfolio');
-        if (btnAtualizar) btnAtualizar.disabled = false;
-    }
 };
 
 window.logout = function() {
@@ -114,7 +100,6 @@ window.logout = function() {
     window.location.href = 'login.html';
 };
 
-// --- GEST├âO DE CURSOS ---
 window.verificarStatusResponse = function(response) {
     if (response.status === 401 || response.status === 403) {
         alert('Sua sessão expirou ou é inválida. Por favor, inicie sessão novamente.');
@@ -124,22 +109,23 @@ window.verificarStatusResponse = function(response) {
     return true;
 };
 
-// --- FUN├ç├òES DE COMUNICA├ç├âO COM O BACKEND ---
+// ============================================================================
+// --- GESTÃO DE CURSOS ---
+// ============================================================================
 
 async function carregarCursosAdmin() {
     const tbody = document.getElementById('corpoTabelaCursos');
     if (!tbody) return;
-    
     const token = localStorage.getItem('token');
 
     try {
-        const response = await fetch(`${API_BASE_URL}/cursos`, {
+        const response = await fetch('http://localhost:3000/api/cursos', {
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (!response.ok) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Erro na resposta do servidor ao listar cursos.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Erro na resposta do servidor.</td></tr>';
             return;
         }
 
@@ -159,7 +145,7 @@ async function carregarCursosAdmin() {
                     <td>${dataFormatada}</td>
                     <td>${curso.vagas}</td>
                     <td>
-                        <button class="btn-sm btn-info" onclick="gerenciarInscritos(${curso.id}, '${curso.titulo}')">­ƒæÑ Inscritos</button>
+                        <button class="btn-sm btn-info" onclick="gerenciarInscritos(${curso.id}, '${curso.titulo.replace(/'/g, "\\'")}')">👥 Inscritos</button>
                         <button class="btn-sm btn-edit" onclick="editarCurso(${curso.id})">Editar</button>
                         <button class="btn-sm btn-delete" onclick="excluirCurso(${curso.id})">Excluir</button>
                     </td>
@@ -171,8 +157,10 @@ async function carregarCursosAdmin() {
     }
 }
 
-document.getElementById('formCurso').addEventListener('submit', async (e) => {
-    e.preventDefault();
+window.salvarNovoCurso = async function() {
+    const form = document.getElementById('formCurso');
+    if (!form.reportValidity()) return;
+
     const curso = {
         titulo: document.getElementById('tituloCurso').value,
         descricao: document.getElementById('descricaoCurso').value,
@@ -183,7 +171,7 @@ document.getElementById('formCurso').addEventListener('submit', async (e) => {
     const msgFeedback = document.getElementById('mensagemFeedback');
 
     try {
-        const response = await fetch(`${API_BASE_URL}/cursos`, {
+        const response = await fetch('http://localhost:3000/api/cursos', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify(curso)
@@ -195,7 +183,7 @@ document.getElementById('formCurso').addEventListener('submit', async (e) => {
             msgFeedback.innerText = 'Curso criado com sucesso!';
             msgFeedback.style.color = '#28a745';
             msgFeedback.style.display = 'block';
-            document.getElementById('formCurso').reset();
+            form.reset();
             carregarCursosAdmin();
             setTimeout(() => { fecharModal('modalCurso'); }, 1500);
         } else {
@@ -204,16 +192,16 @@ document.getElementById('formCurso').addEventListener('submit', async (e) => {
             msgFeedback.style.display = 'block';
         }
     } catch (err) {
-        msgFeedback.innerText = 'Servidor indispon├¡vel.';
+        msgFeedback.innerText = 'Servidor indisponível.';
         msgFeedback.style.color = '#d9534f';
         msgFeedback.style.display = 'block';
     }
-});
+};
 
 window.editarCurso = async function(id) {
     try {
-        const response = await fetch(`${API_BASE_URL}/cursos/${id}`);
-        if (!response.ok) throw new Error('Curso n├úo encontrado');
+        const response = await fetch(`http://localhost:3000/api/cursos/${id}`);
+        if (!response.ok) throw new Error('Curso não encontrado');
         const curso = await response.json();
 
         document.getElementById('editIdCurso').value = curso.id;
@@ -235,8 +223,10 @@ window.editarCurso = async function(id) {
     }
 };
 
-document.getElementById('formEditarCurso').addEventListener('submit', async (e) => {
-    e.preventDefault();
+window.salvarEdicaoCurso = async function() {
+    const form = document.getElementById('formEditarCurso');
+    if (!form.reportValidity()) return;
+
     const id = document.getElementById('editIdCurso').value;
     const cursoAtualizado = {
         titulo: document.getElementById('editTitulo').value,
@@ -249,7 +239,7 @@ document.getElementById('formEditarCurso').addEventListener('submit', async (e) 
     const msgFeedback = document.getElementById('msgEditFeedback');
 
     try {
-        const response = await fetch(`${API_BASE_URL}/cursos/${id}`, {
+        const response = await fetch(`http://localhost:3000/api/cursos/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify(cursoAtualizado)
@@ -264,16 +254,16 @@ document.getElementById('formEditarCurso').addEventListener('submit', async (e) 
             carregarCursosAdmin();
             setTimeout(() => { fecharModal('modalEditarCurso'); }, 1500);
         } else {
-            msgFeedback.innerText = 'Erro ao atualizar. Verifica as permiss├Áes.';
+            msgFeedback.innerText = 'Erro ao atualizar. Verifica as permissões.';
             msgFeedback.style.color = '#d9534f';
             msgFeedback.style.display = 'block';
         }
     } catch (err) {
-        msgFeedback.innerText = 'Servidor indispon├¡vel.';
+        msgFeedback.innerText = 'Servidor indisponível.';
         msgFeedback.style.color = '#d9534f';
         msgFeedback.style.display = 'block';
     }
-});
+};
 
 window.excluirCurso = function(id) {
     document.getElementById('idParaExcluir').value = id;
@@ -285,7 +275,7 @@ window.confirmarExclusao = async function() {
     const token = localStorage.getItem('token');
     
     try {
-        const response = await fetch(`${API_BASE_URL}/cursos/${id}`, {
+        const response = await fetch(`http://localhost:3000/api/cursos/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -300,11 +290,13 @@ window.confirmarExclusao = async function() {
         }
     } catch (error) {
         console.error(error);
-        alert("Servidor indispon├¡vel.");
+        alert("Servidor indisponível.");
     }
 };
 
-// --- GEST├âO DE ALUNOS E INSCRI├ç├òES ---
+// ============================================================================
+// --- GESTÃO DE ALUNOS INSCRITOS ---
+// ============================================================================
 
 window.gerenciarInscritos = async function(cursoId, tituloCurso) {
     document.getElementById('tituloModalInscritos').innerText = `Inscritos: ${tituloCurso}`;
@@ -318,18 +310,15 @@ window.gerenciarInscritos = async function(cursoId, tituloCurso) {
 async function atualizarTabelaInscritos(cursoId) {
     const tbody = document.getElementById('corpoTabelaInscritos');
     tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Buscando alunos...</td></tr>';
-    
     const token = localStorage.getItem('token');
 
     try {
-        const response = await fetch(`${API_BASE_URL}/inscricoes/curso/${cursoId}`, {
+        const response = await fetch(`http://localhost:3000/api/inscricoes/curso/${cursoId}`, {
             method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+            headers: { 'Authorization': `Bearer ${token}` }
         });
 
-        if (!response.ok) throw new Error('Acesso negado pelo servidor');
+        if (!response.ok) throw new Error('Acesso negado');
 
         const inscritos = await response.json();
         tbody.innerHTML = '';
@@ -341,7 +330,6 @@ async function atualizarTabelaInscritos(cursoId) {
 
         inscritos.forEach(aluno => {
             const nomeSeguro = aluno.nome ? aluno.nome.replace(/'/g, "\\'") : '';
-            
             let btnTermo = '<span style="color:#999; font-size:0.85rem;">Sem anexo</span>';
             if (aluno.termo_consentimento) {
                 const caminhoCorrigido = aluno.termo_consentimento.replace(/\\/g, '/');
@@ -370,8 +358,10 @@ window.exibirFormularioInscricaoManual = function() {
     document.getElementById('formInscricaoManual').style.display = 'block';
 };
 
-document.getElementById('formInscricaoManual').addEventListener('submit', async (e) => {
-    e.preventDefault();
+window.salvarInscricaoManual = async function() {
+    const form = document.getElementById('formInscricaoManual');
+    if (!form.reportValidity()) return;
+
     const cursoId = document.getElementById('manualCursoId').value;
     const token = localStorage.getItem('token');
 
@@ -383,7 +373,7 @@ document.getElementById('formInscricaoManual').addEventListener('submit', async 
     };
 
     try {
-        const response = await fetch(`${API_BASE_URL}/inscricoes`, {
+        const response = await fetch('http://localhost:3000/api/inscricoes', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify(dados)
@@ -391,25 +381,23 @@ document.getElementById('formInscricaoManual').addEventListener('submit', async 
 
         if (response.ok) {
             alert('Aluno inscrito manualmente com sucesso!');
-            document.getElementById('formInscricaoManual').reset();
-            // A JANELA S├ô SE ESCONDE AQUI, SE TUDO CORRER BEM:
-            document.getElementById('formInscricaoManual').style.display = 'none';
+            form.reset();
+            form.style.display = 'none';
             atualizarTabelaInscritos(cursoId);
         } else {
             const erroData = await response.json();
-            alert(`ÔÜá´©Å Aten├º├úo: ${erroData.erro}`);
-            // Se der erro, n├úo fazemos nada! O formul├írio fica intoc├ível e aberto.
+            alert(`⚠️ Atenção: ${erroData.erro}`);
         }
     } catch (error) {
         alert('Servidor fora do ar.');
     }
-});
+};
 
 window.removerInscrito = async function(inscricaoId, cursoId) {
-    if (confirm("Deseja mesmo cancelar a inscri├º├úo deste aluno?")) {
+    if (confirm("Deseja mesmo cancelar a inscrição deste aluno?")) {
         const token = localStorage.getItem('token');
         try {
-            const response = await fetch(`${API_BASE_URL}/inscricoes/${inscricaoId}`, {
+            const response = await fetch(`http://localhost:3000/api/inscricoes/${inscricaoId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -419,7 +407,7 @@ window.removerInscrito = async function(inscricaoId, cursoId) {
                 alert('Erro ao cancelar.');
             }
         } catch (error) {
-            alert('Erro de conex├úo.');
+            alert('Erro de conexão.');
         }
     }
 };
@@ -434,8 +422,10 @@ window.abrirEdicaoInscrito = function(id, nome, documento, email, cursoId) {
     abrirModal('modalEditarInscrito');
 };
 
-document.getElementById('formEditarInscrito').addEventListener('submit', async (e) => {
-    e.preventDefault();
+window.salvarEdicaoInscrito = async function() {
+    const form = document.getElementById('formEditarInscrito');
+    if (!form.reportValidity()) return;
+
     const id = document.getElementById('editInscritoId').value;
     const cursoId = document.getElementById('editInscritoCursoId').value;
     const token = localStorage.getItem('token');
@@ -447,7 +437,7 @@ document.getElementById('formEditarInscrito').addEventListener('submit', async (
     };
 
     try {
-        const response = await fetch(`${API_BASE_URL}/inscricoes/${id}`, {
+        const response = await fetch(`http://localhost:3000/api/inscricoes/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify(dados)
@@ -455,27 +445,27 @@ document.getElementById('formEditarInscrito').addEventListener('submit', async (
 
         if (response.ok) {
             alert('Dados do aluno atualizados com sucesso!');
-            // A JANELA S├ô SE FECHA AQUI:
             fecharModal('modalEditarInscrito');
             atualizarTabelaInscritos(cursoId);
         } else {
             const erroData = await response.json();
-            alert(`ÔÜá´©Å Aten├º├úo: ${erroData.erro}`);
-            // Se der erro, n├úo fazemos nada! O formul├írio fica intoc├ível e aberto.
+            alert(`⚠️ Atenção: ${erroData.erro}`);
         }
     } catch (error) {
-        alert('Servidor indispon├¡vel.');
+        alert('Servidor indisponível.');
     }
-});
+};
 
-// --- GEST├âO DE VAGAS ---
+// ============================================================================
+// --- GESTÃO DE VAGAS ---
+// ============================================================================
 
 async function carregarVagasAdmin() {
     const tbody = document.getElementById('corpoTabelaVagas');
     if(!tbody) return; 
     
     try {
-        const response = await fetch(`${API_BASE_URL}/vagas`);
+        const response = await fetch('http://localhost:3000/api/vagas');
         const vagas = await response.json();
         tbody.innerHTML = ''; 
         
@@ -503,60 +493,59 @@ async function carregarVagasAdmin() {
     }
 }
 
-const formVaga = document.getElementById('formVaga');
-if(formVaga) {
-    formVaga.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const titulo = document.getElementById('tituloVaga').value;
-        const descricao = document.getElementById('descricaoVaga').value;
-        const datalimite = document.getElementById('dataLimiteVaga').value;
-        const msgFeedback = document.getElementById('mensagemFeedbackVaga');
+window.salvarNovaVaga = async function() {
+    const form = document.getElementById('formVaga');
+    if (!form.reportValidity()) return;
 
-        const hoje = new Date();
-        hoje.setHours(0, 0, 0, 0);
-        const dataSelecionada = new Date(datalimite + 'T00:00:00');
+    const titulo = document.getElementById('tituloVaga').value;
+    const descricao = document.getElementById('descricaoVaga').value;
+    const datalimite = document.getElementById('dataLimiteVaga').value;
+    const msgFeedback = document.getElementById('mensagemFeedbackVaga');
 
-        if (dataSelecionada < hoje) {
-            msgFeedback.innerText = 'A data limite n├úo pode ser no passado.';
-            msgFeedback.style.color = '#d9534f';
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    const dataSelecionada = new Date(datalimite + 'T00:00:00');
+
+    if (dataSelecionada < hoje) {
+        msgFeedback.innerText = 'A data limite não pode ser no passado.';
+        msgFeedback.style.color = '#d9534f';
+        msgFeedback.style.display = 'block';
+        return;
+    }
+
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch('http://localhost:3000/api/vagas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ titulo, descricao, datalimite })
+        });
+
+        if (!window.verificarStatusResponse(response)) return;
+
+        if (response.ok) {
+            msgFeedback.innerText = 'Vaga criada com sucesso!';
+            msgFeedback.style.color = '#28a745';
             msgFeedback.style.display = 'block';
-            return;
-        }
-
-        const token = localStorage.getItem('token');
-        try {
-            const response = await fetch(`${API_BASE_URL}/vagas`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ titulo, descricao, datalimite })
-            });
-
-            if (!window.verificarStatusResponse(response)) return;
-
-            if (response.ok) {
-                msgFeedback.innerText = 'Vaga criada com sucesso!';
-                msgFeedback.style.color = '#28a745';
-                msgFeedback.style.display = 'block';
-                document.getElementById('formVaga').reset();
-                carregarVagasAdmin();
-                setTimeout(() => { fecharModal('modalVaga'); }, 1500);
-            } else {
-                msgFeedback.innerText = 'Erro ao criar a vaga.';
-                msgFeedback.style.color = '#d9534f';
-                msgFeedback.style.display = 'block';
-            }
-        } catch (err) {
-            msgFeedback.innerText = 'Servidor indispon├¡vel.';
+            form.reset();
+            carregarVagasAdmin();
+            setTimeout(() => { fecharModal('modalVaga'); }, 1500);
+        } else {
+            msgFeedback.innerText = 'Erro ao criar a vaga.';
             msgFeedback.style.color = '#d9534f';
             msgFeedback.style.display = 'block';
         }
-    });
-}
+    } catch (err) {
+        msgFeedback.innerText = 'Servidor indisponível.';
+        msgFeedback.style.color = '#d9534f';
+        msgFeedback.style.display = 'block';
+    }
+};
 
 window.editarVaga = async function(id) {
     try {
-        const response = await fetch(`${API_BASE_URL}/vagas/${id}`);
-        if (!response.ok) throw new Error('Vaga n├úo encontrada');
+        const response = await fetch(`http://localhost:3000/api/vagas/${id}`);
+        if (!response.ok) throw new Error('Vaga não encontrada');
         const vaga = await response.json();
 
         document.getElementById('editIdVaga').value = vaga.id;
@@ -564,10 +553,8 @@ window.editarVaga = async function(id) {
         document.getElementById('editDescricaoVaga').value = vaga.descricao;
         
         if (vaga.datalimite) {
-            let dataString = '';
-            if (typeof vaga.datalimite === 'string') {
-                dataString = vaga.datalimite.substring(0, 10);
-            } else {
+            let dataString = typeof vaga.datalimite === 'string' ? vaga.datalimite.substring(0, 10) : '';
+            if (!dataString) {
                 const dateObj = new Date(vaga.datalimite);
                 const ano = dateObj.getFullYear();
                 const mes = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -583,55 +570,54 @@ window.editarVaga = async function(id) {
     }
 };
 
-const formEditarVaga = document.getElementById('formEditarVaga');
-if(formEditarVaga) {
-    formEditarVaga.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const id = document.getElementById('editIdVaga').value;
-        const titulo = document.getElementById('editTituloVaga').value;
-        const descricao = document.getElementById('editDescricaoVaga').value;
-        const datalimite = document.getElementById('editDataLimiteVaga').value;
-        const msgFeedback = document.getElementById('msgEditFeedbackVaga');
+window.salvarEdicaoVaga = async function() {
+    const form = document.getElementById('formEditarVaga');
+    if (!form.reportValidity()) return;
 
-        const hoje = new Date();
-        hoje.setHours(0, 0, 0, 0);
-        const dataSelecionada = new Date(datalimite + 'T00:00:00');
+    const id = document.getElementById('editIdVaga').value;
+    const titulo = document.getElementById('editTituloVaga').value;
+    const descricao = document.getElementById('editDescricaoVaga').value;
+    const datalimite = document.getElementById('editDataLimiteVaga').value;
+    const msgFeedback = document.getElementById('msgEditFeedbackVaga');
 
-        if (dataSelecionada < hoje) {
-            msgFeedback.innerText = 'A data limite n├úo pode ser no passado.';
-            msgFeedback.style.color = '#d9534f';
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    const dataSelecionada = new Date(datalimite + 'T00:00:00');
+
+    if (dataSelecionada < hoje) {
+        msgFeedback.innerText = 'A data limite não pode ser no passado.';
+        msgFeedback.style.color = '#d9534f';
+        msgFeedback.style.display = 'block';
+        return;
+    }
+
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`http://localhost:3000/api/vagas/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ titulo, descricao, datalimite })
+        });
+
+        if (!window.verificarStatusResponse(response)) return;
+
+        if (response.ok) {
+            msgFeedback.innerText = 'Vaga atualizada com sucesso!';
+            msgFeedback.style.color = '#28a745';
             msgFeedback.style.display = 'block';
-            return;
-        }
-
-        const token = localStorage.getItem('token');
-        try {
-            const response = await fetch(`${API_BASE_URL}/vagas/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ titulo, descricao, datalimite })
-            });
-
-            if (!window.verificarStatusResponse(response)) return;
-
-            if (response.ok) {
-                msgFeedback.innerText = 'Vaga atualizada com sucesso!';
-                msgFeedback.style.color = '#28a745';
-                msgFeedback.style.display = 'block';
-                carregarVagasAdmin();
-                setTimeout(() => { fecharModal('modalEditarVaga'); }, 1500);
-            } else {
-                msgFeedback.innerText = 'Erro ao atualizar. Verifica as permiss├Áes.';
-                msgFeedback.style.color = '#d9534f';
-                msgFeedback.style.display = 'block';
-            }
-        } catch (err) {
-            msgFeedback.innerText = 'Servidor indispon├¡vel.';
+            carregarVagasAdmin();
+            setTimeout(() => { fecharModal('modalEditarVaga'); }, 1500);
+        } else {
+            msgFeedback.innerText = 'Erro ao atualizar. Verifica as permissões.';
             msgFeedback.style.color = '#d9534f';
             msgFeedback.style.display = 'block';
         }
-    });
-}
+    } catch (err) {
+        msgFeedback.innerText = 'Servidor indisponível.';
+        msgFeedback.style.color = '#d9534f';
+        msgFeedback.style.display = 'block';
+    }
+};
 
 window.excluirVaga = function(id) {
     document.getElementById('idParaExcluirVaga').value = id;
@@ -643,7 +629,7 @@ window.confirmarExclusaoVaga = async function() {
     const token = localStorage.getItem('token');
     
     try {
-        const response = await fetch(`${API_BASE_URL}/vagas/${id}`, {
+        const response = await fetch(`http://localhost:3000/api/vagas/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -657,19 +643,69 @@ window.confirmarExclusaoVaga = async function() {
             alert("Erro ao excluir a vaga.");
         }
     } catch (error) {
-        console.error(error);
-        alert("Servidor indispon├¡vel.");
+        alert("Servidor indisponível.");
     }
 };
 
-// --- GEST├âO DE TUTORIAIS ---
+// ============================================================================
+// --- GESTÃO DE CANDIDATOS (Vagas) ---
+// ============================================================================
+
+window.gerenciarCandidatos = async function(vagaId, tituloVaga) {
+    document.getElementById('tituloModalCandidatos').innerText = `Candidatos à Vaga: ${tituloVaga}`;
+    const tbody = document.getElementById('corpoTabelaCandidatos');
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">A procurar candidatos...</td></tr>';
+    
+    abrirModal('modalCandidatos');
+
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`http://localhost:3000/api/vagas/${vagaId}/candidaturas-admin`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Falha ao carregar');
+
+        const candidatos = await response.json();
+        tbody.innerHTML = '';
+
+        if (candidatos.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Ninguém se candidatou a esta vaga ainda.</td></tr>';
+            return;
+        }
+
+        candidatos.forEach(cand => {
+            let linkLinkedin = cand.linkedin ? `<a href="${cand.linkedin}" target="_blank" style="color: #007bff; text-decoration: underline;">Ver Perfil</a>` : '-';
+            let caminhoPDF = cand.curriculo_path ? cand.curriculo_path.replace(/\\/g, '/') : '';
+            let btnCurriculo = caminhoPDF ? `<a href="http://localhost:3000/uploads/${caminhoPDF}" target="_blank" class="btn-sm btn-info" style="text-decoration:none; display:inline-block;">Ver PDF</a>` : 'Sem anexo';
+
+            tbody.innerHTML += `
+                <tr>
+                    <td style="font-weight: 500;">${cand.nome}</td>
+                    <td>${cand.curso}</td>
+                    <td>${cand.email}</td>
+                    <td>${cand.telefone}</td>
+                    <td>${linkLinkedin}</td>
+                    <td>${btnCurriculo}</td>
+                </tr>
+            `;
+        });
+    } catch (error) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Erro ao carregar dados.</td></tr>';
+    }
+};
+
+// ============================================================================
+// --- GESTÃO DE TUTORIAIS ---
+// ============================================================================
 
 async function carregarTutoriaisAdmin() {
     const tbody = document.getElementById('corpoTabelaTutoriais');
     if(!tbody) return;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/tutoriais`);
+        const response = await fetch('http://localhost:3000/api/tutoriais');
         if (!response.ok) {
             tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: red;">Erro ao ligar ao servidor.</td></tr>';
             return;
@@ -715,7 +751,7 @@ if (inputImagens) {
         btnSalvar.disabled = false;
         
         if (this.files.length > 5) {
-            feedback.innerText = 'O m├íximo de imagens permitido ├® 5.';
+            feedback.innerText = 'O máximo de imagens permitido é 5.';
             feedback.style.color = '#d9534f';
             feedback.style.display = 'block';
             btnSalvar.disabled = true;
@@ -730,57 +766,54 @@ if (inputImagens) {
     });
 }
 
-const formTutorial = document.getElementById('formTutorial');
-if (formTutorial) {
-    formTutorial.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const feedback = document.getElementById('mensagemFeedbackTutorial');
-        const btnSalvar = document.getElementById('btnSalvarTutorial');
-        
-        btnSalvar.disabled = true;
-        
-        const formData = new FormData(this);
-        const token = localStorage.getItem('token');
-        
-        try {
-            const response = await fetch(`${API_BASE_URL}/tutoriais`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` },
-                body: formData
-            });
-            
-            if (!window.verificarStatusResponse(response)) return;
+window.salvarNovoTutorial = async function() {
+    const form = document.getElementById('formTutorial');
+    if (!form.reportValidity()) return;
 
-            if (response.ok) {
-                feedback.innerText = 'Tutorial criado com sucesso!';
-                feedback.style.color = '#28a745';
-                feedback.style.display = 'block';
-                this.reset();
-                const preview = document.getElementById('previewImagensTutorial');
-                if (preview) preview.innerHTML = '';
-                carregarTutoriaisAdmin();
-                setTimeout(() => { fecharModal('modalTutorial'); }, 1500);
-            } else {
-                const data = await response.json();
-                feedback.innerText = data.error || 'Erro ao criar o tutorial.';
-                feedback.style.color = '#d9534f';
-                feedback.style.display = 'block';
-                btnSalvar.disabled = false;
-            }
-        } catch (err) {
-            feedback.innerText = 'Servidor indispon├¡vel.';
+    const feedback = document.getElementById('mensagemFeedbackTutorial');
+    const btnSalvar = document.getElementById('btnSalvarTutorial');
+    btnSalvar.disabled = true;
+    
+    const formData = new FormData(form);
+    const token = localStorage.getItem('token');
+    
+    try {
+        const response = await fetch('http://localhost:3000/api/tutoriais', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData
+        });
+        
+        if (!window.verificarStatusResponse(response)) return;
+
+        if (response.ok) {
+            feedback.innerText = 'Tutorial criado com sucesso!';
+            feedback.style.color = '#28a745';
+            feedback.style.display = 'block';
+            form.reset();
+            const preview = document.getElementById('previewImagensTutorial');
+            if (preview) preview.innerHTML = '';
+            carregarTutoriaisAdmin();
+            setTimeout(() => { fecharModal('modalTutorial'); }, 1500);
+        } else {
+            const data = await response.json();
+            feedback.innerText = data.error || 'Erro ao criar o tutorial.';
             feedback.style.color = '#d9534f';
             feedback.style.display = 'block';
             btnSalvar.disabled = false;
         }
-    });
-}
+    } catch (err) {
+        feedback.innerText = 'Servidor indisponível.';
+        feedback.style.color = '#d9534f';
+        feedback.style.display = 'block';
+        btnSalvar.disabled = false;
+    }
+};
 
 window.editarTutorial = function(id) {
     const tutorial = tutoriaisCarregados.find(t => t.id === id);
     if (!tutorial) {
-        alert('Tutorial n├úo encontrado.');
+        alert('Tutorial não encontrado.');
         return;
     }
     
@@ -843,7 +876,7 @@ window.validarQuantidadeImagensEditar = function() {
     
     if (totalQty > 5) {
         if (feedback) {
-            feedback.innerText = 'O total de imagens (mantidas + novas) n├úo pode exceder 5.';
+            feedback.innerText = 'O total de imagens (mantidas + novas) não pode exceder 5.';
             feedback.style.color = '#d9534f';
             feedback.style.display = 'block';
         }
@@ -875,55 +908,50 @@ if (inputEditNovo) {
     });
 }
 
-const formEditarTutorial = document.getElementById('formEditarTutorial');
-if (formEditarTutorial) {
-    formEditarTutorial.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const id = document.getElementById('editIdTutorial').value;
-        const feedback = document.getElementById('msgEditFeedbackTutorial');
-        const btnAtualizar = document.getElementById('btnAtualizarTutorial');
-        
-        if (!window.validarQuantidadeImagensEditar()) {
-            return;
-        }
-        
-        btnAtualizar.disabled = true;
-        
-        const formData = new FormData(this);
-        formData.set('imagens_mantidas', JSON.stringify(imagensMantidas));
-        const token = localStorage.getItem('token');
-        
-        try {
-            const response = await fetch(`${API_BASE_URL}/tutoriais/${id}`, {
-                method: 'PUT',
-                headers: { 'Authorization': `Bearer ${token}` },
-                body: formData
-            });
-            
-            if (!window.verificarStatusResponse(response)) return;
+window.salvarEdicaoTutorial = async function() {
+    const form = document.getElementById('formEditarTutorial');
+    if (!form.reportValidity()) return;
 
-            if (response.ok) {
-                feedback.innerText = 'Tutorial atualizado com sucesso!';
-                feedback.style.color = '#28a745';
-                feedback.style.display = 'block';
-                carregarTutoriaisAdmin();
-                setTimeout(() => { fecharModal('modalEditarTutorial'); }, 1500);
-            } else {
-                const data = await response.json();
-                feedback.innerText = data.error || 'Erro ao atualizar o tutorial.';
-                feedback.style.color = '#d9534f';
-                feedback.style.display = 'block';
-                btnAtualizar.disabled = false;
-            }
-        } catch (err) {
-            feedback.innerText = 'Servidor indispon├¡vel.';
+    const id = document.getElementById('editIdTutorial').value;
+    const feedback = document.getElementById('msgEditFeedbackTutorial');
+    const btnAtualizar = document.getElementById('btnAtualizarTutorial');
+    
+    if (!window.validarQuantidadeImagensEditar()) return;
+    btnAtualizar.disabled = true;
+    
+    const formData = new FormData(form);
+    formData.set('imagens_mantidas', JSON.stringify(imagensMantidas));
+    const token = localStorage.getItem('token');
+    
+    try {
+        const response = await fetch(`http://localhost:3000/api/tutoriais/${id}`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData
+        });
+        
+        if (!window.verificarStatusResponse(response)) return;
+
+        if (response.ok) {
+            feedback.innerText = 'Tutorial atualizado com sucesso!';
+            feedback.style.color = '#28a745';
+            feedback.style.display = 'block';
+            carregarTutoriaisAdmin();
+            setTimeout(() => { fecharModal('modalEditarTutorial'); }, 1500);
+        } else {
+            const data = await response.json();
+            feedback.innerText = data.error || 'Erro ao atualizar o tutorial.';
             feedback.style.color = '#d9534f';
             feedback.style.display = 'block';
             btnAtualizar.disabled = false;
         }
-    });
-}
+    } catch (err) {
+        feedback.innerText = 'Servidor indisponível.';
+        feedback.style.color = '#d9534f';
+        feedback.style.display = 'block';
+        btnAtualizar.disabled = false;
+    }
+};
 
 window.excluirTutorial = function(id) {
     document.getElementById('idParaExcluirTutorial').value = id;
@@ -935,7 +963,7 @@ window.confirmarExclusaoTutorial = async function() {
     const token = localStorage.getItem('token');
     
     try {
-        const response = await fetch(`${API_BASE_URL}/tutoriais/${id}`, {
+        const response = await fetch(`http://localhost:3000/api/tutoriais/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -949,62 +977,311 @@ window.confirmarExclusaoTutorial = async function() {
             alert('Erro ao excluir o tutorial.');
         }
     } catch (error) {
-        console.error(error);
-        alert('Servidor indispon├¡vel.');
+        alert('Servidor indisponível.');
     }
 };
 
-// =====================================================================// =====================================================================// --- GESTÃO DE CANDIDATOS (Vagas) ---
-// =====================================================================        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Erro ao carregar dados.</td></tr>';
-    }
-};
-        tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: red;">Erro ao carregar dados.</td></tr>';
+// ============================================================================
+// --- CRUD BIBLIOTECA (Materiais) ---
+// ============================================================================
+
+async function carregarBibliotecaAdmin() {
+    const tbody = document.getElementById('corpoTabelaBiblioteca');
+    if (!tbody) return;
+    try {
+        const response = await fetch('http://localhost:3000/api/materiais');
+        const materiais = await response.json();
+        tbody.innerHTML = '';
+
+        if (materiais.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhum material cadastrado ainda.</td></tr>';
+            return;
+        }
+
+        materiais.forEach(mat => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${mat.titulo}</td>
+                    <td>${mat.categoria}</td>
+                    <td>${mat.tipo}</td>
+                    <td>
+                        <button class="btn-sm btn-edit" onclick="editarBiblioteca(${mat.id}, '${mat.titulo.replace(/'/g, "\\'")}', '${mat.categoria}', '${mat.tipo}', '${mat.link}')">Editar</button>
+                        <button class="btn-sm btn-delete" onclick="abrirConfirmacaoBiblioteca(${mat.id})">Excluir</button>
+                    </td>
+                </tr>
+            `;
+        });
+    } catch (error) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Erro ao carregar dados da biblioteca.</td></tr>';
     }
 }
 
-const formDesafio = document.getElementById('formDesafio');
-if (formDesafio) {
-    formDesafio.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const titulo = document.getElementById('tituloDesafio').value;
-        const descricao = document.getElementById('descricaoDesafio').value;
-        const datalimite = document.getElementById('dataLimiteDesafio').value;
-        const msgFeedback = document.getElementById('mensagemFeedbackDesafio');
+window.abrirModalBiblioteca = function() {
+    document.getElementById('formBiblioteca').reset();
+    document.getElementById('bibId').value = '';
+    document.getElementById('tituloModalBiblioteca').innerText = 'Novo Material';
+    abrirModal('modalBiblioteca');
+};
 
-        const token = localStorage.getItem('token');
-        try {
-            const response = await fetch(`${API_BASE_URL}/desafios`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ titulo, descricao, datalimite })
-            });
+window.editarBiblioteca = function(id, titulo, categoria, tipo, link) {
+    document.getElementById('bibId').value = id;
+    document.getElementById('bibTitulo').value = titulo;
+    document.getElementById('bibCategoria').value = categoria;
+    document.getElementById('bibTipo').value = tipo;
+    document.getElementById('bibLink').value = link;
+    document.getElementById('tituloModalBiblioteca').innerText = 'Editar Material';
+    abrirModal('modalBiblioteca');
+};
 
-            if (!window.verificarStatusResponse(response)) return;
+window.salvarBiblioteca = async function() {
+    const form = document.getElementById('formBiblioteca');
+    if (!form.reportValidity()) return;
 
-            if (response.ok) {
-                msgFeedback.innerText = 'Desafio criado com sucesso!';
-                msgFeedback.style.color = '#28a745';
-                msgFeedback.style.display = 'block';
-                document.getElementById('formDesafio').reset();
-                carregarDesafiosAdmin();
-                setTimeout(() => { fecharModal('modalDesafio'); }, 1500);
-            } else {
-                const err = await response.json();
-                msgFeedback.innerText = err.erro || 'Erro ao criar o desafio.';
-                msgFeedback.style.color = '#d9534f';
-                msgFeedback.style.display = 'block';
+    const id = document.getElementById('bibId').value;
+    const dados = {
+        titulo: document.getElementById('bibTitulo').value,
+        categoria: document.getElementById('bibCategoria').value,
+        tipo: document.getElementById('bibTipo').value,
+        link: document.getElementById('bibLink').value
+    };
+
+    const metodo = id ? 'PUT' : 'POST';
+    const url = id ? `http://localhost:3000/api/materiais/${id}` : `http://localhost:3000/api/materiais`;
+    const token = localStorage.getItem('token');
+
+    try {
+        const response = await fetch(url, {
+            method: metodo,
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(dados)
+        });
+
+        if (!window.verificarStatusResponse(response)) return;
+
+        if (response.ok) {
+            fecharModal('modalBiblioteca');
+            carregarBibliotecaAdmin();
+        } else {
+            alert('Erro ao salvar material.');
+        }
+    } catch (error) {
+        alert('Servidor indisponível.');
+    }
+};
+
+window.abrirConfirmacaoBiblioteca = function(id) {
+    document.getElementById('idParaExcluirBiblioteca').value = id;
+    abrirModal('modalConfirmacaoBiblioteca');
+};
+
+window.confirmarExclusaoBiblioteca = async function() {
+    const id = document.getElementById('idParaExcluirBiblioteca').value;
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`http://localhost:3000/api/materiais/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!window.verificarStatusResponse(response)) return;
+        fecharModal('modalConfirmacaoBiblioteca');
+        carregarBibliotecaAdmin();
+    } catch (error) {
+        alert('Servidor indisponível.');
+    }
+};
+
+// ============================================================================
+// --- CRUD PORTFÓLIO ---
+// ============================================================================
+
+async function carregarPortfolioAdmin() {
+    const tbody = document.getElementById('corpoTabelaPortfolio');
+    if (!tbody) return;
+    try {
+        const response = await fetch('http://localhost:3000/api/portfolio');
+        const projetos = await response.json();
+        tbody.innerHTML = '';
+
+        if (projetos.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhum projeto cadastrado ainda.</td></tr>';
+            return;
+        }
+
+        projetos.forEach(proj => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${proj.titulo}</td>
+                    <td>${proj.autor}</td>
+                    <td><a href="${proj.link_github}" target="_blank">Acessar Repo</a></td>
+                    <td>
+                        <button class="btn-sm btn-edit" onclick="editarPortfolio(${proj.id}, '${proj.titulo.replace(/'/g, "\\'")}', '${proj.autor.replace(/'/g, "\\'")}', '${proj.descricao.replace(/'/g, "\\'")}', '${proj.link_github}')">Editar</button>
+                        <button class="btn-sm btn-delete" onclick="abrirConfirmacaoPortfolio(${proj.id})">Excluir</button>
+                    </td>
+                </tr>
+            `;
+        });
+    } catch (error) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Erro ao carregar projetos do portfólio.</td></tr>';
+    }
+}
+
+window.abrirModalPortfolio = function() {
+    document.getElementById('formPortfolio').reset();
+    document.getElementById('portId').value = '';
+    document.getElementById('tituloModalPortfolio').innerText = 'Novo Projeto';
+    abrirModal('modalPortfolio');
+};
+
+window.editarPortfolio = function(id, titulo, autor, descricao, link_github) {
+    document.getElementById('portId').value = id;
+    document.getElementById('portTitulo').value = titulo;
+    document.getElementById('portAutor').value = autor;
+    document.getElementById('portDescricao').value = descricao;
+    document.getElementById('portLink').value = link_github;
+    document.getElementById('tituloModalPortfolio').innerText = 'Editar Projeto';
+    abrirModal('modalPortfolio');
+};
+
+window.salvarPortfolio = async function() {
+    const form = document.getElementById('formPortfolio');
+    if (!form.reportValidity()) return;
+
+    const id = document.getElementById('portId').value;
+    const dados = {
+        titulo: document.getElementById('portTitulo').value,
+        autor: document.getElementById('portAutor').value,
+        descricao: document.getElementById('portDescricao').value,
+        link_github: document.getElementById('portLink').value
+    };
+
+    const metodo = id ? 'PUT' : 'POST';
+    const url = id ? `http://localhost:3000/api/portfolio/${id}` : `http://localhost:3000/api/portfolio`;
+    const token = localStorage.getItem('token');
+
+    try {
+        const response = await fetch(url, {
+            method: metodo,
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(dados)
+        });
+
+        if (!window.verificarStatusResponse(response)) return;
+
+        if (response.ok) {
+            fecharModal('modalPortfolio');
+            carregarPortfolioAdmin();
+        } else {
+            alert('Erro ao salvar projeto.');
+        }
+    } catch (error) {
+        alert('Servidor indisponível.');
+    }
+};
+
+window.abrirConfirmacaoPortfolio = function(id) {
+    document.getElementById('idParaExcluirPortfolio').value = id;
+    abrirModal('modalConfirmacaoPortfolio');
+};
+
+window.confirmarExclusaoPortfolio = async function() {
+    const id = document.getElementById('idParaExcluirPortfolio').value;
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`http://localhost:3000/api/portfolio/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!window.verificarStatusResponse(response)) return;
+        fecharModal('modalConfirmacaoPortfolio');
+        carregarPortfolioAdmin();
+    } catch (error) {
+        alert('Servidor indisponível.');
+    }
+};
+
+// ============================================================================
+// --- GESTÃO DE DESAFIOS ---
+// ============================================================================
+
+window.carregarDesafiosAdmin = async function() {
+    const tbody = document.getElementById('corpoTabelaDesafios');
+    if (!tbody) return;
+    try {
+        const response = await fetch('http://localhost:3000/api/desafios');
+        const desafios = await response.json();
+        tbody.innerHTML = '';
+
+        if (desafios.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhum desafio cadastrado ainda.</td></tr>';
+            return;
+        }
+
+        desafios.forEach(desafio => {
+            let prazo = 'A definir';
+            if (desafio.datalimite) {
+                const dateObj = new Date(desafio.datalimite);
+                prazo = dateObj.toLocaleDateString('pt-BR');
             }
-        } catch (err) {
-            msgFeedback.innerText = 'Servidor indisponível.';
+            
+            tbody.innerHTML += `
+                <tr>
+                    <td style="font-weight: 500;">${desafio.titulo}</td>
+                    <td>${prazo}</td>
+                    <td>
+                        <button class="btn-sm btn-info" onclick="verSolucoes(${desafio.id})">💡 Soluções</button>
+                        <button class="btn-sm btn-edit" onclick="editarDesafio(${desafio.id})">Editar</button>
+                        <button class="btn-sm btn-delete" onclick="excluirDesafio(${desafio.id})">Excluir</button>
+                    </td>
+                </tr>
+            `;
+        });
+    } catch (error) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Erro ao carregar desafios.</td></tr>';
+    }
+};
+
+window.salvarNovoDesafio = async function() {
+    const form = document.getElementById('formDesafio');
+    if (!form.reportValidity()) return;
+
+    const titulo = document.getElementById('tituloDesafio').value;
+    const descricao = document.getElementById('descricaoDesafio').value;
+    const datalimite = document.getElementById('dataLimiteDesafio').value;
+    const msgFeedback = document.getElementById('mensagemFeedbackDesafio');
+
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch('http://localhost:3000/api/desafios', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ titulo, descricao, datalimite })
+        });
+
+        if (!window.verificarStatusResponse(response)) return;
+
+        if (response.ok) {
+            msgFeedback.innerText = 'Desafio criado com sucesso!';
+            msgFeedback.style.color = '#28a745';
+            msgFeedback.style.display = 'block';
+            document.getElementById('formDesafio').reset();
+            carregarDesafiosAdmin();
+            setTimeout(() => { fecharModal('modalDesafio'); }, 1500);
+        } else {
+            const err = await response.json();
+            msgFeedback.innerText = err.erro || 'Erro ao criar o desafio.';
             msgFeedback.style.color = '#d9534f';
             msgFeedback.style.display = 'block';
         }
-    });
-}
+    } catch (err) {
+        msgFeedback.innerText = 'Servidor indisponível.';
+        msgFeedback.style.color = '#d9534f';
+        msgFeedback.style.display = 'block';
+    }
+};
 
 window.editarDesafio = async function(id) {
     try {
-        const response = await fetch(`${API_BASE_URL}/desafios/${id}`);
+        const response = await fetch(`http://localhost:3000/api/desafios/${id}`);
         if (!response.ok) throw new Error('Desafio não encontrado');
         const desafio = await response.json();
 
@@ -1032,44 +1309,43 @@ window.editarDesafio = async function(id) {
     }
 };
 
-const formEditarDesafio = document.getElementById('formEditarDesafio');
-if (formEditarDesafio) {
-    formEditarDesafio.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const id = document.getElementById('editIdDesafio').value;
-        const titulo = document.getElementById('editTituloDesafio').value;
-        const descricao = document.getElementById('editDescricaoDesafio').value;
-        const datalimite = document.getElementById('editDataLimiteDesafio').value;
-        const msgFeedback = document.getElementById('msgEditFeedbackDesafio');
+window.salvarEdicaoDesafio = async function() {
+    const form = document.getElementById('formEditarDesafio');
+    if (!form.reportValidity()) return;
 
-        const token = localStorage.getItem('token');
-        try {
-            const response = await fetch(`${API_BASE_URL}/desafios/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ titulo, descricao, datalimite })
-            });
+    const id = document.getElementById('editIdDesafio').value;
+    const titulo = document.getElementById('editTituloDesafio').value;
+    const descricao = document.getElementById('editDescricaoDesafio').value;
+    const datalimite = document.getElementById('editDataLimiteDesafio').value;
+    const msgFeedback = document.getElementById('msgEditFeedbackDesafio');
 
-            if (!window.verificarStatusResponse(response)) return;
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`http://localhost:3000/api/desafios/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ titulo, descricao, datalimite })
+        });
 
-            if (response.ok) {
-                msgFeedback.innerText = 'Desafio atualizado com sucesso!';
-                msgFeedback.style.color = '#28a745';
-                msgFeedback.style.display = 'block';
-                carregarDesafiosAdmin();
-                setTimeout(() => { fecharModal('modalEditarDesafio'); }, 1500);
-            } else {
-                msgFeedback.innerText = 'Erro ao atualizar. Verifica as permissões.';
-                msgFeedback.style.color = '#d9534f';
-                msgFeedback.style.display = 'block';
-            }
-        } catch (err) {
-            msgFeedback.innerText = 'Servidor indisponível.';
+        if (!window.verificarStatusResponse(response)) return;
+
+        if (response.ok) {
+            msgFeedback.innerText = 'Desafio atualizado com sucesso!';
+            msgFeedback.style.color = '#28a745';
+            msgFeedback.style.display = 'block';
+            carregarDesafiosAdmin();
+            setTimeout(() => { fecharModal('modalEditarDesafio'); }, 1500);
+        } else {
+            msgFeedback.innerText = 'Erro ao atualizar. Verifica as permissões.';
             msgFeedback.style.color = '#d9534f';
             msgFeedback.style.display = 'block';
         }
-    });
-}
+    } catch (err) {
+        msgFeedback.innerText = 'Servidor indisponível.';
+        msgFeedback.style.color = '#d9534f';
+        msgFeedback.style.display = 'block';
+    }
+};
 
 window.excluirDesafio = function(id) {
     document.getElementById('idParaExcluirDesafio').value = id;
@@ -1081,7 +1357,7 @@ window.confirmarExclusaoDesafio = async function() {
     const token = localStorage.getItem('token');
     
     try {
-        const response = await fetch(`${API_BASE_URL}/desafios/${id}`, {
+        const response = await fetch(`http://localhost:3000/api/desafios/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -1102,13 +1378,15 @@ window.confirmarExclusaoDesafio = async function() {
 
 window.verSolucoes = async function(desafioId) {
     const tbody = document.getElementById('corpoTabelaSolucoes');
+    if (!tbody) return;
+    
     tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">A carregar soluções...</td></tr>';
     abrirModal('modalVerSolucoes');
     
     const token = localStorage.getItem('token');
     
     try {
-        const response = await fetch(`${API_BASE_URL}/desafios/${desafioId}/solucoes`, {
+        const response = await fetch(`http://localhost:3000/api/desafios/${desafioId}/solucoes`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
@@ -1144,7 +1422,7 @@ window.verSolucoes = async function(desafioId) {
                                 <option value="Aprovado" ${sol.status === 'Aprovado' ? 'selected' : ''}>Aprovado</option>
                                 <option value="Reprovado" ${sol.status === 'Reprovado' ? 'selected' : ''}>Reprovado</option>
                             </select>
-                            <button class="btn-sm btn-primary" onclick="salvarNotaSolucao(${sol.id}, ${desafioId})">Salvar</button>
+                            <button class="btn-sm btn-info" onclick="salvarNotaSolucao(${sol.id}, ${desafioId})" style="margin-top: 5px;">Salvar</button>
                         </div>
                     </td>
                 </tr>
@@ -1162,7 +1440,7 @@ window.salvarNotaSolucao = async function(solucaoId, desafioId) {
     const token = localStorage.getItem('token');
     
     try {
-        const response = await fetch(`${API_BASE_URL}/desafios/solucoes/${solucaoId}`, {
+        const response = await fetch(`http://localhost:3000/api/desafios/solucoes/${solucaoId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ nota, status })
@@ -1172,7 +1450,7 @@ window.salvarNotaSolucao = async function(solucaoId, desafioId) {
         
         if (response.ok) {
             alert('Avaliação salva com sucesso!');
-            verSolucoes(desafioId); // recarregar
+            verSolucoes(desafioId); 
         } else {
             const err = await response.json();
             alert(`Erro: ${err.erro}`);
